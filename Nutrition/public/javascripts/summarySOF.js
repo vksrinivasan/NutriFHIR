@@ -3,12 +3,17 @@ function onReady(smart) {
   var patient = smart.patient;
   var pt = patient.read();
   var obv = smart.patient.api.fetchAll({
+
+    // Note - I don't know how to sort results by time or anything. Someone
+    // should figure that out
     type: 'Observation',
     query: {
       code: {
-        $or: ['http://loinc.org|3141-9'] // Body weight measured
+        $or: ['http://loinc.org|3141-9', // Body weight measured
+              'http://loinc.org|8302-2'] // Body height
       }
     }
+
   });
 
   $.when(pt, obv).fail(onError);
@@ -51,7 +56,15 @@ function onReady(smart) {
       $("#age-text").text(age + " yrs");
 
       /* Get Weight */
+      var byCodes = smart.byCodes(obv, 'code');
+      var weight = byCodes('3141-9');
+      console.log(getQuantityValueAndUnit(weight[0]));
+      $("#weight-text").text(getQuantityValueAndUnit(weight[0]));
 
+      /* Get Height */
+      var height = byCodes('8302-2');
+      console.log(getQuantityValueAndUnit(height[0]));
+      $("#height-text").text(getQuantityValueAndUnit(height[0]));
     }
   )
 }
@@ -89,6 +102,18 @@ function calculateAge(date) {
     return years + days / (isLeapYear(now.getFullYear()) ? 366 : 365);
   }
   else {
+    return undefined;
+  }
+}
+
+/* Helper Function to Get Quantity Value/Units for a Given Observation */
+function getQuantityValueAndUnit(ob) {
+  if (typeof ob != 'undefined' &&
+      typeof ob.valueQuantity != 'undefined' &&
+      typeof ob.valueQuantity.value != 'undefined' &&
+      typeof ob.valueQuantity.unit != 'undefined') {
+        return ob.valueQuantity.value + ' ' + ob.valueQuantity.unit;
+  } else {
     return undefined;
   }
 }
