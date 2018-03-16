@@ -1,0 +1,31 @@
+{
+  "name": "nutrition",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "postinstall": "cp -R node_modules/font-awesome/fonts ./public/"
+  },
+  "dependencies": {
+    "body-parser": "~1.16.0",
+    "bootstrap": "^4.0.0-alpha.6",
+    "connect-flash": "*",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.0",
+    "ejs": "~2.5.5",
+    "express": "~4.14.1",
+    "express-handlebars": "*",
+    "express-messages": "*",
+    "express-session": "*",
+    "express-validator": "~3.2.1",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.1.1",
+    "morgan": "~1.7.0",
+    "nodemon": "^1.11.0",
+    "passport": "*",
+    "passport-http": "*",
+    "passport-local": "*",
+    "serve-favicon": "~2.3.2",
+    "fhir.js": "file:../fhir.js"
+  }
+}

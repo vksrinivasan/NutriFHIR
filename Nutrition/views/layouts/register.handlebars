@@ -1,0 +1,59 @@
+<h2 class="page-header">Register</h2>
+{{#if errors}}
+  {{#each errors}}
+    <div class="alert alert-danger">{{msg}}</div>
+  {{/each}}
+{{/if}}
+<form method="post" action="/users/register">
+
+  <!-- First Name -->
+  <div class="form-group">
+    <label>First Name</label>
+    <input type="text" class="form-control"
+    placeholder="First Name" name="fName">
+  </div>
+
+  <!-- Last Name -->
+  <div class="form-group">
+    <label>Last Name</label>
+    <input type="text" class="form-control"
+    placeholder="Last Name" name="lName">
+  </div>
+
+  <!-- Email -->
+  <div class="form-group">
+    <label>Email</label>
+    <input type="email" class="form-control"
+    placeholder="Email" name="email">
+  </div>
+
+  <!-- Phone Number -->
+  <div class="form-group">
+    <label>Phone Number</label>
+    <input type="tel" class="form-control"
+    placeholder="x-(xxx)-xxx-xxxx" name="telNumber">
+  </div>
+
+  <!-- Username -->
+  <div class="form-group">
+    <label>Username</label>
+    <input type="text" class="form-control"
+    placeholder="Username" name="username">
+  </div>
+
+  <!-- Password -->
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" class="form-control"
+    placeholder="Password" name="password">
+  </div>
+
+  <!-- Password Re-Enter -->
+  <div class="form-group">
+    <label>Confirm Password</label>
+    <input type="password" class="form-control"
+    placeholder="Password" name="password2">
+  </div>
+
+  <button type="submit" class="btn btn-default">Submit</button>
+</form>

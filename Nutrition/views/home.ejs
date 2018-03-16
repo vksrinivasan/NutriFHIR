@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/css/tether.min.css" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+
+    <!-- JS -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/javascripts/main.js"></script>
+  </head>
+  <body>
+    
+    <header>
+      <%- include ./partials/header-home %>
+    </header>
+    <div class="container">
+      <%- include(page) %>  
+    </div>
+
+  </body>
+</html>

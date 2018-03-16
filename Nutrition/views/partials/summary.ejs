@@ -1,0 +1,132 @@
+<div class="col-sm-10 mx-auto">
+  <h1 id="name-text">Loading patient info...</h1>
+  <hr>
+  <div class="row">
+    <!-- Left Side -->
+    <div class="col-md-3">
+        <b>Gender:</b><br>
+        <b>Birth Date:</b><br>
+        <b>Age:</b><br>
+        <b>Weight:</b><br>
+        <b>Height:</b>
+    </div>
+    <div class="col-md-3">
+        <span id="gender-text">-</span><br>
+        <span id="birth-text">-</span><br>
+        <span id="age-text">-</span><br>
+        <span id="weight-text">-</span><br>
+        <span id="height-text">-</span><br>
+    </div>
+    <!-- /Left Side -->
+
+    <!-- Right Side -->
+    <!-- Left Side -->
+    <div class="col-md-3">
+        <b>Diabetes:</b><br>
+        <b>Hypertension:</b><br>
+        <b>Allergies:</b><br>
+    </div>
+    <div class="col-md-3">
+        -<br>
+        -<br>
+        -<br>
+    </div>
+    <!-- /Right Side -->
+  </div>
+
+  <hr>
+
+  <div class="measurement" id="nutrition-measurement">
+    <div class="measurement-header">
+      <div>
+        <h4>Nutrition Score</h4>
+      </div>
+      <div class="measurement-right">
+        <h4 id="nutrient-score" class="score"></h4>
+        <a href='#progress-chart' onclick="toggler('progress-chart');">
+          <img type="image/svg+xml"></img>
+        </a>
+      </div>
+    </div>
+
+    <div id="progress-chart" class='hidden' align="center">
+      <!-- Contents filled by JS -->
+    </div>
+  </div>
+
+  <div class="measurement" id="bmi-measurement">
+    <div class="measurement-header">
+      <div>
+        <h4>BMI (kg/m<sup>2</sup>)</h4>
+      </div>
+      <div class="measurement-right">
+        <h4 id="bmi-score" class="score"></h4>
+        <a href='#Chart1' onclick="toggler('Chart1');">
+          <img type="image/svg+xml"></img>
+        </a>
+      </div>
+    </div>
+
+    <div id="Chart1" class='hidden' align="center">
+      <!-- Contents filled by JS -->
+    </div>
+  </div>
+
+  <div class="measurement" id="HBA1C-measurement">
+    <div class="measurement-header">
+      <div>
+        <h4>HBA1C (mmol/mol)</h4>
+      </div>
+      <div class="measurement-right">
+        <h4 id="hba1c-score" class="score"></h4>
+        <a href='#Chart2' onclick="toggler('Chart2');">
+          <img type="image/svg+xml"></img>
+        </a>
+      </div>
+    </div>
+
+    <div id="Chart1" class='hidden' align="center">
+      <!-- Contents filled by JS -->
+    </div>
+  </div>
+
+  <div class="measurement" id="HDL-measurement">
+    <div class="measurement-header">
+      <div>
+        <h4>HDL (mmol/L)</h4>
+      </div>
+      <div class="measurement-right">
+        <h4 id="hdl-score" class="score"></h4>
+        <a href='#Chart3' onclick="toggler('Chart3');">
+          <img type="image/svg+xml"></img>
+        </a>
+      </div>
+    </div>
+
+    <div id="Chart3" class='hidden' align="center">
+      <!-- Contents filled by JS -->
+    </div>
+  </div>
+
+  <div class="measurement" id="LDL-measurement">
+    <div class="measurement-header">
+      <div>
+        <h4>LDL (mmol/L)</h4>
+      </div>
+      <div class="measurement-right">
+        <h4 id="ldl-score" class="score"></h4>
+        <a href='#Chart4' onclick="toggler('Chart4');">
+          <img type="image/svg+xml"></img>
+        </a>
+      </div>
+    </div>
+
+    <div id="Chart4" class='hidden' align="center">
+      <!-- Contents filled by JS -->
+    </div>
+  </div>
+</div>
+
+
+
+<script src="/javascripts/summary.js"></script>
