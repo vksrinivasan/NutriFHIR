@@ -10,17 +10,23 @@ function onReady(smart) {
     query: {
       code: {
         $or: ['http://loinc.org|3141-9', // Body weight measured
-              'http://loinc.org|8302-2'] // Body height
+              'http://loinc.org|8302-2', // Body height
+              'http://loinc.org|39156-5'] // BMI
       }
     }
 
   });
 
-  $.when(pt, obv).fail(onError);
-  $.when(pt, obv).done(
-    function(patient, obv) {
+  var cond = smart.patient.api.search({type: 'Condition'});
+  var meds = smart.patient.api.search({type: 'MedicationOrder'});
+
+  $.when(pt, obv, cond, meds).fail(onError);
+  $.when(pt, obv, cond, meds).done(
+    function(patient, obv, conditions, prescriptions) {
       console.log(patient);
       console.log(obv);
+      console.log(conditions);
+      console.log(prescriptions);
       /* Get Name */
       var fname = '';
       var lname = '';
@@ -65,6 +71,11 @@ function onReady(smart) {
       var height = byCodes('8302-2');
       console.log(getQuantityValueAndUnit(height[0]));
       $("#height-text").text(getQuantityValueAndUnit(height[0]));
+
+      /* Get BMI */
+      var BMI = byCodes('39156-5');
+      console.log(getQuantityValueAndUnit(BMI[0]));
+      $("#bmi-score").text(getQuantityValueAndUnit(BMI[0]));
     }
   )
 }
