@@ -127,22 +127,8 @@
   </div>
 </div>
 
+<script src="javascripts/summarySOF.js" type="text/javascript"></script>
 <script>
-  function onReady(smart) {
-    var patient = smart.patient;
-    var pt = patient.read();
-    $.when(pt).done(
-      function(patient) {
-        console.log(patient.gender);
-        $("#gender-text").text(patient.gender);
-      }
-    )
-  }
-  function onError() {
-    console.log('Loading error', arguments);
-  }
-
-
   FHIR.oauth2.ready(onReady, onError);
   console.log('hii');
 </script>
