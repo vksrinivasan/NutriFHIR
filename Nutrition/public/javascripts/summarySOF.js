@@ -16,17 +16,55 @@ function onReady(smart) {
     }
 
   });
+  var isDiabetic = 0;
+  var hasHypertension = false;
 
   var cond = smart.patient.api.search({type: 'Condition'});
   var meds = smart.patient.api.search({type: 'MedicationOrder'});
+  var allergies = smart.patient.api.search({type: 'AllergyIntolerance'});
 
-  $.when(pt, obv, cond, meds).fail(onError);
-  $.when(pt, obv, cond, meds).done(
-    function(patient, obv, conditions, prescriptions) {
+  /* Generate Medication List */
+  smart.patient.api.fetchAllWithReferences({type: "MedicationOrder"},["MedicationOrder.medicationReference"]).then(function(results, refs) {
+   results.forEach(function(prescription){
+        if (prescription.medicationCodeableConcept) {
+            displayMedication(prescription.medicationCodeableConcept.coding);
+        } else if (prescription.medicationReference) {
+            var med = refs(prescription, prescription.medicationReference);
+            displayMedication(med && med.code.coding || []);
+        }
+     });
+   });
+
+  /* Generate Problem List */
+  smart.patient.api.fetchAllWithReferences({type: 'Condition'}).then(function(results) {
+   results.forEach(function(condition){
+	if (condition.code.text !== "Entered In Error" && condition.category.text == "Problem") {
+          $("#problems-list").append("<p>" + condition.code.text + "</p>");
+	}
+	if (condition.code.text.toLowerCase().indexOf("diabetes") >= 0) {
+	  //console.log("Has diabetes");
+	  isDiabetic += 1;	
+	}
+     });
+   });
+
+  /* Generate Allergy List */
+  smart.patient.api.fetchAllWithReferences({type: 'AllergyIntolerance'}).then(function(results) {
+   results.forEach(function(allergy){
+	if (allergy.substance.coding) {
+          $("#allergies-list").append("<p>" + allergy.substance.text + "</p>");
+	}
+     });
+   });
+
+  $.when(pt, obv, cond, meds, allergies).fail(onError);
+  $.when(pt, obv, cond, meds, allergies).done(
+    function(patient, obv, conditions, prescriptions, allergies) {
       console.log(patient);
       console.log(obv);
       console.log(conditions);
       console.log(prescriptions);
+      console.log(allergies);
       /* Get Name */
       var fname = '';
       var lname = '';
@@ -60,6 +98,22 @@ function onReady(smart) {
       var age = parseInt(calculateAge(dob));
       console.log(age);
       $("#age-text").text(age + " yrs");
+
+      /* Print statuses for diabetes and hypertension */
+      console.log("Diabetes: " + isDiabetic);
+      if (isDiabetic > 0) {
+	$("#has-diabetes").text("Yes");
+      }
+      else {
+	$("#has-diabetes").text("No");
+      }
+
+      if (hasHypertension) {
+	$("#has-hypertension").text("Yes");
+      }
+      else {
+	$("#has-hypertension").text("No");
+      }
 
       /* Get Weight */
       var byCodes = smart.byCodes(obv, 'code');
@@ -127,4 +181,17 @@ function getQuantityValueAndUnit(ob) {
   } else {
     return undefined;
   }
+}
+
+/* Helper Functions to Generate Medication List From Search Results for MedicationOrders */
+function getMedicationName (medCodings) {
+  var coding = medCodings.find(function(c){
+    return c.system == "http://www.nlm.nih.gov/research/umls/rxnorm";
+  });
+
+  return coding && coding.display || "Unnamed Medication(TM)"
+}
+
+function displayMedication (medCodings) {
+  $("#med-list").append("<p>" + getMedicationName(medCodings) + "</p>");
 }
