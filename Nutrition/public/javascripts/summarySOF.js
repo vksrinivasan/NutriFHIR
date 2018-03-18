@@ -50,7 +50,7 @@ function onReady(smart) {
 	}
 	if (condition.code.text.toLowerCase().indexOf("diabetes") >= 0) {
 	  //console.log("Has diabetes");
-	  isDiabetic += 1;	
+	  isDiabetic += 1;
 	}
      });
    });
@@ -237,6 +237,7 @@ function getMedicationName (medCodings) {
 
 function displayMedication (medCodings) {
   $("#med-list").append("<p>" + getMedicationName(medCodings) + "</p>");
+}
 
 /*Define toggler function for the dropdown*/
 function toggler(divId) {
@@ -302,7 +303,7 @@ test= [
     data: [9,9, 8, 10, 6, 9, 7,8,7],
     pointPlacement: 'on'
 },
-]
+];
 
 /*Draw charts that are independant of FHIR calls*/
 window.onload=function() {
