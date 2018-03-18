@@ -30,39 +30,39 @@ function onReady(smart) {
 
   var allergies = smart.patient.api.search({type: 'AllergyIntolerance'});
 
-  /* Generate Medication List */
-  smart.patient.api.fetchAllWithReferences({type: "MedicationOrder"},["MedicationOrder.medicationReference"]).then(function(results, refs) {
-   results.forEach(function(prescription){
-        if (prescription.medicationCodeableConcept) {
-            displayMedication(prescription.medicationCodeableConcept.coding);
-        } else if (prescription.medicationReference) {
-            var med = refs(prescription, prescription.medicationReference);
-            displayMedication(med && med.code.coding || []);
-        }
-     });
-   });
+  // /* Generate Medication List */
+  // smart.patient.api.fetchAllWithReferences({type: "MedicationOrder"},["MedicationOrder.medicationReference"]).then(function(results, refs) {
+  //  results.forEach(function(prescription){
+  //       if (prescription.medicationCodeableConcept) {
+  //           displayMedication(prescription.medicationCodeableConcept.coding);
+  //       } else if (prescription.medicationReference) {
+  //           var med = refs(prescription, prescription.medicationReference);
+  //           displayMedication(med && med.code.coding || []);
+  //       }
+  //    });
+  //  });
+  //
+  // /* Generate Problem List */
+  // smart.patient.api.fetchAllWithReferences({type: 'Condition'}).then(function(results) {
+  //  results.forEach(function(condition){
+	// if (condition.code.text !== "Entered In Error" && condition.category.text == "Problem") {
+  //         $("#problems-list").append("<p>" + condition.code.text + "</p>");
+	// }
+	// if (condition.code.text.toLowerCase().indexOf("diabetes") >= 0) {
+	//   //console.log("Has diabetes");
+	//   isDiabetic += 1;
+	// }
+  //    });
+  //  });
 
-  /* Generate Problem List */
-  smart.patient.api.fetchAllWithReferences({type: 'Condition'}).then(function(results) {
-   results.forEach(function(condition){
-	if (condition.code.text !== "Entered In Error" && condition.category.text == "Problem") {
-          $("#problems-list").append("<p>" + condition.code.text + "</p>");
-	}
-	if (condition.code.text.toLowerCase().indexOf("diabetes") >= 0) {
-	  //console.log("Has diabetes");
-	  isDiabetic += 1;
-	}
-     });
-   });
-
-  /* Generate Allergy List */
-  smart.patient.api.fetchAllWithReferences({type: 'AllergyIntolerance'}).then(function(results) {
-   results.forEach(function(allergy){
-	if (allergy.substance.coding) {
-          $("#allergies-list").append("<p>" + allergy.substance.text + "</p>");
-	}
-     });
-   });
+  // /* Generate Allergy List */
+  // smart.patient.api.fetchAllWithReferences({type: 'AllergyIntolerance'}).then(function(results) {
+  //  results.forEach(function(allergy){
+	// if (allergy.substance.coding) {
+  //         $("#allergies-list").append("<p>" + allergy.substance.text + "</p>");
+	// }
+  //    });
+  //  });
 
   $.when(pt, obv, cond, meds, allergies).fail(onError);
   $.when(pt, obv, cond, meds, allergies).done(
