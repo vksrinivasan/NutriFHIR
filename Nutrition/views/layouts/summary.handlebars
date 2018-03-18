@@ -113,7 +113,7 @@
   <div class="measurement" id="HBA1C-measurement">
     <div class="measurement-header">
       <div>
-        <h4>HBA1C (mmol/mol)</h4>
+        <h4>HBA1C</h4>
       </div>
       <div class="measurement-right">
         <h4 id="hba1c-score" class="score"></h4>
@@ -128,10 +128,31 @@
     </div>
   </div>
 
+
+  <div class="measurement" id="cholesterol-measurement">
+    <div class="measurement-header">
+      <div>
+        <h4>Cholesterol in Serum</h4>
+      </div>
+      <div class="measurement-right">
+        <h4 id="chol" class="score"></h4>
+        <a href='#Chart5' onclick="toggler('Chart5');">
+          <img type="image/svg+xml"></img>
+        </a>
+      </div>
+    </div>
+
+    <div id="Chart5" class='hidden' align="center">
+      <!-- Contents filled by JS -->
+    </div>
+  </div>
+
+
+
   <div class="measurement" id="HDL-measurement">
     <div class="measurement-header">
       <div>
-        <h4>HDL (mmol/L)</h4>
+        <h4>HDL</h4>
       </div>
       <div class="measurement-right">
         <h4 id="hdl-score" class="score"></h4>
@@ -149,7 +170,7 @@
   <div class="measurement" id="LDL-measurement">
     <div class="measurement-header">
       <div>
-        <h4>LDL (mmol/L)</h4>
+        <h4>LDL</h4>
       </div>
       <div class="measurement-right">
         <h4 id="ldl-score" class="score"></h4>
