@@ -11,7 +11,13 @@ function onReady(smart) {
       code: {
         $or: ['http://loinc.org|3141-9', // Body weight measured
               'http://loinc.org|8302-2', // Body height
-              'http://loinc.org|39156-5'] // BMI
+              'http://loinc.org|39156-5', // BMI
+              'http://loinc.org|14647-2',//Cholesterol in serum(moles/volume)
+              'http://loinc.org|2093-3',//Cholesterol in serum(mass/volume)
+              'http://loinc.org|4548-4',//Hba1c
+              'http://loinc.org|2085-9',//HDL
+              'http://loinc.org|13457-7',//LDL
+            ]
       }
     }
 
@@ -23,10 +29,10 @@ function onReady(smart) {
   $.when(pt, obv, cond, meds).fail(onError);
   $.when(pt, obv, cond, meds).done(
     function(patient, obv, conditions, prescriptions) {
-      console.log(patient);
-      console.log(obv);
-      console.log(conditions);
-      console.log(prescriptions);
+      //console.log(patient);
+      //console.log(obv);
+      //console.log(conditions);
+      //console.log(prescriptions);
       /* Get Name */
       var fname = '';
       var lname = '';
@@ -34,15 +40,15 @@ function onReady(smart) {
         fname = patient.name[0].given.join(' ').toLowerCase();
         lname = patient.name[0].family.join(' ').toLowerCase();
       }
-      console.log(titleCase(fname));
-      console.log(titleCase(lname));
+      //console.log(titleCase(fname));
+      //console.log(titleCase(lname));
 
       $("#name-text").text(
         titleCase(lname) + ', ' + titleCase(fname)
       );
 
       /* Get Patient Gender */
-      console.log(patient.gender);
+      //console.log(patient.gender);
       $("#gender-text").text(
         titleCase(patient.gender)
       );
@@ -53,29 +59,64 @@ function onReady(smart) {
       var monthIndex = dob.getMonth() + 1;
       var year = dob.getFullYear();
       var dobStr = monthIndex + "/" + day + '/' + year;
-      console.log(dobStr);
+      //console.log(dobStr);
       $("#birth-text").text(dobStr);
 
       /* Get Age */
       var age = parseInt(calculateAge(dob));
-      console.log(age);
+      //console.log(age);
       $("#age-text").text(age + " yrs");
 
       /* Get Weight */
       var byCodes = smart.byCodes(obv, 'code');
       var weight = byCodes('3141-9');
-      console.log(getQuantityValueAndUnit(weight[0]));
+      //console.log(getQuantityValueAndUnit(weight[0]));
       $("#weight-text").text(getQuantityValueAndUnit(weight[0]));
 
       /* Get Height */
       var height = byCodes('8302-2');
-      console.log(getQuantityValueAndUnit(height[0]));
+      //console.log(getQuantityValueAndUnit(height[0]));
       $("#height-text").text(getQuantityValueAndUnit(height[0]));
 
       /* Get BMI */
       var BMI = byCodes('39156-5');
-      console.log(getQuantityValueAndUnit(BMI[0]));
+      //console.log(getQuantityValueAndUnit(BMI[0]));
       $("#bmi-score").text(getQuantityValueAndUnit(BMI[0]));
+      drawGraph("Chart1",'BMI',BMI,24.9,18.5,'BMI','BMI kg/m2',0,50)
+
+      /*Get Cholesterol(moles/volume) in Serum*/
+      var cholesterol = byCodes('14647-2')
+
+      /*obv.forEach(function(Observation){
+        if(Observation.valueQuantity){
+        console.log(Observation.valueQuantity)
+      }
+    })*/
+
+      /*Get total HBA1C*/
+      var hba1c = byCodes('4548-4')
+      //console.log(getQuantityValueAndUnit(hba1c[0]))
+      $("#hba1c-score").text(getQuantityValueAndUnit(hba1c[0]));
+
+      /*Get total cholesterol*/
+      var chol = byCodes('2093-3')
+      //console.log(getQuantityValueAndUnit(chol[0]))
+      $("#chol").text(getQuantityValueAndUnit(chol[0]))
+      console.log(obv)
+      drawGraph("Chart5",'Cholesterol(mg/dl)',chol,100,200,'Cholesterol','Cholesterol',50,300)
+
+      /*Get LDL*/
+      var hdl = byCodes('2085-9')
+      //console.log(getQuantityValueAndUnit(ldl[0]))
+      $("#hdl-score").text(getQuantityValueAndUnit(hdl[0]))
+      drawGraph("Chart3",'HDL(mg/dl)',hdl,35,60,'HDL','HDL',0,100)
+
+      /*Get HDL*/
+      var ldl = byCodes('13457-7')
+      //console.log(getQuantityValueAndUnit(hdl[0]))
+      $("#ldl-score").text(getQuantityValueAndUnit(ldl[0]))
+      drawGraph("Chart4",'HDL(mg/dl)',ldl,100,129,'LDL','LDL',90,200)
+
     }
   )
 }
@@ -127,4 +168,115 @@ function getQuantityValueAndUnit(ob) {
   } else {
     return undefined;
   }
+}
+
+
+/*Define toggler function for the dropdown*/
+function toggler(divId) {
+    $("#" + divId).toggle();
+}
+
+
+/*Draw Spider Chart for a given set of scores in the target div*/
+function drawSpider(target,scores){
+
+  Highcharts.chart(target, {
+
+    chart: {
+        polar: true,
+        type: 'line'
+    },
+
+    title: {
+        text: 'Nutrition Score Comoponents',
+        x: -80
+    },
+
+    xAxis: {
+        categories: ['Fruits', 'Vegetables', 'Grains', 'Dairy',
+                'Protein Foods', 'Fats', 'Refined Grains', 'Sodium', 'Empty Calories'],
+        tickmarkPlacement: 'on',
+        lineWidth: 0
+    },
+
+    yAxis: {
+        gridLineInterpolation: 'polygon',
+        lineWidth: 0,
+        min: 0,
+        max: 20
+    },
+
+    tooltip: {
+        shared: true,
+    },
+
+    legend: {
+        align: 'right',
+        verticalAlign: 'top',
+        y: 70,
+        layout: 'vertical'
+    },
+    series : scores
+})};
+
+/*Fake data for spider chart*/
+test= [
+  {
+    name: 'Purchase period 1',
+    data: [1,5, 10, 3, 1, 4, 6,8,19],
+    pointPlacement: 'on'
+},
+{
+    name: 'Purchase period 2',
+    data: [1,6, 3, 10, 5, 8, 3,2,12],
+    pointPlacement: 'on'
+},
+{
+    name: 'Purchase period 3',
+    data: [9,9, 8, 10, 6, 9, 7,8,7],
+    pointPlacement: 'on'
+},
+]
+
+/*Draw charts that are independant of FHIR calls*/
+window.onload=function() {
+  document.getElementById("nutrient-score").innerHTML = 42;//Cuz, answer to everything
+  drawSpider("progress-chart",test)
+}
+
+/*Draw line graph*/
+function drawGraph(target,title,measurement,rangehigh,rangelow,xtitle,ytitle,min,max){
+
+  series = [{name : xtitle,data:[]}]
+  measurement.forEach(function(measurement){
+    date = new Date(measurement.meta.lastUpdated)
+    formattedDate = Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())
+    series[0].data.push([formattedDate,measurement.valueQuantity.value])
+  })
+  console.log(series)
+
+  Highcharts.chart(target,{
+
+    title : {text : title, x: -80},
+    xAxis: {
+        type: 'datetime',
+        tickInterval : 6 * 30 * 24 * 365
+    },
+      yAxis :{
+      min : min,
+      max : max,
+      plotBands : [{
+          from: rangelow, // Start of the plot band
+          to: rangehigh, // End of the plot band
+          color: 'rgba(68, 170, 213, 0.1)', // Color value
+          label : {text : 'Reference region', style : { color : '#606060'}}
+        }],
+      title:{ text : ytitle}
+
+        },
+    series : series
+
+    })
+
+
 }
