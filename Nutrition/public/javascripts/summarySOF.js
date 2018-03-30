@@ -307,7 +307,7 @@ test= [
 
 /*Draw charts that are independant of FHIR calls*/
 window.onload=function() {
-  document.getElementById("nutrient-score").innerHTML = 42;//Cuz, answer to everything
+  //document.getElementById("nutrient-score").innerHTML = 42;//Cuz, answer to everything
   drawSpider("progress-chart",test)
 }
 
