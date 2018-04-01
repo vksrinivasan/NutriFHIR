@@ -7,7 +7,7 @@
   <div class="card">
    <div class="card-body">
      <h2 class="card-title">Some Title.... Not needed for this thing though</h2>
-     
+
    </div>
   </div>
   -->
@@ -50,30 +50,42 @@
     </div>
   </div>
 
+  <div class="card" id='medicationTimeline'>
+    <div class="card-body">
+      <h2 class="card-title">Medication timeline</h2>
+    </div>
+  </div>
 
 
   <div class="card">
     <div class="card-body">
-      <h2 class="card-title">Medications</h2>
+      <h2 class="card-title" id = "medTitle">Medications</h2>
 
       <div class="row">
         <!-- Left Side -->
-        <div class="col-md-3">
-          <b>Medications:</b>
+        <div class="col-md-9">
+          <b>Prescriber: <span id="med-list-prescriber">-</span></b><br>
+          <b>Dose: <span id="med-list-dose">-</span></b><br>
+          <b>Route: <span id="med-list-route">-</span></b><br>
+          <b>Start Date: <span id="med-list-startDate">-</span></b><br>
+          <b>End Date: <span id="med-list-endDate">-</span></b><br>
         </div>
-        <div class="col-md-3">
+
+<!--
+        <div class="col-md-6">
           <span id="med-list"></span>
         </div>
-        <!--/Left Side -->
+        /Left Side -->
 
         <!-- Right Side -->
         <div class="col-md-3">
-          <b>Problems:</b><br>
+          <b>Status: <span id="med-list-status"></span></b><br>
         </div>
+        <!--
         <div class="col-md-3">
           <span id="problems-list"></span><br>
         </div>
-        <!--/Right Side -->
+        /Right Side -->
 
       </div>
 
@@ -116,12 +128,33 @@
     <div class="card-body">
       <h2 class="card-title">Diet Indicators</h2>
 
-      <div id="progress-chart" align="center">
-        <!-- Contents filled by JS -->
+      <div class="left-list">
+        <div id="scores" class="scores">
+          <h5 class="card-subtitle">Nutrition score : 42</h5>
+          <br>
+          <h5 class="card-subtitle">Component scores:</h5>
+          <ul class="score-list">
+            <li><h5>Fruits: 9</h5></li>
+            <li><h5>Vegetables: 10</h5></li>
+            <li><h5>Grains: 6</h5></li>
+            <li><h5>Dairy: 8</h5></li>
+            <li><h5>Protein Foods: 10</h5></li>
+            <li><h5>Fats: 5</h5></li>
+            <li><h5>Refined Grains : 6</h5></li>
+            <li><h5>Sodium: 8</h5></li>
+            <li><h5>Empty calories: 15</h5></li>
+          </ul>
+        </div>
       </div>
 
-    </div>
+      <div class="right-chart">
+        <div id="progress-chart" class="spider">
+        <!-- Contents filled by JS -->
+        </div>
+      </div>
+
   </div>
+    </div>
 
 
   <div class="card">
@@ -212,7 +245,7 @@
       </div>
     </div>
 
-    <div id="Chart1" class='hidden' align="center">
+    <div id="Chart2" class='hidden' align="center">
       <!-- Contents filled by JS -->
     </div>
   </div>

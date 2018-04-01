@@ -28,45 +28,102 @@ function onReady(smart) {
   var cond = smart.patient.api.search({type: 'Condition'});
   var meds = smart.patient.api.search({type: 'MedicationOrder'});
 
-  var allergies = smart.patient.api.search({type: 'AllergyIntolerance'});
+  //var allergies = smart.patient.api.search({type: 'AllergyIntolerance'});
 
   // /* Generate Medication List */
-  // smart.patient.api.fetchAllWithReferences({type: "MedicationOrder"},["MedicationOrder.medicationReference"]).then(function(results, refs) {
-  //  results.forEach(function(prescription){
-  //       if (prescription.medicationCodeableConcept) {
-  //           displayMedication(prescription.medicationCodeableConcept.coding);
-  //       } else if (prescription.medicationReference) {
-  //           var med = refs(prescription, prescription.medicationReference);
-  //           displayMedication(med && med.code.coding || []);
-  //       }
-  //    });
-  //  });
-  //
-  // /* Generate Problem List */
-  // smart.patient.api.fetchAllWithReferences({type: 'Condition'}).then(function(results) {
-  //  results.forEach(function(condition){
-	// if (condition.code.text !== "Entered In Error" && condition.category.text == "Problem") {
-  //         $("#problems-list").append("<p>" + condition.code.text + "</p>");
-	// }
-	// if (condition.code.text.toLowerCase().indexOf("diabetes") >= 0) {
-	//   //console.log("Has diabetes");
-	//   isDiabetic += 1;
-	// }
-  //    });
-  //  });
+  smart.patient.api.fetchAllWithReferences({type: "MedicationOrder"},["MedicationOrder.medicationReference"]).then(function(results, refs) {
+    id = 0;
+    meds=[]
 
-  // /* Generate Allergy List */
-  // smart.patient.api.fetchAllWithReferences({type: 'AllergyIntolerance'}).then(function(results) {
-  //  results.forEach(function(allergy){
-	// if (allergy.substance.coding) {
-  //         $("#allergies-list").append("<p>" + allergy.substance.text + "</p>");
-	// }
-  //    });
-  //  });
+    //Trying timeline concept
+   results.forEach(function(prescription){
+     //console.log(prescription)
+     item = {}
+     try{
+     item.id =  id
+     item.start = new Date(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.start)
+     //item.end = new Date(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.end)
+     //item.content = prescription.medicationCodeableConcept.coding[0].display
+     if(prescription.dosageInstruction[0].route){
+     item.route = prescription.dosageInstruction[0].route.text
+      }
+    if(prescription.dosageInstruction[0].dosageQuantity){
+     item.dosageQuantity = prescription.dosageInstruction[0].doseQuantity.value +" "+prescription.dosageInstruction[0].doseQuantity.unit
+    }
 
-  $.when(pt, obv, cond, meds, allergies).fail(onError);
-  $.when(pt, obv, cond, meds, allergies).done(
-    function(patient, obv, conditions, prescriptions, allergies) {
+    item.status = prescription.status
+    item.prescriber = prescription.prescriber.display
+        if (prescription.medicationCodeableConcept) {
+            item.content = getMedicationName(prescription.medicationCodeableConcept.coding)
+            //displayMedication(prescription.medicationCodeableConcept.coding);
+        } else if (prescription.medicationReference) {
+            var med = refs(prescription, prescription.medicationReference);
+            item.content = getMedicationName(med && med.code.coding || [])
+            //displayMedication(med && med.code.coding || []);
+        }
+    }
+
+    catch (e){
+      console.log(e.name)
+    }
+
+    //console.log(item)
+    meds.push(item)
+    id =id +1;
+
+     });
+
+     //Build timeline
+     var container = document.getElementById('medicationTimeline')
+     var items = new vis.DataSet(meds)
+     var options = {
+       maxHeight : '400px'
+     }
+
+     var Timeline = new vis.Timeline(container,items,options)
+     console.log(items)
+
+     Timeline.on('select', function (properties) {
+     if(properties.items[0]){
+       document.getElementById("medTitle").innerHTML = meds[properties.items[0]].content
+       document.getElementById("med-list-prescriber").innerHTML = meds[properties.items[0]].prescriber
+       document.getElementById("med-list-dose").innerHTML = meds[properties.items[0]].dosageQuantity
+       document.getElementById("med-list-route").innerHTML = meds[properties.items[0]].route
+       document.getElementById("med-list-status").innerHTML = meds[properties.items[0]].status
+       document.getElementById("med-list-startDate").innerHTML = meds[properties.items[0]].start.toDateString()
+     };
+     });
+
+   });
+
+
+
+  /* Generate Problem List */
+  smart.patient.api.fetchAllWithReferences({type: 'Condition'}).then(function(results) {
+   results.forEach(function(condition){
+	if (condition.code.text !== "Entered In Error" && condition.category.text == "Problem") {
+          //$("#problems-list").append("<p>" + condition.code.text + "</p>");
+	}
+	if (condition.code.text.toLowerCase().indexOf("diabetes") >= 0) {
+	  //console.log("Has diabetes");
+	  isDiabetic += 1;
+	}
+     });
+   });
+
+  /* Generate Allergy List */
+  /*
+  smart.patient.api.fetchAllWithReferences({type: 'AllergyIntolerance'}).then(function(results) {
+   results.forEach(function(allergy){
+	if (allergy.substance.coding) {
+          $("#allergies-list").append("<p>" + allergy.substance.text + "</p>");
+	}
+     });
+   });*/
+
+  $.when(pt, obv, cond, meds).fail(onError);
+  $.when(pt, obv, cond, meds).done(
+    function(patient, obv, conditions, prescriptions) {
       // console.log(patient);
       // console.log(obv);
       // console.log(conditions);
@@ -110,17 +167,17 @@ function onReady(smart) {
       /* Print statuses for diabetes and hypertension */
       console.log("Diabetes: " + isDiabetic);
       if (isDiabetic > 0) {
-	$("#has-diabetes").text("Yes");
+	       $("#has-diabetes").text("Yes");
       }
       else {
-	$("#has-diabetes").text("No");
+	       $("#has-diabetes").text("No");
       }
 
       if (hasHypertension) {
-	$("#has-hypertension").text("Yes");
+	       $("#has-hypertension").text("Yes");
       }
       else {
-	$("#has-hypertension").text("No");
+	       $("#has-hypertension").text("No");
       }
 
       /* Get Weight */
@@ -153,12 +210,14 @@ function onReady(smart) {
       var hba1c = byCodes('4548-4')
       //console.log(getQuantityValueAndUnit(hba1c[0]))
       $("#hba1c-score").text(getQuantityValueAndUnit(hba1c[0]));
+      drawGraph("Chart2",'HbA1c',hba1c,0,15,'HbA1c','Hba1c',6,9)
+
 
       /*Get total cholesterol*/
       var chol = byCodes('2093-3')
       //console.log(getQuantityValueAndUnit(chol[0]))
       $("#chol").text(getQuantityValueAndUnit(chol[0]))
-      console.log(obv)
+      //console.log(obv)
       drawGraph("Chart5",'Cholesterol(mg/dl)',chol,100,200,'Cholesterol','Cholesterol',50,300)
 
       /*Get LDL*/
@@ -278,10 +337,9 @@ function drawSpider(target,scores){
     },
 
     legend: {
-        align: 'right',
+        align: 'center',
         verticalAlign: 'top',
-        y: 70,
-        layout: 'vertical'
+        layout: 'horizontal'
     },
     series : scores
 })};
@@ -303,6 +361,11 @@ test= [
     data: [9,9, 8, 10, 6, 9, 7,8,7],
     pointPlacement: 'on'
 },
+{
+    name: 'Reference',
+    data: [10,10, 10, 10, 10, 10, 10,10,20],
+    //pointPlacement: 'on'
+}
 ];
 
 /*Draw charts that are independant of FHIR calls*/
@@ -320,7 +383,7 @@ function drawGraph(target,title,measurement,rangehigh,rangelow,xtitle,ytitle,min
     formattedDate = Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())
     series[0].data.push([formattedDate,measurement.valueQuantity.value])
   })
-  console.log(series)
+  //console.log(series)
 
   Highcharts.chart(target,{
 
