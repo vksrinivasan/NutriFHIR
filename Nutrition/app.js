@@ -12,17 +12,18 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var http = require('http');
+var d3 = require("d3");
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-
-
+  
+     
 /* Initialize app */
 var app = module.exports = express();
 
 /* View Engine */
 app.set('views', path.join(__dirname, 'views'));
-
+ 
 app.engine('handlebars', exphbs({defaultLayout:'layout'}));
 
 app.set('view engine', 'ejs'); // ejs engine - default engine
