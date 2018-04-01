@@ -3,7 +3,7 @@ function onReady(smart) {
   var patient = smart.patient;
   var pt = patient.read();
   var obv = smart.patient.api.fetchAll({
-
+   
     // Note - I don't know how to sort results by time or anything. Someone
     // should figure that out
     type: 'Observation',
@@ -17,10 +17,13 @@ function onReady(smart) {
               'http://loinc.org|4548-4',//Hba1c
               'http://loinc.org|2085-9',//HDL
               'http://loinc.org|13457-7',//LDL
+			  'http://loinc.org|2345-7', // Glucose in Serum/Plasma
+			  'http://loinc.org|8480-6', // Systolic Blood Pressure
+			  'http://loinc.org|8462-4', // Diastolic Blood Pressure 
             ]
       }
-    }
-
+    }                       
+               
   });
   var isDiabetic = 0;
   var hasHypertension = false;
@@ -195,7 +198,6 @@ function onReady(smart) {
       var BMI = byCodes('39156-5');
       //console.log(getQuantityValueAndUnit(BMI[0]));
       $("#bmi-score").text(getQuantityValueAndUnit(BMI[0]));
-      drawGraph("Chart1",'BMI',BMI,24.9,18.5,'BMI','BMI kg/m2',0,50)
 
       /*Get Cholesterol(moles/volume) in Serum*/
       var cholesterol = byCodes('14647-2')
@@ -205,37 +207,50 @@ function onReady(smart) {
         console.log(Observation.valueQuantity)
       }
     })*/
-
+  
       /*Get total HBA1C*/
       var hba1c = byCodes('4548-4')
       //console.log(getQuantityValueAndUnit(hba1c[0]))
       $("#hba1c-score").text(getQuantityValueAndUnit(hba1c[0]));
+      
       drawGraph("Chart2",'HbA1c',hba1c,0,15,'HbA1c','Hba1c',6,9)
-
 
       /*Get total cholesterol*/
       var chol = byCodes('2093-3')
       //console.log(getQuantityValueAndUnit(chol[0]))
       $("#chol").text(getQuantityValueAndUnit(chol[0]))
-      //console.log(obv)
+
       drawGraph("Chart5",'Cholesterol(mg/dl)',chol,100,200,'Cholesterol','Cholesterol',50,300)
 
-      /*Get LDL*/
+
+      console.log(obv)
+       
+      /*Get HDL*/
       var hdl = byCodes('2085-9')
       //console.log(getQuantityValueAndUnit(ldl[0]))
       $("#hdl-score").text(getQuantityValueAndUnit(hdl[0]))
-      drawGraph("Chart3",'HDL(mg/dl)',hdl,35,60,'HDL','HDL',0,100)
-
-      /*Get HDL*/
+ 
+      /*Get LDL*/
       var ldl = byCodes('13457-7')
       //console.log(getQuantityValueAndUnit(hdl[0]))
       $("#ldl-score").text(getQuantityValueAndUnit(ldl[0]))
-      drawGraph("Chart4",'HDL(mg/dl)',ldl,100,129,'LDL','LDL',90,200)
-
+	  
+	  /*Get Glucose [Mass/volume] in serum or plasma*/
+	  var gluc = byCodes('2345-7')
+	  //console.log(getQuantityValueAndUnit(gluc[0]))
+	  $("#gluc-score").text(getQuantityValueAndUnit(gluc[0]))
+	  
+	  /*Get Systolic Blood Pressure*/
+	  var sbp = byCodes('8480-6')
+	  $("#sbp-text").text(getQuantityValueAndUnit(sbp[0]))
+	  
+	  /*Get Diastolic Blood Pressure*/
+	  var dbp = byCodes('8462-4')
+	  $("#dbp-text").text(getQuantityValueAndUnit(dbp[0]))
     }
   )
 }
-
+     
 /* Required On Error function */
 function onError() {
   console.log('Loading error', arguments);
@@ -272,7 +287,7 @@ function calculateAge(date) {
     return undefined;
   }
 }
-
+  
 /* Helper Function to Get Quantity Value/Units for a Given Observation */
 function getQuantityValueAndUnit(ob) {
   if (typeof ob != 'undefined' &&
@@ -367,7 +382,7 @@ test= [
     //pointPlacement: 'on'
 }
 ];
-
+ 
 /*Draw charts that are independant of FHIR calls*/
 window.onload=function() {
   //document.getElementById("nutrient-score").innerHTML = 42;//Cuz, answer to everything

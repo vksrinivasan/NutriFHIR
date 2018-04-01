@@ -158,159 +158,73 @@
 
 
   <div class="card">
-    <div class="card-body">
-      <h2 class="card-title">Vital Signs</h2>
 
-      <div class="row">
-        <!-- Left Side -->
-        <div class="col-md-3">
-          <b>Age:</b><br>
-          <b>Weight:</b><br>
-          <b>Height:</b><br>
-        </div>
-        <div class="col-md-3">
-          <span id="age-text">-</span><br>
-          <span id="weight-text">-</span><br>
-          <span id="height-text">-</span><br>
-        </div>
-        <!-- /Left Side -->
-
-        <!-- Right Side -->
-        <!-- Left Side -->
-        <div class="col-md-3">
-          <b>Diabetes:</b><br>
-          <b>Hypertension:</b><br>
-        </div>
-        <div class="col-md-3">
-          <span id="has-diabetes"></span><br>
-          <span id="has-hypertension"></span><br>
-        </div>
-        <!-- /Right Side -->
-      </div>
-
-    </div>
-  </div>
-
-
-  <hr>
-  <h2>---Stuff below this needs to be put in cards above somewhere.---</h2>
-  <!--
-  <div class="measurement" id="nutrition-measurement">
-    <div class="measurement-header">
-      <div>
-        <h4>Nutrition Score</h4>
-      </div>
-      <div class="measurement-right">
-        <h4 id="nutrient-score" class="score"></h4>
-        <a href='#progress-chart' onclick="toggler('progress-chart');">
-          <img type="image/svg+xml"></img>
-        </a>
-      </div>
-    </div>
-
-    <div id="progress-chart" class='hidden' align="center">
-
-    </div>
-  </div>
-  -->
-
-  <div class="measurement" id="bmi-measurement">
-    <div class="measurement-header">
-      <div>
-        <h4>BMI (kg/m<sup>2</sup>)</h4>
-      </div>
-      <div class="measurement-right">
-        <h4 id="bmi-score" class="score"></h4>
-        <a href='#Chart1' onclick="toggler('Chart1');">
-          <img type="image/svg+xml"></img>
-        </a>
-      </div>
-    </div>
-
-    <div id="Chart1" class='hidden' align="center">
-      <!-- Contents filled by JS -->
-    </div>
-  </div>
-
-  <div class="measurement" id="HBA1C-measurement">
-    <div class="measurement-header">
-      <div>
-        <h4>HBA1C</h4>
-      </div>
-      <div class="measurement-right">
-        <h4 id="hba1c-score" class="score"></h4>
-        <a href='#Chart2' onclick="toggler('Chart2');">
-          <img type="image/svg+xml"></img>
-        </a>
-      </div>
-    </div>
-
-    <div id="Chart2" class='hidden' align="center">
-      <!-- Contents filled by JS -->
-    </div>
-  </div>
-
-
-  <div class="measurement" id="cholesterol-measurement">
-    <div class="measurement-header">
-      <div>
-        <h4>Cholesterol in Serum</h4>
-      </div>
-      <div class="measurement-right">
-        <h4 id="chol" class="score"></h4>
-        <a href='#Chart5' onclick="toggler('Chart5');">
-          <img type="image/svg+xml"></img>
-        </a>
-      </div>
-    </div>
-
-    <div id="Chart5" class='hidden' align="center">
-      <!-- Contents filled by JS -->
-    </div>
-  </div>
-
-
-
-  <div class="measurement" id="HDL-measurement">
-    <div class="measurement-header">
-      <div>
-        <h4>HDL</h4>
-      </div>
-      <div class="measurement-right">
-        <h4 id="hdl-score" class="score"></h4>
-        <a href='#Chart3' onclick="toggler('Chart3');">
-          <img type="image/svg+xml"></img>
-        </a>
-      </div>
-    </div>
-
-    <div id="Chart3" class='hidden' align="center">
-      <!-- Contents filled by JS -->
-    </div>
-  </div>
-
-  <div class="measurement" id="LDL-measurement">
-    <div class="measurement-header">
-      <div>
-        <h4>LDL</h4>
-      </div>
-      <div class="measurement-right">
-        <h4 id="ldl-score" class="score"></h4>
-        <a href='#Chart4' onclick="toggler('Chart4');">
-          <img type="image/svg+xml"></img>
-        </a>
-      </div>
-    </div>
-
-    <div id="Chart4" class='hidden' align="center">
-      <!-- Contents filled by JS -->
-    </div>
+	<div id=”container”>
+	<div class="card-body" style="float:left; width: 70%"> 
+		<h2 class="card-title">Vital Signs</h2>
+		<table id="vitals">
+			<tbody>
+				<tr>
+					<th class="width-30" onclick="plotHeight()" style="cursor: pointer;">Height:</th>
+					<td id="height-text" onclick="plotHeight()" style="cursor: pointer;"></td>
+					<th class="width-30"></th>
+					<td></td>
+					<th class="width-30"></th>
+					<td></td>
+					<th class="width-30">Systolic Blood Pressure:</th>
+					<td id="sbp-text"></td>
+				</tr>
+				<tr>
+					<th class="width-30">Weight:</th>
+					<td id="weight-text"></td>
+					<th class="width-30"></th>
+					<td></td>
+					<th class="width-30"></th>
+					<td></td>
+					<th class="width-30">Diastolic Blood Pressure:</th>
+					<td id="dbp-text"></td>
+				</tr>
+				<tr>
+					<th class="width-30">BMI:</th>
+					<td id=bmi-score></td>
+					<th class="width-30"></th>
+					<td></td>
+					<th class="width-30"></th>
+					<td></td>
+					<th class="width-30">Cholesterol in Serum:</th>
+					<td id=chol></td>
+				</tr>
+				<tr>
+					<th class="width-30">Glucose:</th>
+					<td id=gluc-score></td>
+					<th class="width-30"></th>
+					<td></td>
+					<th class="width-30"></th>
+					<td></td>
+					<th class="width-30">High Density Lipoprotein:</th>
+					<td id=hdl-score></td>
+				</tr>
+				<tr>
+					<th class="width-30">HbA1c:</th>
+					<td id=hba1c-score></td>
+					<th class="width-30"></th>
+					<td></td>
+					<th class="width-30"></th>
+					<td></td>
+					<th class="width-30">Low Density Lipoprotein:</th>
+					<td id=ldl-score></td>
+				</tr>				
+			</tbody>
+		</table>
+	</div>
+	<div id="chartRegion" class="card-body" style="float:right; width: 30%">second div</div>
   </div>
 </div>
 
 <script src="javascripts/summarySOF.js" type="text/javascript"></script>
+<script src="javascripts/plotFunctions.js" type="text/javascript"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
 <script>
   FHIR.oauth2.ready(onReady, onError);
-  console.log('hii');
-
 </script>
+
