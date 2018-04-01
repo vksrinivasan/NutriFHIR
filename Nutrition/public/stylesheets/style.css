@@ -190,6 +190,32 @@ body {
   border-top: 1px solid #e5e5e5;
 }
 
+/* List for scores*/
+.left-list{
+  width: 28%;
+  float: left;
+  margin-top: 10px;
+}
+
+.right-chart{
+  width: 70%;
+  float:right;
+}
+
+.spider{
+  max-width: 90%;
+  height: 100%;
+  margin-left: 10%;
+}
+
+.scores{
+  margin-top: 15%;
+}
+
+.score-list{
+  margin-left: 0.5%;
+}
+
 /* Customize container */
 @media (min-width: 768px) {
   .container {
