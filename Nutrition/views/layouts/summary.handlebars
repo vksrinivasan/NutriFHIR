@@ -128,7 +128,7 @@
 	<div id=”container”>
 	<div class="card-body" style="float:left; width: 70%"> 
 		<h2 class="card-title">Vital Signs</h2>
-		<table>
+		<table id="vitals">
 			<tbody>
 				<tr>
 					<th class="width-30" onclick="plotHeight()" style="cursor: pointer;">Height:</th>
@@ -188,8 +188,9 @@
 </div>
 
 <script src="javascripts/summarySOF.js" type="text/javascript"></script>
+<script src="javascripts/plotFunctions.js" type="text/javascript"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
 <script>
   FHIR.oauth2.ready(onReady, onError);
-  FHIR.oauth2.ready(plotHeight, onError);
-  
+ 
 </script>
