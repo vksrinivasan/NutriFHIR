@@ -278,3 +278,19 @@ body {
 footer{
   margin-top:20px;
 }
+
+.axis2 path,
+.axis2 line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
+.axis2 text {
+	font-family: sans-serif;
+	font-size: 11px;
+}
+
+.axis text {
+	font-family: sans-serif;
+	font-size: 11px;
+}
