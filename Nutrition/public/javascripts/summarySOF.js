@@ -186,58 +186,38 @@ function onReady(smart) {
       /* Get Weight */
       var byCodes = smart.byCodes(obv, 'code');
       var weight = byCodes('3141-9');
-      //console.log(getQuantityValueAndUnit(weight[0]));
       $("#weight-text").text(getQuantityValueAndUnit(weight[0]));
 
       /* Get Height */
       var height = byCodes('8302-2');
-      //console.log(getQuantityValueAndUnit(height[0]));
       $("#height-text").text(getQuantityValueAndUnit(height[0]));
 
       /* Get BMI */
       var BMI = byCodes('39156-5');
-      //console.log(getQuantityValueAndUnit(BMI[0]));
       $("#bmi-score").text(getQuantityValueAndUnit(BMI[0]));
 
       /*Get Cholesterol(moles/volume) in Serum*/
       var cholesterol = byCodes('14647-2')
-
-      /*obv.forEach(function(Observation){
-        if(Observation.valueQuantity){
-        console.log(Observation.valueQuantity)
-      }
-    })*/
   
       /*Get total HBA1C*/
       var hba1c = byCodes('4548-4')
-      //console.log(getQuantityValueAndUnit(hba1c[0]))
       $("#hba1c-score").text(getQuantityValueAndUnit(hba1c[0]));
-      
-      drawGraph("Chart2",'HbA1c',hba1c,0,15,'HbA1c','Hba1c',6,9)
-
+  
       /*Get total cholesterol*/
       var chol = byCodes('2093-3')
-      //console.log(getQuantityValueAndUnit(chol[0]))
       $("#chol").text(getQuantityValueAndUnit(chol[0]))
-
-      drawGraph("Chart5",'Cholesterol(mg/dl)',chol,100,200,'Cholesterol','Cholesterol',50,300)
-
-
       console.log(obv)
        
       /*Get HDL*/
       var hdl = byCodes('2085-9')
-      //console.log(getQuantityValueAndUnit(ldl[0]))
       $("#hdl-score").text(getQuantityValueAndUnit(hdl[0]))
  
-      /*Get LDL*/
+      /*Get HDL*/
       var ldl = byCodes('13457-7')
-      //console.log(getQuantityValueAndUnit(hdl[0]))
       $("#ldl-score").text(getQuantityValueAndUnit(ldl[0]))
 	  
 	  /*Get Glucose [Mass/volume] in serum or plasma*/
 	  var gluc = byCodes('2345-7')
-	  //console.log(getQuantityValueAndUnit(gluc[0]))
 	  $("#gluc-score").text(getQuantityValueAndUnit(gluc[0]))
 	  
 	  /*Get Systolic Blood Pressure*/

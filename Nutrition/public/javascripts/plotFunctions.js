@@ -40,28 +40,60 @@ function genHeightChart(smart) {
 
 function plotD3Data(retStruct) {
 	/* Get the size of the LHS of the card div so I know how big to make this */
-	var lhs = document.getElementById('vitals')
-	var positionInfo = lhs.getBoundingClientRect();
-	var svg = d3.select("#chartRegion").append("svg").attr("width",positionInfo.width).attr("height",positionInfo.height)
-	var circle = svg.append("circle").attr("cx",30).attr("cy",30).attr("r",20)
+	var lhs_data = document.getElementById('vitals')
+	var lhs_header = document.getElementById('vitalTitle')
+	var positionInfo_data = lhs_data.getBoundingClientRect();
+	var positionInfo_header = lhs_header.getBoundingClientRect();
+	
+	// Make margins/Get weidth height
+	var margin = {top: 2, right: 2, bottom: 2, left: 2},
+    width = (positionInfo_data.width)*0.42 - margin.left - margin.right,
+    height = (positionInfo_data.height + positionInfo_header.height) - margin.top - margin.bottom;
+	
+	// Define axes
+	var x = d3.scale.linear().range([0, 3]);
+	var y = d3.scale.linear().range([220, 100]);
+	
+	// Define the axes
+	var xAxis = d3.svg.axis().scale(x)
+    .orient("bottom").ticks(5);
+	
+	var yAxis = d3.svg.axis().scale(y)
+    .orient("left").ticks(5);
+	
+	// Define the line
+	var valueline = d3.svg.line()
+    .x(function(d) { return x(d.x); })
+    .y(function(d) { return y(d.y); });
+				  
+	// Adds the svg canvas
+	var svg = d3.select("#chartRegion")
+    .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+			  
+    
+	
 } 
 
 function extractDateVal(obv) {
-	var values = []
-	var dates = []
-	var ref_hi = []
-	var ref_lo = []
+	var retVals = []
 	var units = undefined 
 	
 	for(i = 0; i < obv.length; i++) {
 		var encounter = obv[i];
-		values.push(encounter['valueQuantity']['value'])
-		dates.push(i)
-		ref_hi.push(encounter['referenceRange'][0]['high'])
-		ref_lo.push(encounter['referenceRange'][0]['low'])
+		var temp = [encounter['valueQuantity']['value'], 
+					i,
+					encounter['referenceRange'][0]['high'],
+					encounter['referenceRange'][0]['low']
+					]
+		retVals.push(temp)
 		units = encounter['valueQuantity']['unit']
 	}
 	
-	var retStruct = {x: values, y: dates, y_hi: ref_hi, y_lo: ref_lo, unit: units};
+	var retStruct = {data:retVals, unit: units};
 	return retStruct
 }
