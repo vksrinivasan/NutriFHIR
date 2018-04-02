@@ -23,8 +23,8 @@ function onReady(smart) {
             ]
       }
     }                       
-               
-  });
+                        
+  });                   
   var isDiabetic = 0;
   var hasHypertension = false;
 
@@ -32,7 +32,7 @@ function onReady(smart) {
   var meds = smart.patient.api.search({type: 'MedicationOrder'});
 
   //var allergies = smart.patient.api.search({type: 'AllergyIntolerance'});
-
+ 
   // /* Generate Medication List */
   smart.patient.api.fetchAllWithReferences({type: "MedicationOrder"},["MedicationOrder.medicationReference"]).then(function(results, refs) {
     id = 0;
@@ -40,7 +40,7 @@ function onReady(smart) {
 
     //Trying timeline concept
    results.forEach(function(prescription){
-     //console.log(prescription)
+     //console.log(prescription)  
      item = {}
      try{
      item.id =  id
@@ -100,7 +100,7 @@ function onReady(smart) {
    });
 
 
-
+ 
   /* Generate Problem List */
   smart.patient.api.fetchAllWithReferences({type: 'Condition'}).then(function(results) {
    results.forEach(function(condition){
@@ -112,7 +112,7 @@ function onReady(smart) {
 	  isDiabetic += 1;
 	}
      });
-   });
+   });   
 
   /* Generate Allergy List */
   /*
@@ -123,11 +123,11 @@ function onReady(smart) {
 	}
      });
    });*/
-
+    
   $.when(pt, obv, cond, meds).fail(onError);
   $.when(pt, obv, cond, meds).done(
     function(patient, obv, conditions, prescriptions) {
-      // console.log(patient);
+      console.log(patient);
       // console.log(obv);
       // console.log(conditions);
       // console.log(prescriptions);
@@ -140,16 +140,14 @@ function onReady(smart) {
         fname = patient.name[0].given.join(' ').toLowerCase();
         lname = patient.name[0].family.join(' ').toLowerCase();
       }
-      //console.log(titleCase(fname));
-      //console.log(titleCase(lname));
 
-      $("#name-text").text(
-        titleCase(lname) + ', ' + titleCase(fname)
+      $("#Patient_Name").text(
+        titleCase(fname) + ' ' + titleCase(lname)
       );
 
       /* Get Patient Gender */
       //console.log(patient.gender);
-      $("#gender-text").text(
+      $("#gender_text").text(
         titleCase(patient.gender)
       );
 

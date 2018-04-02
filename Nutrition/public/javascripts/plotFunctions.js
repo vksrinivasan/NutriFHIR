@@ -23,14 +23,14 @@ function plotVitals(vital) {
 			FHIR.oauth2.ready(genSBPChart, onError);
 		break;
 	}
-}
+}  
  
 /* Create the chart for height */
 function genHeightChart(smart) {
   var patient = smart.patient;
   var pt = patient.read();
   var obv = smart.patient.api.fetchAll({
-   
+    
     // Note - I don't know how to sort results by time or anything. Someone
     // should figure that out
     type: 'Observation',
@@ -42,8 +42,8 @@ function genHeightChart(smart) {
       }
     }                       
                
-  });
-  
+  });       
+   
   $.when(pt, obv).fail(onError);
   $.when(pt, obv).done(
     function(patient, obv) {
@@ -75,9 +75,9 @@ function genSBPChart(smart) {
       }
     }                       
                
-  });
+  });       
   
-  $.when(pt, obv).fail(onError);
+  $.when(pt, obv).fail(onError);         
   $.when(pt, obv).done(
     function(patient, obv) {
 		

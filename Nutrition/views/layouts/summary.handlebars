@@ -3,51 +3,72 @@
 -->
 <div class="col-lg12 mx-auto">
 
-  <!--
-  <div class="card">
-   <div class="card-body">
-     <h2 class="card-title">Some Title.... Not needed for this thing though</h2>
-
-   </div>
-  </div>
-  -->
-
-  <div class="card">
-    <div class="card-body">
-      <h2 id="name-text" class="card-title">Patient Name</h2>
-
-      <div class="row">
-        <!-- Left Side -->
-        <div class="col-md-3">
-          <b>Gender:</b><br>
-          <b>Birth Date:</b><br>
-        </div>
-        <div class="col-md-3">
-          <span id="gender-text">-</span><br>
-          <span id="birth-text">-</span><br>
-        </div>
-        <!-- /Left Side -->
-
-        <!-- Right Side -->
-        <!-- Left Side -->
-        <div class="col-md-3">
-
-        </div>
-        <div class="col-md-3">
-
-        </div>
-        <!-- /Right Side -->
-      </div>
-
-    </div>
-  </div>
-
-
-  <div class="card">
-    <div class="card-body">
-      <h2 class="card-title">Grocery Shopping</h2>
-
-    </div>
+ 
+   <div class="card">
+     <div id=”container”>
+		<div id="demographicInformation" class="card-body" style="float:left; width: 50%">  
+		  <h2 id="Patient_Name" class="card-title">Loading Patient</h2>
+		    <div id="borderDiv" style="border-right:1px solid black">
+			  <table id="demo1">
+				<tbody>
+					<tr>
+						<th id="dob_age_text" class="width-30">01/12/1998 (30Y)</th>
+						<th></th>
+						<th></th>
+						<th id="gender_text" class="width-30">Gender Unknown</th>
+					</tr>		
+						
+					<tr>
+						<th id="race_text" class="width-30">Race Unknown</th>
+						<th></th>
+						<th></th>
+						<th id="hisp_or_lat_text" class="width-30">Hisp/Latino Unknown</th>
+					</tr>		
+					
+					<tr>
+						<th id="married_text" class="width-30">Not Married</th>
+					</tr>
+					
+				</tbody>
+			  </table>
+			  
+			  <table id="demo2">
+				<tbody>
+					<tr>
+						<th id="addr_text" class="width-30">12309 Randolph Ln. Austin, Texas</th>
+					</tr>
+				</tbody>
+			  </table>
+			</div>
+		</div>
+		<div id="contact_info" class="card-body" style="float:right; width: 50%">
+		  <br>
+		  <br>
+		  <table id="demo3">
+			<tbody>
+			
+				<tr>
+					<th class="width-30">Home Phone #:</th>
+					<th class="width-10">
+					<td id="home_phone_text">512-844-3982</td>
+				</tr>
+				
+				<tr>
+					<th class="width-30">Cell Phone #:</th>
+					<th class="width-10">
+					<td id="cell_phone_text">512-322-4852</td>
+				</tr>
+				
+				<tr>
+					<th class="width-30">Email:</th>
+					<th class="width-10">
+					<td id="email_text">bobrylandisgreat@gmail.com</td>
+				</tr>
+				
+			</tbody>
+		  </table>
+		</div>
+	 </div>
   </div>
 
   <div class="card" id='medicationTimeline'>
