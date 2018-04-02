@@ -1,10 +1,30 @@
-/* Required Smart on Fhir On Ready Function */
-function plotHeight() {
-	/* First thing to do is the clean up what is already there if anything */
-	d3.select("#chartRegion").select("svg").remove();
-	FHIR.oauth2.ready(genHeightChart, onError);
+/* Handlers */
+function heightHandler() {
+	plotVitals("Height");
 }
 
+function sbpHandler() {
+	plotVitals("SBP");
+}
+
+/* Required Smart on Fhir On Ready Function */
+function plotVitals(vital) {
+	/* First thing to do is the clean up what is already there if anything */
+	d3.select("#chartRegion").select("svg").remove();
+	
+	console.log(vital);
+	
+	/* Then pick which plot function (i.e. data gather function) we need */
+	switch(vital) {
+		case "Height":
+			FHIR.oauth2.ready(genHeightChart, onError);
+		break;
+		case "SBP":
+			FHIR.oauth2.ready(genSBPChart, onError);
+		break;
+	}
+}
+ 
 /* Create the chart for height */
 function genHeightChart(smart) {
   var patient = smart.patient;
@@ -34,6 +54,39 @@ function genHeightChart(smart) {
 		var retStruct = extractDateVal(height);
 		
 		plotD3Data(retStruct, "Height");
+    }
+  )
+}
+
+/* Create the chart for SBP */
+function genSBPChart(smart) {
+  var patient = smart.patient;
+  var pt = patient.read();
+  var obv = smart.patient.api.fetchAll({
+   
+    // Note - I don't know how to sort results by time or anything. Someone
+    // should figure that out
+    type: 'Observation',
+    query: {
+      code: {
+        $or: [
+              'http://loinc.org|8480-6', // Systolic Blood Pressure
+            ]
+      }
+    }                       
+               
+  });
+  
+  $.when(pt, obv).fail(onError);
+  $.when(pt, obv).done(
+    function(patient, obv) {
+		
+		var byCodes = smart.byCodes(obv, 'code');
+		
+		var sbp = byCodes('8480-6');
+		var retStruct = extractDateVal(sbp);
+		
+		plotD3Data(retStruct, "SBP");
     }
   )
 }

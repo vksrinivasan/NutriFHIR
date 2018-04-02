@@ -75,7 +75,7 @@ function onReady(smart) {
     id =id +1;
 
      });
-
+ 
      //Build timeline
      var container = document.getElementById('medicationTimeline')
      var items = new vis.DataSet(meds)
@@ -276,7 +276,7 @@ function getQuantityValueAndUnit(ob) {
       typeof ob.valueQuantity.unit != 'undefined') {
         return ob.valueQuantity.value + ' ' + ob.valueQuantity.unit;
   } else {
-    return undefined;
+    return '-';
   }
 }
 

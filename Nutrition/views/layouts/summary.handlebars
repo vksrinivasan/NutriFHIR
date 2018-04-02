@@ -164,14 +164,14 @@
 		<table id="vitals">
 			<tbody>
 				<tr>
-					<th class="width-30" onclick="plotHeight()" style="cursor: pointer;">Height:</th>
-					<td id="height-text" onclick="plotHeight()" style="cursor: pointer;"></td>
+					<th id="height-name" class="width-30" style="cursor: pointer;">Height:</th>
+					<td id="height-text" style="cursor: pointer;"></td>
 					<th class="width-30"></th>
 					<td></td>
 					<th class="width-30"></th>
 					<td></td>
-					<th class="width-30">Systolic Blood Pressure:</th>
-					<td id="sbp-text"></td>
+					<th id="sbp-name" class="width-30" style="cursor: pointer;">Systolic Blood Pressure:</th>
+					<td id="sbp-text" style="cursor: pointer;"></td>
 				</tr>
 				<tr>
 					<th class="width-30">Weight:</th>
@@ -225,5 +225,15 @@
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script>
   FHIR.oauth2.ready(onReady, onError);
+  
+  /* Height Listener */
+  document.getElementById("height-name").addEventListener("click", heightHandler, false);
+  document.getElementById("height-text").addEventListener("click", heightHandler, false);
+  
+  /* SBP Listener */
+  document.getElementById("sbp-name").addEventListener("click", sbpHandler, false);
+  document.getElementById("sbp-text").addEventListener("click", sbpHandler, false);
+	
+  
 </script>
 
