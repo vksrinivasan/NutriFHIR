@@ -23,7 +23,7 @@ function onReady(smart) {
             ]
       }
     }                       
-                        
+                            
   });                   
   var isDiabetic = 0;
   var hasHypertension = false;
@@ -68,20 +68,20 @@ function onReady(smart) {
 
     catch (e){
       console.log(e.name)
-    }
+    } 
 
     //console.log(item)
     meds.push(item)
     id =id +1;
 
-     });
+     });  
  
      //Build timeline
      var container = document.getElementById('medicationTimeline')
      var items = new vis.DataSet(meds)
      var options = {
        maxHeight : '400px'
-     }
+     } 
 
      var Timeline = new vis.Timeline(container,items,options)
      console.log(items)
@@ -95,7 +95,7 @@ function onReady(smart) {
        document.getElementById("med-list-status").innerHTML = meds[properties.items[0]].status
        document.getElementById("med-list-startDate").innerHTML = meds[properties.items[0]].start.toDateString()
      };
-     });
+     });  
 
    });
 
