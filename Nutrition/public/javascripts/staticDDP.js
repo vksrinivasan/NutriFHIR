@@ -1,5 +1,5 @@
 function populateDietaryData() {
-	
+	 
 	/*  When we get access to some nutrition server/scoring method, we can 
 	 *  change these first 3 calls to get real data 
 	 */
@@ -14,27 +14,52 @@ function populateDietaryData() {
 	var dash = getDashData_randomized(); 
 	
 	/* Fill out current scores */
-	fillOutScores(hei['score'][hei['score'].length-1], // Score For Most Recent Month
-				  hei['ref_hi'], 					   // Reference Ideal Score
-				  hei['date'][hei['date'].length-1],   // Date on Nearest Most Recent Period
-				  "#mrpp_text",						   // ID of element for Most Recent Purchase Period
-				  "#hei_value");					   // ID of element for Most Recent HEI %
+	hei_color =	fillOutScores(hei['score'][hei['score'].length-1], // Score For Most Recent Month
+							  hei['ref_hi'], 					   // Reference Ideal Score
+							  hei['date'][hei['date'].length-1],   // Date on Nearest Most Recent Period
+							  "#mrpp_text",						   // ID of element for Most Recent Purchase Period
+							  "#hei_value");					   // ID of element for Most Recent HEI %
 				  
-	fillOutScores(ahei['score'][ahei['score'].length-1], // Score For Most Recent Month
-				  ahei['ref_hi'], 					     // Reference Ideal Score
-				  ahei['date'][ahei['date'].length-1],   // Date on Nearest Most Recent Period
-				  "#mrpp_text",						     // ID of element for Most Recent Purchase Period
-				  "#ahei_value");					     // ID of element for Most Recent AHEI %
+	ahei_color = fillOutScores(ahei['score'][ahei['score'].length-1], // Score For Most Recent Month
+							   ahei['ref_hi'], 					      // Reference Ideal Score
+							   ahei['date'][ahei['date'].length-1],   // Date on Nearest Most Recent Period
+							   "#mrpp_text",						  // ID of element for Most Recent Purchase Period
+							   "#ahei_value");					      // ID of element for Most Recent AHEI %
 				  
-	fillOutScores(dash['score'][dash['score'].length-1], // Score For Most Recent Month
-				  dash['ref_hi'], 					     // Reference Ideal Score
-				  dash['date'][dash['date'].length-1],   // Date on Nearest Most Recent Period
-				  "#mrpp_text",						     // ID of element for Most Recent Purchase Period
-				  "#dash_value");					     // ID of element for Most Recent DASH %
+	dash_color = fillOutScores(dash['score'][dash['score'].length-1],    // Score For Most Recent Month
+							   dash['ref_hi'], 					         // Reference Ideal Score
+							   dash['date'][dash['date'].length-1],      // Date on Nearest Most Recent Period
+				               "#mrpp_text",						     // ID of element for Most Recent Purchase Period
+							   "#dash_value");					         // ID of element for Most Recent DASH %
 	
 	/* Calculate KL-Divergence Between Each Period's Scores and Ideal */
+	hei_divergence = getTimeSeriesDivergence(hei['score'], hei['ref_hi']);
+	ahei_divergence = getTimeSeriesDivergence(ahei['score'], ahei['ref_hi']);
+	dash_divergence = getTimeSeriesDivergence(dash['score'], dash['ref_hi']);
 	
+	/* Add Divergences/Names to the structs */
+	hei['divergence'] = hei_divergence;
+	hei['name'] = 'HEI';
+	ahei['divergence'] = ahei_divergence;
+	ahei['name'] = 'AHEI';
+	dash['divergence'] = dash_divergence;
+	dash['name'] = 'DASH';
 	
+	/* Plot KL Divergence */
+	plotDistributionDivergence([hei,ahei,dash]);
+	
+}
+
+function plotDistributionDivergence(arr_metrics) {
+	
+}
+
+function getTimeSeriesDivergence(actual, ideal) {
+	ret_timeSeries = [];
+	for(i = 0; i < actual.length; i++) {
+		ret_timeSeries.push(math.kldivergence(actual[i], ideal));
+	}
+	return ret_timeSeries;
 }
 
 function add(a, b) {
@@ -49,7 +74,7 @@ function fillOutScores(actComponentScores, idealComponentScores, date, loc_mrpp,
 	$(loc_mrpp).text("Most Recent Purchase Period (" + date + ")");
 	
 	/* We want to have a color scale for the %'s */
-	var color = d3.scale.linear().domain([0.3,0.7])
+	var color = d3.scale.linear().domain([0.4,0.6])
 								 .interpolate(d3.interpolateHcl)
 								 .range([d3.rgb("#C21807"), d3.rgb('#4CBB17')]);
 	
@@ -66,6 +91,10 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+/* Randomized Data Generating Functions Below - Whoever gets access to an API 
+ * for nutrition data would need to just replace these functions with calls to 
+ * that API and transform the data into this format 
+ */
 function getHEIData_randomized() {
 	var components = [
 		'Total Fruits',
