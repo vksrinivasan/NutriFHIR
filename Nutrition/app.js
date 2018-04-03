@@ -13,6 +13,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var http = require('http');
 var d3 = require("d3");
+var math = require("mathjs");
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -40,6 +41,7 @@ app.use('/js', express.static(__dirname + '/node_modules/jquery/dist')); // redi
 app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
 app.use('/css', express.static(__dirname + '/node_modules/font-awesome/css')); // redirect CSS font-awesome
+app.use('/scripts', express.static(__dirname + '/node_modules/mathjs/dist/'));
 
 app.use(session({
   secret: 'secret',

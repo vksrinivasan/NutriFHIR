@@ -11,6 +11,7 @@
     "bootstrap": "^4.0.0-alpha.6",
     "connect-flash": "*",
     "cookie-parser": "~1.4.3",
+    "d3": "3",
     "debug": "~2.6.0",
     "ejs": "~2.5.5",
     "express": "~4.14.1",
@@ -28,6 +29,6 @@
     "passport-local": "*",
     "popper.js": "^1.14.1",
     "serve-favicon": "~2.3.2",
-    "d3": "3"
+    "mathjs": "*"
   }
 }
