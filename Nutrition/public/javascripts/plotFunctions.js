@@ -7,6 +7,37 @@ function sbpHandler() {
 	plotVitals("SBP");
 }
 
+function weightHandler() {
+	plotVitals("Weight");
+}
+
+function dbpHandler() {
+	plotVitals("DBP");
+}
+
+function bmiHandler() {
+	plotVitals("BMI");
+}
+
+function cholHandler() {
+	plotVitals("Cholestrol");
+}
+
+function glucoseHandler() {
+	plotVitals("Glucose");
+}
+
+function hdlHandler() {
+	plotVitals("HDL");
+}
+
+function hba1cHandler() {
+	plotVitals("HBA1c");
+}
+
+function ldlHandler() {
+	plotVitals("LDL");
+}
 /* Required Smart on Fhir On Ready Function */
 function plotVitals(vital) {
 	/* First thing to do is the clean up what is already there if anything */
@@ -21,6 +52,30 @@ function plotVitals(vital) {
 		break;
 		case "SBP":
 			FHIR.oauth2.ready(genSBPChart, onError);
+		break;
+		case "Weight":
+			FHIR.oauth2.ready(genWeightChart, onError);
+		break;
+		case "DBP":
+			FHIR.oauth2.ready(genDBPChart, onError);
+		break;
+		case "BMI":
+			FHIR.oauth2.ready(genBMIChart, onError);
+		break;
+		case "Cholestrol":
+			FHIR.oauth2.ready(genCholChart, onError);
+		break;
+		case "Glucose":
+			FHIR.oauth2.ready(genGlucoseChart, onError);
+		break;
+		case "HDL":
+			FHIR.oauth2.ready(genHDLChart, onError);
+		break;
+		case "HBA1c":
+			FHIR.oauth2.ready(genHBA1cChart, onError);
+		break;
+		case "LDL":
+			FHIR.oauth2.ready(genLDLChart, onError);
 		break;
 	}
 }  
@@ -51,6 +106,7 @@ function genHeightChart(smart) {
 		var byCodes = smart.byCodes(obv, 'code');
 		
 		var height = byCodes('8302-2');
+		console.log(height);
 		var retStruct = extractDateVal(height);
 		
 		plotD3Data(retStruct, "Height");
@@ -80,13 +136,433 @@ function genSBPChart(smart) {
   $.when(pt, obv).fail(onError);         
   $.when(pt, obv).done(
     function(patient, obv) {
-		
 		var byCodes = smart.byCodes(obv, 'code');
-		
+	
 		var sbp = byCodes('8480-6');
-		var retStruct = extractDateVal(sbp);
-		
-		plotD3Data(retStruct, "SBP");
+		if (sbp.length > 0) {
+			console.log("plotting SBP");
+			ob = sbp[0];
+			//some vitals couldn't be plotted, even though the values were clearly there
+			if (typeof ob.referenceRange != 'undefined' &&
+			      typeof ob['referenceRange'][0] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+				var retStruct = extractDateVal(sbp);
+	
+				plotD3Data(retStruct, "SBP");
+			}
+			else {
+				console.log("couldn't read values to plot SBP");
+			}
+		}
+		else {
+			console.log("No SBP");
+		}
+    }
+  )
+}
+
+/* Create the chart for Weight */
+function genWeightChart(smart) {
+  var patient = smart.patient;
+  var pt = patient.read();
+  var obv = smart.patient.api.fetchAll({
+   
+    // Note - I don't know how to sort results by time or anything. Someone
+    // should figure that out
+    type: 'Observation',
+    query: {
+      code: {
+        $or: [
+              'http://loinc.org|3141-9', // Weight
+            ]
+      }
+    }                       
+               
+  });       
+  
+  $.when(pt, obv).fail(onError);         
+  $.when(pt, obv).done(
+    function(patient, obv) {
+		var byCodes = smart.byCodes(obv, 'code');
+	
+		var weight = byCodes('3141-9');
+		if (weight.length > 0) {
+			console.log("plotting Weight");
+			ob = weight[0];
+			//some vitals couldn't be plotted, even though the values were clearly there
+			if (typeof ob.referenceRange != 'undefined' &&
+			      typeof ob['referenceRange'][0] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+				var retStruct = extractDateVal(weight);
+	
+				plotD3Data(retStruct, "Weight");
+			}
+			else {
+				console.log("couldn't read values to plot Weight");
+			}
+		}
+		else {
+			console.log("No weight");
+		}
+    }
+  )
+}
+
+/* Create the chart for DBP */
+function genDBPChart(smart) {
+  var patient = smart.patient;
+  var pt = patient.read();
+  var obv = smart.patient.api.fetchAll({
+   
+    // Note - I don't know how to sort results by time or anything. Someone
+    // should figure that out
+    type: 'Observation',
+    query: {
+      code: {
+        $or: [
+              'http://loinc.org|8462-4', // Diastolic Blood Pressure
+            ]
+      }
+    }                       
+               
+  });       
+  
+  $.when(pt, obv).fail(onError);         
+  $.when(pt, obv).done(
+    function(patient, obv) {
+		var byCodes = smart.byCodes(obv, 'code');
+	
+		var dbp = byCodes('8462-4');
+		if (dbp.length > 0) {
+			console.log("plotting DBP");
+			ob = dbp[0];
+			//some vitals couldn't be plotted, even though the values were clearly there
+			if (typeof ob.referenceRange != 'undefined' &&
+			      typeof ob['referenceRange'][0] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+				var retStruct = extractDateVal(dbp);
+
+				plotD3Data(retStruct, "DBP");
+			}
+			else {
+				console.log("couldn't read values to plot DBP");
+			}
+		}
+		else {
+			console.log("No DBP");
+		}
+    }
+  )
+}
+
+/* Create the chart for BMI */
+function genBMIChart(smart) {
+  var patient = smart.patient;
+  var pt = patient.read();
+  var obv = smart.patient.api.fetchAll({
+   
+    // Note - I don't know how to sort results by time or anything. Someone
+    // should figure that out
+    type: 'Observation',
+    query: {
+      code: {
+        $or: [
+              'http://loinc.org|39156-5', // BMI
+            ]
+      }
+    }                       
+               
+  });       
+  
+  $.when(pt, obv).fail(onError);         
+  $.when(pt, obv).done(
+    function(patient, obv) {
+		var byCodes = smart.byCodes(obv, 'code');
+	
+		var bmi = byCodes('39156-5');
+		if (bmi.length > 0) {
+			console.log("plotting BMI");
+			ob = bmi[0];
+			//some vitals couldn't be plotted, even though the values were clearly there
+			if (typeof ob.referenceRange != 'undefined' &&
+			      typeof ob['referenceRange'][0] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+				var retStruct = extractDateVal(bmi);
+
+				plotD3Data(retStruct, "BMI");
+			}
+			else {
+				console.log("couldn't read values to plot BMI");
+			}
+		}
+		else {
+			console.log("No BMI");
+		}
+    }
+  )
+}
+
+/* Create the chart for Cholestrol */
+function genCholChart(smart) {
+  var patient = smart.patient;
+  var pt = patient.read();
+  var obv = smart.patient.api.fetchAll({
+   
+    // Note - I don't know how to sort results by time or anything. Someone
+    // should figure that out
+    type: 'Observation',
+    query: {
+      code: {
+        $or: [
+              'http://loinc.org|2093-3', // Cholestrol in Serum (mg/dL)
+            ]
+      }
+    }                       
+               
+  });       
+  
+  $.when(pt, obv).fail(onError);         
+  $.when(pt, obv).done(
+    function(patient, obv) {
+		var byCodes = smart.byCodes(obv, 'code');
+	
+		var chol = byCodes('2093-3');
+		if (chol.length > 0) {
+			console.log("plotting Cholestrol");
+			ob = chol[0];
+			//some vitals couldn't be plotted, even though the values were clearly there
+			if (typeof ob.referenceRange != 'undefined' &&
+			      typeof ob['referenceRange'][0] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+				var retStruct = extractDateVal(chol);
+	
+				plotD3Data(retStruct, "Cholestrol");
+			}
+			else {
+				console.log("couldn't read values to plot Cholestrol");
+			}
+		}
+		else {
+			console.log("No Cholestrol");
+		}
+    }
+  )
+}
+
+/* Create the chart for Glucose */
+function genGlucoseChart(smart) {
+  var patient = smart.patient;
+  var pt = patient.read();
+  var obv = smart.patient.api.fetchAll({
+   
+    // Note - I don't know how to sort results by time or anything. Someone
+    // should figure that out
+    type: 'Observation',
+    query: {
+      code: {
+        $or: [
+              'http://loinc.org|2345-7', // Glucose
+            ]
+      }
+    }                       
+               
+  });       
+  
+  $.when(pt, obv).fail(onError);         
+  $.when(pt, obv).done(
+    function(patient, obv) {
+		var byCodes = smart.byCodes(obv, 'code');
+	
+		var glucose = byCodes('2345-7');
+		if (glucose.length > 0) {
+			console.log("plotting Glucose");
+			ob = glucose[0];
+			//some vitals couldn't be plotted, even though the values were clearly there
+			if (typeof ob.referenceRange != 'undefined' &&
+			      typeof ob['referenceRange'][0] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+				var retStruct = extractDateVal(glucose);
+	
+				plotD3Data(retStruct, "Glucose");
+			}
+			else {
+				console.log("couldn't read values to plot Glucose");
+			}
+		}
+		else {
+			console.log("No Glucose");
+		}
+    }
+  )
+}
+
+/* Create the chart for HDL */
+function genHDLChart(smart) {
+  var patient = smart.patient;
+  var pt = patient.read();
+  var obv = smart.patient.api.fetchAll({
+   
+    // Note - I don't know how to sort results by time or anything. Someone
+    // should figure that out
+    type: 'Observation',
+    query: {
+      code: {
+        $or: [
+              'http://loinc.org|2085-9', // HDL
+            ]
+      }
+    }                       
+               
+  });       
+  
+  $.when(pt, obv).fail(onError);         
+  $.when(pt, obv).done(
+    function(patient, obv) {
+		var byCodes = smart.byCodes(obv, 'code');
+	
+		var hdl = byCodes('2085-9');
+		if (hdl.length > 0) {
+			console.log("plotting HDL");
+			console.log(hdl);
+			ob = hdl[0];
+			//some vitals couldn't be plotted, even though the values were clearly there
+			if (typeof ob.referenceRange != 'undefined' &&
+			      typeof ob['referenceRange'][0] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+				var retStruct = extractDateVal(hdl);
+	
+				plotD3Data(retStruct, "HDL");
+			}
+			else {
+				console.log("couldn't read values to plot HDL");
+			}
+		}
+		else {
+			console.log("No HDL");
+		}
+    }
+  )
+}
+
+/* Create the chart for HBA1c */
+function genHBA1cChart(smart) {
+  var patient = smart.patient;
+  var pt = patient.read();
+  var obv = smart.patient.api.fetchAll({
+   
+    // Note - I don't know how to sort results by time or anything. Someone
+    // should figure that out
+    type: 'Observation',
+    query: {
+      code: {
+        $or: [
+              'http://loinc.org|4548-4', // HBA1c
+            ]
+      }
+    }                       
+               
+  });       
+  
+  $.when(pt, obv).fail(onError);         
+  $.when(pt, obv).done(
+    function(patient, obv) {
+		var byCodes = smart.byCodes(obv, 'code');
+	
+		var hba1c = byCodes('4548-4');
+		if (hba1c.length > 0) {
+			console.log("plotting HBA1c");
+			console.log(hba1c);
+			ob = hba1c[0];
+			//some vitals couldn't be plotted, even though the values were clearly there
+			if (typeof ob.referenceRange != 'undefined' &&
+			      typeof ob['referenceRange'][0] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+				var retStruct = extractDateVal(hba1c);
+	
+				plotD3Data(retStruct, "HBA1c");
+			}
+			else {
+				console.log("couldn't read values to plot HBA1c");
+			}
+		}
+		else {
+			console.log("No HBA1c");
+		}
+    }
+  )
+}
+
+/* Create the chart for LDL */
+function genLDLChart(smart) {
+  var patient = smart.patient;
+  var pt = patient.read();
+  var obv = smart.patient.api.fetchAll({
+   
+    // Note - I don't know how to sort results by time or anything. Someone
+    // should figure that out
+    type: 'Observation',
+    query: {
+      code: {
+        $or: [
+              'http://loinc.org|13457-7', // LDL
+            ]
+      }
+    }                       
+               
+  });       
+  
+  $.when(pt, obv).fail(onError);         
+  $.when(pt, obv).done(
+    function(patient, obv) {
+		var byCodes = smart.byCodes(obv, 'code');
+	
+		var ldl = byCodes('13457-7');
+		if (ldl.length > 0) {
+			console.log("plotting LDL");
+			console.log(ldl);
+			ob = ldl[0];
+			//some vitals couldn't be plotted, even though the values were clearly there
+			if (typeof ob.referenceRange != 'undefined' &&
+			      typeof ob['referenceRange'][0] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low'] != 'undefined' &&
+			      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+				var retStruct = extractDateVal(ldl);
+	
+				plotD3Data(retStruct, "LDL");
+			}
+			else {
+				console.log("couldn't read values to plot LDL");
+			}
+		}
+		else {
+			console.log("No LDL");
+		}
     }
   )
 }
