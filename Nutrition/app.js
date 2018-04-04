@@ -12,17 +12,19 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var http = require('http');
+var d3 = require("d3");
+var math = require("mathjs");
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-
-
+  
+     
 /* Initialize app */
 var app = module.exports = express();
 
 /* View Engine */
 app.set('views', path.join(__dirname, 'views'));
-
+ 
 app.engine('handlebars', exphbs({defaultLayout:'layout'}));
 
 app.set('view engine', 'ejs'); // ejs engine - default engine
@@ -39,6 +41,7 @@ app.use('/js', express.static(__dirname + '/node_modules/jquery/dist')); // redi
 app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
 app.use('/css', express.static(__dirname + '/node_modules/font-awesome/css')); // redirect CSS font-awesome
+app.use('/scripts', express.static(__dirname + '/node_modules/mathjs/dist/'));
 
 app.use(session({
   secret: 'secret',

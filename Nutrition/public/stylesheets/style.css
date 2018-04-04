@@ -190,6 +190,32 @@ body {
   border-top: 1px solid #e5e5e5;
 }
 
+/* List for scores*/
+.left-list{
+  width: 28%;
+  float: left;
+  margin-top: 10px;
+}
+
+.right-chart{
+  width: 70%;
+  float:right;
+}
+
+.spider{
+  max-width: 90%;
+  height: 100%;
+  margin-left: 10%;
+}
+
+.scores{
+  margin-top: 15%;
+}
+
+.score-list{
+  margin-left: 0.5%;
+}
+
 /* Customize container */
 @media (min-width: 768px) {
   .container {
@@ -251,4 +277,31 @@ body {
 
 footer{
   margin-top:20px;
+}
+
+.axis path,
+.axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
+.axis text {
+	font-family: sans-serif;
+	font-size: 11px;
+}
+
+.axis text {
+	font-family: sans-serif;
+	font-size: 11px;
+}
+
+.axis2 path,
+.axis2 line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
+.axis2 text {
+	font-family: sans-serif;
+	font-size: 11px;
 }

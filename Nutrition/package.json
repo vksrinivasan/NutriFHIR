@@ -11,6 +11,7 @@
     "bootstrap": "^4.0.0-alpha.6",
     "connect-flash": "*",
     "cookie-parser": "~1.4.3",
+    "d3": "3",
     "debug": "~2.6.0",
     "ejs": "~2.5.5",
     "express": "~4.14.1",
@@ -18,6 +19,7 @@
     "express-messages": "*",
     "express-session": "*",
     "express-validator": "~3.2.1",
+    "fhir.js": "file:../fhir.js",
     "font-awesome": "^4.7.0",
     "jquery": "^3.1.1",
     "morgan": "~1.7.0",
@@ -25,7 +27,8 @@
     "passport": "*",
     "passport-http": "*",
     "passport-local": "*",
+    "popper.js": "^1.14.1",
     "serve-favicon": "~2.3.2",
-    "fhir.js": "file:../fhir.js"
+    "mathjs": "*"
   }
 }
