@@ -1,13 +1,18 @@
 <!--
 <h2 class="page-header" id="name-text">Summary</h2>
 -->
-<div class="col-lg12 mx-auto">
+<div class="mx-auto" id="summary">
 
  
    <div class="card">
      <div id=”container”>
 		<div id="demographicInformation" class="card-body" style="float:left; width: 50%">  
+    
+    <div class="row">
 		  <h2 id="Patient_Name" class="card-title">Loading Patient</h2>
+      <div class="glyphicon glyphicon-menu-hamburger pull-right" style="margin: 10px 20px; color:#2196f3; cursor: move" aria-hidden="true"></div>
+    </div>
+      
 		    <div id="borderDiv" style="border-right:1px solid black">
 			  <table id="demo1">
 				<tbody>
@@ -73,52 +78,24 @@
 
   <div class="card" id='medicationTimeline'>
     <div class="card-body">
-      <h2 class="card-title">Medication timeline</h2>
-    </div>
-  </div>
-
-
-  <div class="card">
-    <div class="card-body">
-      <h2 class="card-title" id = "medTitle">Medications</h2>
 
       <div class="row">
-        <!-- Left Side -->
-        <div class="col-md-9">
-          <b>Prescriber: <span id="med-list-prescriber">-</span></b><br>
-          <b>Dose: <span id="med-list-dose">-</span></b><br>
-          <b>Route: <span id="med-list-route">-</span></b><br>
-          <b>Start Date: <span id="med-list-startDate">-</span></b><br>
-          <b>End Date: <span id="med-list-endDate">-</span></b><br>
-        </div>
-
-<!--
-        <div class="col-md-6">
-          <span id="med-list"></span>
-        </div>
-        /Left Side -->
-
-        <!-- Right Side -->
-        <div class="col-md-3">
-          <b>Status: <span id="med-list-status"></span></b><br>
-        </div>
-        <!--
-        <div class="col-md-3">
-          <span id="problems-list"></span><br>
-        </div>
-        /Right Side -->
-
+        <h2 class="card-title">Medication timeline</h2>
+        <div class="glyphicon glyphicon-menu-hamburger pull-right" style="margin: 10px 20px; color:#2196f3; cursor: move" aria-hidden="true"></div>
       </div>
 
     </div>
   </div>
 
 
+
   <div id="DietCard" class="card">
     <div class="card-body">
-
-		<h2 class="card-title">Diet Indicators</h2>
-		
+      <div class="row">
+        <h2 class="card-title">Diet Indicators</h2>
+        <div class="glyphicon glyphicon-menu-hamburger pull-right" style="margin: 10px 20px; color:#2196f3; cursor: move" aria-hidden="true"></div>
+      </div>
+   
 		<table id="dietHeader">
 			<tbody>
 				<tr>
@@ -163,8 +140,13 @@
   <div class="card">
 	<div id=”container”>
 	<div class="card-body" style="float:left; width: 70%"> 
-		<h2 id="vitalTitle" class="card-title">Vital Signs</h2>
-		<table id="vitals">
+		
+    <div class="row">
+      <h2 id="vitalTitle" class="card-title">Vital Signs</h2>
+		  <div class="glyphicon glyphicon-menu-hamburger pull-right" style="margin: 10px 20px; color:#2196f3; cursor: move" aria-hidden="true"></div>
+    </div>
+      
+    <table id="vitals">
 			<tbody>
 				<tr>
 					<th id="height-name" class="width-30" style="cursor: pointer;">Height:</th>
@@ -224,10 +206,12 @@
 </div>
 
 <script src="javascripts/summarySOF.js" type="text/javascript"></script>
+<script src="javascripts/Sortable.js" type="text/javascript"></script>
 <script src="javascripts/plotFunctions.js" type="text/javascript"></script>
 <script src="javascripts/staticDDP.js" type="text/javascript"></script>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script src="/scripts/math.js" type="text/javascript"></script>
+
 <script>
 
   /* Get static data - Eventually Johnny will have an api/specification for this */
@@ -260,6 +244,10 @@
   document.getElementById("sbp-name").addEventListener("click", sbpHandler, false);
   document.getElementById("sbp-text").addEventListener("click", sbpHandler, false);
 	
-  
+  /* Dragging Cards */
+  Sortable.create(summary, {
+    handle: '.glyphicon-menu-hamburger',
+    animation: 150
+  });
 </script>
 
