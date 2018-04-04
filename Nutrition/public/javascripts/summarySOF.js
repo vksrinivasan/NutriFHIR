@@ -185,6 +185,7 @@ function onReady(smart) {
       var byCodes = smart.byCodes(obv, 'code');
       var weight = byCodes('3141-9');
       $("#weight-text").text(getQuantityValueAndUnit(weight[0]));
+      colorField("#weight-text", weight[0]);
 
       /* Get Height */
       var height = byCodes('8302-2');
@@ -193,6 +194,7 @@ function onReady(smart) {
       /* Get BMI */
       var BMI = byCodes('39156-5');
       $("#bmi-score").text(getQuantityValueAndUnit(BMI[0]));
+      colorField("#bmi-score", BMI[0]);
 
       /*Get Cholesterol(moles/volume) in Serum*/
       var cholesterol = byCodes('14647-2')
@@ -200,31 +202,38 @@ function onReady(smart) {
       /*Get total HBA1C*/
       var hba1c = byCodes('4548-4')
       $("#hba1c-score").text(getQuantityValueAndUnit(hba1c[0]));
+      colorField("#hba1c-score", hba1c[0]);
   
       /*Get total cholesterol*/
       var chol = byCodes('2093-3')
       $("#chol").text(getQuantityValueAndUnit(chol[0]))
       console.log(obv)
+      colorField("#chol", chol[0]);
        
       /*Get HDL*/
       var hdl = byCodes('2085-9')
       $("#hdl-score").text(getQuantityValueAndUnit(hdl[0]))
+      colorField("#hdl-score", hdl[0]);
  
       /*Get HDL*/
       var ldl = byCodes('13457-7')
       $("#ldl-score").text(getQuantityValueAndUnit(ldl[0]))
+      colorField("#ldl-score", ldl[0]);
 	  
-	  /*Get Glucose [Mass/volume] in serum or plasma*/
-	  var gluc = byCodes('2345-7')
-	  $("#gluc-score").text(getQuantityValueAndUnit(gluc[0]))
+      /*Get Glucose [Mass/volume] in serum or plasma*/
+      var gluc = byCodes('2345-7')
+      $("#gluc-score").text(getQuantityValueAndUnit(gluc[0]))
+      colorField("#gluc-score", gluc[0]);
 	  
-	  /*Get Systolic Blood Pressure*/
-	  var sbp = byCodes('8480-6')
-	  $("#sbp-text").text(getQuantityValueAndUnit(sbp[0]))
-	  
-	  /*Get Diastolic Blood Pressure*/
-	  var dbp = byCodes('8462-4')
-	  $("#dbp-text").text(getQuantityValueAndUnit(dbp[0]))
+      /*Get Systolic Blood Pressure*/
+      var sbp = byCodes('8480-6')
+      $("#sbp-text").text(getQuantityValueAndUnit(sbp[0]))  
+      colorField("#sbp-text", sbp[0]);  
+  
+      /*Get Diastolic Blood Pressure*/
+      var dbp = byCodes('8462-4')
+      $("#dbp-text").text(getQuantityValueAndUnit(dbp[0]))
+      colorField("#dbp-text", dbp[0]);
     }
   )
 }
@@ -275,6 +284,38 @@ function getQuantityValueAndUnit(ob) {
         return ob.valueQuantity.value + ' ' + ob.valueQuantity.unit;
   } else {
     return '-';
+  }
+}
+
+/* Helper Function to color Observation value appropriately (assumes lower is better, green is good and red is bad)*/
+function colorField(fieldID, ob) {
+  if (typeof ob != 'undefined' &&
+      typeof ob.valueQuantity != 'undefined' &&
+      typeof ob.valueQuantity.value != 'undefined' &&
+      typeof ob.referenceRange != 'undefined' &&
+      typeof ob['referenceRange'][0]['high'] != 'undefined' &&
+      typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
+      typeof ob['referenceRange'][0]['low'] != 'undefined' &&
+      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+        var color = d3.scale.linear().domain([ob['referenceRange'][0]['low']['value'], ob['referenceRange'][0]['high']['value']])
+			.interpolate(d3.interpolateHcl)
+			.range([d3.rgb('#4CBB17'), d3.rgb("#C21807")]);
+	if (ob.valueQuantity.value > ob['referenceRange'][0]['high']['value']) {
+	  var value_color = color(ob['referenceRange'][0]['high']['value']);
+	}
+	else if (ob.valueQuantity.value < ob['referenceRange'][0]['low']['value']) {
+	  var value_color = color(ob['referenceRange'][0]['low']['value']);
+	}
+	else {
+	  var value_color = color(ob.valueQuantity.value);
+	}
+	d3.select(fieldID).style("color", value_color);
+  }
+  else {
+	console.log("not coloring " + fieldID);
+	if (typeof ob != 'undefined') {
+	  console.log(typeof ob.referenceRange[0]['high']);
+	}
   }
 }
 
