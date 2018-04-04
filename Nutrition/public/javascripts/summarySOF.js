@@ -173,24 +173,71 @@ function onReady(smart) {
       );
 
       /* Get Patient Gender */
-      //console.log(patient.gender);
       $("#gender_text").text(
-        titleCase(patient.gender)
+        titleCase(patient['gender'])
       );
 
-      /* Get Patient Birth Date */
-      var dob = new Date(patient.birthDate);
+      /* Hispanic or Latino? */
+
+      $("#hisp_or_lat_text").text(patient['extension'][1]['extension'][1].valueString);
+
+
+      /* Get Patient Marital Status */
+      $("#married_text").text(
+        titleCase(patient['maritalStatus'].text)
+      );
+
+
+      /* Get Patient Birth Date and Age*/
+      var dob = new Date(patient['birthDate']);
       var day = dob.getDate();
       var monthIndex = dob.getMonth() + 1;
       var year = dob.getFullYear();
+
+      var today = new Date();
+      var age = today.getFullYear() - year;
+      if (today.getMonth() < monthIndex || (today.getMonth() == monthIndex && today.getDate() < day)) {
+          age--;
+      }
+
+      if (day < 10) {
+        day = '0' + day;
+      }
+      if (monthIndex < 10) {
+        monthIndex = '0' + monthIndex;
+      }
+
       var dobStr = monthIndex + "/" + day + '/' + year;
       //console.log(dobStr);
-      $("#birth-text").text(dobStr);
 
-      /* Get Age */
-      var age = parseInt(calculateAge(dob));
-      //console.log(age);
-      $("#age-text").text(age + " yrs");
+      $("#dob_age_text").text(dobStr + " (" + age + "Y)");
+
+
+      /* Get Patient Address */
+      var adr = patient['address'][0]['line'][0];
+      var city = patient['address'][0].city;
+      var state = patient['address'][0].state;
+      var fullAddress = adr + ", " + city + ", " + state;
+      $("#addr_text").text(
+        (fullAddress)
+      );
+
+      function normalize(phone) {
+        //normalize string and remove all unnecessary characters
+        phone = phone.replace(/[^\d]/g, "");
+        //check if number length equals to 10
+        if (phone.length == 10) {
+            //reformat and return phone number
+            return phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1)-$2-$3");
+        }
+        return null;
+      }
+      var phoneNum = patient['telecom'][0]['value'];
+      phoneNum = normalize(phoneNum);
+
+      $("#home_phone_text").text(
+        (phoneNum)
+      );
 
       /* Print statuses for diabetes and hypertension */
       console.log("Diabetes: " + isDiabetic);

@@ -12,7 +12,7 @@
 			  <table id="demo1">
 				<tbody>
 					<tr>
-						<th id="dob_age_text" class="width-30">01/12/1998 (30Y)</th>
+						<th id="dob_age_text" class="width-30">Unknown</th>
 						<th></th>
 						<th></th>
 						<th id="gender_text" class="width-30">Gender Unknown</th>
@@ -26,7 +26,7 @@
 					</tr>
 
 					<tr>
-						<th id="married_text" class="width-30">Not Married</th>
+						<th id="married_text" class="width-30">Unknown</th>
 					</tr>
 
 				</tbody>
@@ -35,7 +35,7 @@
 			  <table id="demo2">
 				<tbody>
 					<tr>
-						<th id="addr_text" class="width-30">12309 Randolph Ln. Austin, Texas</th>
+						<th id="addr_text" class="width-30">Unknown</th>
 					</tr>
 				</tbody>
 			  </table>
@@ -50,19 +50,19 @@
 				<tr>
 					<th class="width-30">Home Phone #:</th>
 					<th class="width-10">
-					<td id="home_phone_text">512-844-3982</td>
+					<td id="home_phone_text">Unknown</td>
 				</tr>
 
 				<tr>
 					<th class="width-30">Cell Phone #:</th>
 					<th class="width-10">
-					<td id="cell_phone_text">512-322-4852</td>
+					<td id="cell_phone_text">Unknown</td>
 				</tr>
 
 				<tr>
 					<th class="width-30">Email:</th>
 					<th class="width-10">
-					<td id="email_text">bobrylandisgreat@gmail.com</td>
+					<td id="email_text">Unknown</td>
 				</tr>
 
 			</tbody>
@@ -116,38 +116,7 @@
   </div>
 
 
-
-
-
-  <div class="card">
-    <div class="card-body">
-      <h2 class="card-title">Allergies</h2>
-
-      <div class="row">
-        <!-- Left Side -->
-        <div class="col-md-3">
-          <b>Allergies:</b>
-        </div>
-        <div class="col-md-3">
-          <span id="allergies-list"></span>
-        </div>
-        <!--/Left Side -->
-
-        <!-- Right Side -->
-        <div class="col-md-3">
-
-        </div>
-        <div class="col-md-3">
-
-        </div>
-        <!--/Right Side -->
-      </div>
-
-    </div>
-  </div>
-
-
-  <div class="card">
+  <div id="DietCard" class="card">
     <div class="card-body">
 
 		<h2 class="card-title">Diet Indicators</h2>
@@ -174,19 +143,22 @@
 					<th align="center" class="width-30">DASH</th>
 				</tr>
 				<tr>
-					<td id="hei_value" align="center" valign="middle" class="width-30">-</th>
+					<td id="hei_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
 					<th></th>
 					<th></th>
 					<th></th>
-					<td id="ahei_value" align="center" valign="middle" class="width-30">-</th>
+					<td id="ahei_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
 					<th></th>
 					<th></th>
 					<th></th>
-					<td id="dash_value" align="center" valign="middle" class="width-30">-</th>
+					<td id="dash_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
 				</tr>
 			</tbody>
 		</table>
     </div>
+	<div id="DietChart" class="card-body">
+	
+	</div>
   </div>
 
 
@@ -266,6 +238,21 @@
   /* Get data from EHR */
   FHIR.oauth2.ready(onReady, onError);
 
+  /* HEI Listeners */
+  document.getElementById("hei_value").addEventListener("mouseover", heiHandler_mouseover, false);
+  document.getElementById("hei_value").addEventListener("mouseout", handle_mouseout, false);
+  document.getElementById("hei_value").addEventListener("click", heiHandler_click, false);
+  
+  /* AHEI Listeners */
+  document.getElementById("ahei_value").addEventListener("mouseover", aheiHandler_mouseover, false);
+  document.getElementById("ahei_value").addEventListener("mouseout", handle_mouseout, false);
+  document.getElementById("ahei_value").addEventListener("click", aheiHandler_click, false);
+  
+  /* DASH Listeners */
+  document.getElementById("dash_value").addEventListener("mouseover", dashHandler_mouseover, false);
+  document.getElementById("dash_value").addEventListener("mouseout", handle_mouseout, false);
+  document.getElementById("dash_value").addEventListener("click", dashHandler_click, false);
+ 
   /* Height Listener */
   document.getElementById("height-name").addEventListener("click", heightHandler, false);
   document.getElementById("height-text").addEventListener("click", heightHandler, false);

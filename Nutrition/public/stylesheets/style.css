@@ -279,6 +279,22 @@ footer{
   margin-top:20px;
 }
 
+.axis path,
+.axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges;
+}
+.axis text {
+	font-family: sans-serif;
+	font-size: 11px;
+}
+
+.axis text {
+	font-family: sans-serif;
+	font-size: 11px;
+}
+
 .axis2 path,
 .axis2 line {
 	fill: none;
@@ -286,11 +302,6 @@ footer{
 	shape-rendering: crispEdges;
 }
 .axis2 text {
-	font-family: sans-serif;
-	font-size: 11px;
-}
-
-.axis text {
 	font-family: sans-serif;
 	font-size: 11px;
 }
