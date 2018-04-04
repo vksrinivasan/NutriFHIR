@@ -3,10 +3,10 @@
 -->
 <div class="col-lg12 mx-auto">
 
- 
+
    <div class="card">
      <div id=”container”>
-		<div id="demographicInformation" class="card-body" style="float:left; width: 50%">  
+		<div id="demographicInformation" class="card-body" style="float:left; width: 50%">
 		  <h2 id="Patient_Name" class="card-title">Loading Patient</h2>
 		    <div id="borderDiv" style="border-right:1px solid black">
 			  <table id="demo1">
@@ -16,22 +16,22 @@
 						<th></th>
 						<th></th>
 						<th id="gender_text" class="width-30">Gender Unknown</th>
-					</tr>		
-						
+					</tr>
+
 					<tr>
 						<th id="race_text" class="width-30">Race Unknown</th>
 						<th></th>
 						<th></th>
 						<th id="hisp_or_lat_text" class="width-30">Hisp/Latino Unknown</th>
-					</tr>		
-					
+					</tr>
+
 					<tr>
 						<th id="married_text" class="width-30">Not Married</th>
 					</tr>
-					
+
 				</tbody>
 			  </table>
-			  
+
 			  <table id="demo2">
 				<tbody>
 					<tr>
@@ -46,34 +46,36 @@
 		  <br>
 		  <table id="demo3">
 			<tbody>
-			
+
 				<tr>
 					<th class="width-30">Home Phone #:</th>
 					<th class="width-10">
 					<td id="home_phone_text">512-844-3982</td>
 				</tr>
-				
+
 				<tr>
 					<th class="width-30">Cell Phone #:</th>
 					<th class="width-10">
 					<td id="cell_phone_text">512-322-4852</td>
 				</tr>
-				
+
 				<tr>
 					<th class="width-30">Email:</th>
 					<th class="width-10">
 					<td id="email_text">bobrylandisgreat@gmail.com</td>
 				</tr>
-				
+
 			</tbody>
 		  </table>
 		</div>
 	 </div>
   </div>
 
+
   <div class="card" id='medicationTimeline'>
     <div class="card-body">
       <h2 class="card-title">Medication timeline</h2>
+      <div id="tooltips"></div>
     </div>
   </div>
 
@@ -149,7 +151,7 @@
     <div class="card-body">
 
 		<h2 class="card-title">Diet Indicators</h2>
-		
+
 		<table id="dietHeader">
 			<tbody>
 				<tr>
@@ -157,7 +159,7 @@
 				</tr>
 			</tbody>
 		</table>
-		
+
 		<table>
 			<tbody>
 				<tr>
@@ -190,7 +192,7 @@
 
   <div class="card">
 	<div id=”container”>
-	<div class="card-body" style="float:left; width: 70%"> 
+	<div class="card-body" style="float:left; width: 70%">
 		<h2 id="vitalTitle" class="card-title">Vital Signs</h2>
 		<table id="vitals">
 			<tbody>
@@ -243,7 +245,7 @@
 					<td></td>
 					<th class="width-30">Low Density Lipoprotein:</th>
 					<td id=ldl-score></td>
-				</tr>				
+				</tr>
 			</tbody>
 		</table>
 	</div>
@@ -263,15 +265,14 @@
 
   /* Get data from EHR */
   FHIR.oauth2.ready(onReady, onError);
-  
+
   /* Height Listener */
   document.getElementById("height-name").addEventListener("click", heightHandler, false);
   document.getElementById("height-text").addEventListener("click", heightHandler, false);
-  
+
   /* SBP Listener */
   document.getElementById("sbp-name").addEventListener("click", sbpHandler, false);
   document.getElementById("sbp-text").addEventListener("click", sbpHandler, false);
-	
-  
-</script>
 
+
+</script>
