@@ -71,6 +71,18 @@
 	 </div>
   </div>
 
+<div class="card">
+  <div id="GroceryCardMap" class="card-body">
+		<div id=”grocery-container”>
+		<h2 id="groceryTitle" class="card-title">Groceries Map</h2>
+		<div id = "groceryInfo" class="card-body" style="float:left; width: 30%">
+		</div>
+		<div id="mapChart" class="card-body" style="float:right; width: 70%"></div>
+
+  </div>
+  </div>
+</div>
+
 
   <div class="card" id='medicationTimeline'>
     <div class="card-body">
@@ -193,6 +205,7 @@
 <script src="javascripts/staticDDP.js" type="text/javascript"></script>
 <script src="javascripts/radarChart.js" type="text/javascript"></script>
 <script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false&amp;libraries=places,geometry"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script src="/scripts/math.js" type="text/javascript"></script>
 <script>
@@ -225,6 +238,21 @@
   /* SBP Listener */
   document.getElementById("sbp-name").addEventListener("click", sbpHandler, false);
   document.getElementById("sbp-text").addEventListener("click", sbpHandler, false);
+  
+  function waitForElement(){
+    if(typeof pat_addr !== "undefined"){
+    	console.log("got it!");
+    	console.log(pat_addr);
+    	plotMap(pat_addr, "Groceries");
+        //variable exists, do what you want
+    }
+    else{
+    	//console.log("wait");
+        setTimeout(waitForElement, 250);
+    }
+}
+
+	waitForElement();
 
 
 </script>
