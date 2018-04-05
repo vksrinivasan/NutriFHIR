@@ -174,8 +174,15 @@ function plotScatter(scoreObj) {
 	// Put the data for this sore in an easy to use object
 	var plotVals = []
 	for(i = 0; i < scoreObj['date'].length; i++) {
-		plotVals.push([scoreObj['date'][i], scoreObj['divergence'][i]]);
+		plotVals.push([i, scoreObj['date'][i], scoreObj['divergence'][i], scoreObj]);
 	}
+	
+	var tool_tip = d3.tip()
+	  .attr("class", "d3-tip")
+	  .offset([-400, -150])
+	  .html("<div id='tipDiv'></div>");
+	
+	svg.call(tool_tip);
 	
 	// Now create the circles
 	svg.selectAll("circle")
@@ -183,15 +190,67 @@ function plotScatter(scoreObj) {
 	   .enter()
 	   .append("circle")
 	   .attr("cx", function(d) {
-			return x(d[0]);
+			return x(d[1]);
 	   })
 	   .attr("cy", function(d) {
-			return y(d[1]);
+			return y(d[2]);
 	   })
 	   .attr("r", 3)
+	   .attr("myIndex", function(d) {
+			return d[0];
+	   }) 
 	   .attr("transform", 
 				  "translate(" + margin.left + "," + margin.top + ")")
-	   .style("fill", scoreObj['color']);
+	   .style("fill", scoreObj['color'])
+	   .on('mouseover', function(d) {
+		    tool_tip.show();
+		    var tipSVG = d3.select("#tipDiv")
+						  .append("svg")
+						  .attr("width", 300)
+						  .attr("height", 300)
+						  .attr("class", "tipBody")
+						  .style("background-color", "blue");
+				
+			createSpider(tipSVG, d[0], d[3]);
+						  
+			
+						  
+	    })
+		.on('mouseout', tool_tip.hide);
+}
+
+/* Create the spider chart on mouseover */
+function createSpider(toolTip, index, data) {
+	var w = 300,
+		h = 250;
+
+	console.log(data);
+			
+	var colorscale = d3.scale.category10();
+	var LegendOptions = ['Smartphone'];
+
+	// Get data in format
+	var d = []
+	for(iterator = 0; iterator < data['score'][index].length; iterator++) {
+		temp = {axis: data['comp'][iterator], 
+			    value: (data['score'][index][iterator]/data['ref_hi'][iterator])};
+		d.push(temp);
+	}
+	
+	d = [d];
+
+ 	//Options for the Radar chart, other than default
+	var mycfg = {
+	  w: w,
+	  h: h,
+	  maxValue: 1.0,
+	  levels: 4,
+	  ExtraWidthX: 300
+	}
+
+	//Call function to draw the Radar chart
+	//Will expect that data is in %'s
+	RadarChart.draw("#tipDiv", d, mycfg); 
 }
 
 function plotDistributionDivergence(arr_metrics) {
