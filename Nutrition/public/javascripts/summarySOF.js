@@ -1,3 +1,6 @@
+var pat_addr;
+
+
 /* Required Smart on Fhir On Ready Function */
 function onReady(smart) {
   var patient = smart.patient;
@@ -308,6 +311,10 @@ function onReady(smart) {
       var dbp = byCodes('8462-4')
       $("#dbp-text").text(getQuantityValueAndUnit(dbp[0]))
       colorField("#dbp-text", dbp[0]);
+	    
+	var address = fullAddress; 
+      var queryType = "Groceries";
+      pat_addr = fullAddress;
     }
   )
 }
