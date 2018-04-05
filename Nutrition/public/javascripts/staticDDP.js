@@ -504,3 +504,170 @@ function getDashData_randomized() {
 	var retStruct = {comp: components, ref_lo: reference_lo, ref_hi: reference_hi, date: dates, score: scores};
 	return retStruct;
 }
+
+function plotMap(address, queryType) {
+  var map = null;
+  var gmarkers = [];
+  var destMarkers = [];
+  var service = null;
+  var noAutoComplete = true;
+  var noQuery = true;
+  var initialService = null;
+  var geocoder = new google.maps.Geocoder();
+  var infowindow = new google.maps.InfoWindow({
+    size: new google.maps.Size(100, 30)
+  });
+  var startLoc = new google.maps.LatLng(40.7902778, -73.9597222); // Manhattan, NY
+  var circle = new google.maps.Circle({
+    center: startLoc,
+    radius: 5 * 1609.34, // 10 miles
+    strokeWeight: 2,
+    strokeColor: "black",
+    strokeOpacity: 0.9,
+    fillColor: "red",
+    fillOpacity: 0.15,
+    clickable: false,
+    map: map
+  });
+
+  function callback(results, status) {
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
+      var places = [];
+      for (var i = 0; i < gmarkers.length; i++) {
+        gmarkers[i].setMap(null);
+      }
+      gmarkers = [];
+
+      for (var i = 0; i < results.length; i++) {
+        var place = results[i];
+        places.push(place);
+        createMarker(results[i]);
+      }
+
+      map.fitBounds(circle.getBounds());
+      map.setZoom(map.getZoom() + 1);
+      // if (markers.length == 1) map.setZoom(17);
+      var destArray = [];
+      destMarkers = [];
+
+      var minDist = Number.MAX_VALUE;
+
+      var htmlString = "";
+
+      for (var i = 0; i < gmarkers.length; i++) {
+        var currDist = google.maps.geometry.spherical.computeDistanceBetween(startLoc, gmarkers[i].getPosition());
+        if (currDist < 5 * 1609.34) { // 1609.34 meters/mile
+
+          if (currDist < minDist) {
+            minDist = currDist;
+            var htmlString = "Nearest " + queryType + ": " + results[i].name + "(" + Math.round(currDist / 1609.34);
+
+            if (currDist < 1 * 1609.34) {
+              htmlString = htmlString + " mile away)"
+            } else {
+              htmlString = htmlString + " miles away)"
+            }
+
+
+          }
+          destArray.push(gmarkers[i].getPosition());
+          destMarkers.push(gmarkers[i]);
+        }
+      }
+
+      $("#groceryInfo").text(htmlString);
+
+    }
+  }
+
+  function initialize() {
+    //document.getElementById('target').value = "Starbucks";
+		
+    map = new google.maps.Map(document.getElementById('mapChart'), {
+      center: new google.maps.LatLng(40.65, -73.95), // Brooklyn, NY
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      streetViewControl: false
+    });
+    circle.setMap(map);
+    service = new google.maps.places.PlacesService(map);
+    initialService = new google.maps.places.PlacesService(map);
+
+
+    geocoder.geocode({
+      'address': address
+    }, function(results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+        startLoc = results[0].geometry.location;
+        circle.setCenter(startLoc);
+        var request = {
+          bounds: circle.getBounds(),
+          query: queryType
+        };
+        initialService.textSearch(request, callback);
+      } else {
+        alert("geocode failed:" + status); 
+      }
+    });
+
+    var groceryCard = document.getElementById('GroceryCardMap');
+    var groceryCardDim = groceryCard.getBoundingClientRect();
+    var height = groceryCardDim.height*2.7;
+    var width = groceryCardDim.width*1.4;
+
+	var svg2 = d3.select("#mapChart")
+		.append("svg")
+		.attr("width", width)
+		.attr("height", height);
+
+  }
+
+ 
+  var mapDiv = document.getElementById('mapChart');
+
+  initialize();
+  //google.maps.event.addDomListener(window, 'load', initialize);
+
+  function createMarker(place) {
+    var placeLoc = place.geometry.location;
+    if (place.icon) {
+      var image = {
+        url: place.icon,
+        // size:new google.maps.Size(71, 71),
+        // origin: new google.maps.Point(0, 0), 
+        // anchor:new google.maps.Point(35, 0),
+        scaledSize: new google.maps.Size(13, 13)
+      };
+    } else var image = null;
+
+    var marker = new google.maps.Marker({
+      map: map,
+      icon: image,
+      position: place.geometry.location
+    });
+    var request = {
+      reference: place.reference
+    };
+
+    google.maps.event.addListener(marker, 'click', function() {
+      infowindow.marker = marker;
+      service.getDetails(request, function(place, status) {
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+          var contentStr = '<h5>' + place.name + '</h5><p>' + place.formatted_address;
+          if (!!place.formatted_phone_number) contentStr += '<br>' + place.formatted_phone_number;
+          if (!!place.website) contentStr += '<br><a target="_blank" href="' + place.website + '">' + place.website + '</a>';
+          contentStr += '<br>' + place.types + '</p>';
+          infowindow.setContent(contentStr + '<input type="button" value="zoom in" onclick="map.setCenter(infowindow.marker.getPosition());map.setZoom(map.getZoom()+1);"/><input type="button" value="zoom out" onclick="map.fitBounds(circle.getBounds());"/>');
+          infowindow.open(map, marker);
+        } else {
+          var contentStr = "<h5>No Result, status=" + status + "</h5>";
+          infowindow.setContent(contentStr);
+          infowindow.open(map, marker);
+        }
+      });
+
+    });
+
+    gmarkers.push(marker);
+  }
+
+}
