@@ -2,7 +2,7 @@
 var hei;
 var ahei;
 var dash;
-var x; 
+var x;
 var y;
 var margin;
 
@@ -17,7 +17,7 @@ function heiHandler_mouseover() {
 		if(d3.select("#AHEI").style('opacity') === "1") {
 			d3.select("#AHEI").style('opacity', 0.3);
 		}
-		
+
 		if(d3.select("#DASH").style('opacity') === "1") {
 			d3.select("#DASH").style('opacity', 0.3);
 		}
@@ -46,7 +46,7 @@ function aheiHandler_mouseover() {
 		if(d3.select("#HEI").style('opacity') === "1") {
 			d3.select("#HEI").style('opacity', 0.3);
 		}
-		
+
 		if(d3.select("#DASH").style('opacity') === "1") {
 			d3.select("#DASH").style('opacity', 0.3);
 		}
@@ -75,11 +75,11 @@ function dashHandler_mouseover() {
 		if(d3.select("#HEI").style('opacity') === "1") {
 			d3.select("#HEI").style('opacity', 0.3);
 		}
-		
+
 		if(d3.select("#AHEI").style('opacity') === "1") {
 			d3.select("#AHEI").style('opacity', 0.3);
 		}
-	} 
+	}
 }
 
 function dashHandler_click() {
@@ -109,44 +109,44 @@ function handle_mouseout() {
 
 
 function populateDietaryData() {
-	 
-	/*  When we get access to some nutrition server/scoring method, we can 
-	 *  change these first 3 calls to get real data 
+
+	/*  When we get access to some nutrition server/scoring method, we can
+	 *  change these first 3 calls to get real data
 	 */
-	      
-	/* Get HEI-2015 Data */ 
+
+	/* Get HEI-2015 Data */
 	hei = getHEIData_randomized();
-	
-	/* Get AHEI Data */ 
+
+	/* Get AHEI Data */
 	ahei = getAHEIData_randomized();
-	 
+
 	/* Get DASH Data */
-	dash = getDashData_randomized(); 
-	
+	dash = getDashData_randomized();
+
 	/* Fill out current scores */
 	hei_color =	fillOutScores(hei['score'][hei['score'].length-1], // Score For Most Recent Month
 							  hei['ref_hi'], 					   // Reference Ideal Score
 							  hei['date'][hei['date'].length-1],   // Date on Nearest Most Recent Period
 							  "#mrpp_text",						   // ID of element for Most Recent Purchase Period
 							  "#hei_value");					   // ID of element for Most Recent HEI %
-				  
+
 	ahei_color = fillOutScores(ahei['score'][ahei['score'].length-1], // Score For Most Recent Month
 							   ahei['ref_hi'], 					      // Reference Ideal Score
 							   ahei['date'][ahei['date'].length-1],   // Date on Nearest Most Recent Period
 							   "#mrpp_text",						  // ID of element for Most Recent Purchase Period
 							   "#ahei_value");					      // ID of element for Most Recent AHEI %
-				  
+
 	dash_color = fillOutScores(dash['score'][dash['score'].length-1],    // Score For Most Recent Month
 							   dash['ref_hi'], 					         // Reference Ideal Score
 							   dash['date'][dash['date'].length-1],      // Date on Nearest Most Recent Period
 				               "#mrpp_text",						     // ID of element for Most Recent Purchase Period
 							   "#dash_value");					         // ID of element for Most Recent DASH %
-	
+
 	/* Calculate KL-Divergence Between Each Period's Scores and Ideal */
 	hei_divergence = getTimeSeriesDivergence(hei['score'], hei['ref_hi']);
 	ahei_divergence = getTimeSeriesDivergence(ahei['score'], ahei['ref_hi']);
 	dash_divergence = getTimeSeriesDivergence(dash['score'], dash['ref_hi']);
-	
+
 	/* Add Divergences/Names/Colors to the structs */
 	hei['divergence'] = hei_divergence;
 	hei['name'] = 'HEI';
@@ -157,10 +157,10 @@ function populateDietaryData() {
 	dash['divergence'] = dash_divergence;
 	dash['name'] = 'DASH';
 	dash['color'] = dash_color;
-	
+
 	/* Plot KL Divergence */
 	plotDistributionDivergence([hei,ahei,dash]);
-	
+
 }
 
 function clearScatter() {
@@ -170,20 +170,20 @@ function clearScatter() {
 
 function plotScatter(scoreObj) {
 	var svg = d3.select('#DietChart').select("svg");
-	
+
 	// Put the data for this sore in an easy to use object
 	var plotVals = []
 	for(i = 0; i < scoreObj['date'].length; i++) {
 		plotVals.push([i, scoreObj['date'][i], scoreObj['divergence'][i], scoreObj]);
 	}
-	
+
 	var tool_tip = d3.tip()
 	  .attr("class", "d3-tip")
 	  .offset([-400, -150])
 	  .html("<div id='tipDiv'></div>");
-	
+
 	svg.call(tool_tip);
-	
+
 	// Now create the circles
 	svg.selectAll("circle")
 	   .data(plotVals)
@@ -198,8 +198,8 @@ function plotScatter(scoreObj) {
 	   .attr("r", 3)
 	   .attr("myIndex", function(d) {
 			return d[0];
-	   }) 
-	   .attr("transform", 
+	   })
+	   .attr("transform",
 				  "translate(" + margin.left + "," + margin.top + ")")
 	   .style("fill", scoreObj['color'])
 	   .on('mouseover', function(d) {
@@ -210,13 +210,15 @@ function plotScatter(scoreObj) {
 						  .attr("height", 300)
 						  .attr("class", "tipBody")
 						  .style("background-color", "blue");
-				
+
 			createSpider(tipSVG, d[0], d[3]);
-						  
-			
-						  
+
+
+
 	    })
-		.on('mouseout', tool_tip.hide);
+		.on('mouseout', function(){
+				d3.select("#tipDiv").remove()
+		});
 }
 
 /* Create the spider chart on mouseover */
@@ -225,18 +227,18 @@ function createSpider(toolTip, index, data) {
 		h = 250;
 
 	console.log(data);
-			
+
 	var colorscale = d3.scale.category10();
 	var LegendOptions = ['Smartphone'];
 
 	// Get data in format
 	var d = []
 	for(iterator = 0; iterator < data['score'][index].length; iterator++) {
-		temp = {axis: data['comp'][iterator], 
+		temp = {axis: data['comp'][iterator],
 			    value: (data['score'][index][iterator]/data['ref_hi'][iterator])};
 		d.push(temp);
 	}
-	
+
 	d = [d];
 
  	//Options for the Radar chart, other than default
@@ -250,60 +252,60 @@ function createSpider(toolTip, index, data) {
 
 	//Call function to draw the Radar chart
 	//Will expect that data is in %'s
-	RadarChart.draw("#tipDiv", d, mycfg); 
+	RadarChart.draw("#tipDiv", d, mycfg);
 }
 
 function plotDistributionDivergence(arr_metrics) {
 	console.log(arr_metrics);
 	var cardData = document.getElementById('DietCard');
 	var cardDim = cardData.getBoundingClientRect();
-	
+
 	var width = cardDim.width*.95;
 	var height = cardDim.height;
-	
+
 	//Get margin and weidth height
 	margin = {top: 30, right: 50, bottom: 30, left: 50};
 	var width = width - margin.left - margin.right;
 	var height = height - margin.top - margin.bottom;
-				
+
 	// Set Axis Scales
 	var y_min = arr_metrics[0]['divergence'][0];
 	var y_max = arr_metrics[0]['divergence'][0];
 	var x_min = arr_metrics[0]['date'][0];
 	var x_max = arr_metrics[0]['date'][0];
-	
+
 	for(i = 0; i < arr_metrics.length; i++) {
 		y_min = math.min(math.min(arr_metrics[i]['divergence']), y_min);
 		y_max = math.max(math.max(arr_metrics[i]['divergence']), y_max);
-		
+
 		var x_min_t = new Date(Math.min.apply(null, arr_metrics[i]['date']));
 		x_min = new Date(Math.min.apply(null, [x_min_t, x_min]));
-		
+
 		var x_max_t = new Date(Math.max.apply(null, arr_metrics[i]['date']));
 		x_max = new Date(Math.max.apply(null, [x_max_t, x_max]));
 	}
-	
+
 	console.log(x_min);
 	console.log(x_max);
 	var adj_factor = (y_max - y_min)/4.0;
 	y_min = y_min - adj_factor;
 	y_max = y_max + adj_factor;
-	
+
 	x = d3.time.scale()
 			   .domain([x_min, x_max])
 			   .range([0, width]);
-				  
+
 	y = d3.scale.linear()
 					  .domain([y_min, y_max])
 					  .range([height, 0]);
-						  
-	// Define the axes 
+
+	// Define the axes
 	var xAxis = d3.svg.axis().scale(x)
     .orient("bottom").ticks(5);
-	
+
 	var yAxis = d3.svg.axis().scale(y)
     .orient("left").ticks(5);
-	
+
 	// Define the line
 	var lineFunc = d3.svg.line()
 		.x(function(d) {
@@ -313,27 +315,27 @@ function plotDistributionDivergence(arr_metrics) {
 			return y(d[1]);
 		})
 	  .interpolate('linear');
-		
+
 	// Adds the svg canvas
 	var svg = d3.select("#DietChart")
 		.append("svg")
 			.attr("width", width + margin.left + margin.right)
 			.attr("height", height + margin.top + margin.bottom)
 		.append("g")
-			.attr("transform", 
+			.attr("transform",
 				  "translate(" + margin.left + "," + margin.top + ")");
-				  
+
 	// Add the X Axis
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
- 
+
     // Add the Y Axis
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis);
-	
+
 	// Plot data
 	for(i = 0; i < arr_metrics.length; i++) {
 		var plotVals = [];
@@ -347,16 +349,16 @@ function plotDistributionDivergence(arr_metrics) {
 			.attr('fill', 'none')
 			.attr('id', arr_metrics[i]['name']);
 	}
-	
+
 	// Give title
 	svg.append("text")
-        .attr("x", (width / 2))             
+        .attr("x", (width / 2))
         .attr("y", 0 - (margin.top / 4))
-        .attr("text-anchor", "middle")  
+        .attr("text-anchor", "middle")
 		.attr("font-family", "sans-serif")
-        .style("font-size", "15px")  
+        .style("font-size", "15px")
         .text("Ideal Eating Index Divergence v. Time");
-		
+
 	// Add y-axis
     svg.append("text")
 		.attr("transform", "rotate(-90)")
@@ -381,21 +383,21 @@ function add(a, b) {
     return a + b;
 }
 
-function fillOutScores(actComponentScores, idealComponentScores, date, loc_mrpp, loc_val) { 
+function fillOutScores(actComponentScores, idealComponentScores, date, loc_mrpp, loc_val) {
 	var actTotal = actComponentScores.reduce(add, 0.0);
 	var idealTotal = idealComponentScores.reduce(add, 0.0);
 	var propOfIdeal = actTotal/idealTotal;
-	
+
 	$(loc_mrpp).text("Most Recent Purchase Period (" + date.toDateString() + ")");
-	
+
 	/* We want to have a color scale for the %'s */
 	var color = d3.scale.linear().domain([0.30,0.70])
 								 .interpolate(d3.interpolateHcl)
 								 .range([d3.rgb("#C21807"), d3.rgb('#4CBB17')]);
-	
+
 	var value_color = color(propOfIdeal);
 	$(loc_val).text(String(((propOfIdeal) * 100).toFixed(0) + '%'));
-	d3.select(loc_val).style("color",value_color); 
+	d3.select(loc_val).style("color",value_color);
 	return value_color;
 }
 
@@ -407,9 +409,9 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-/* Randomized Data Generating Functions Below - Whoever gets access to an API 
- * for nutrition data would need to just replace these functions with calls to 
- * that API and transform the data into this format 
+/* Randomized Data Generating Functions Below - Whoever gets access to an API
+ * for nutrition data would need to just replace these functions with calls to
+ * that API and transform the data into this format
  */
 function getHEIData_randomized() {
 	var components = [
@@ -427,18 +429,18 @@ function getHEIData_randomized() {
 		'Added Sugars',
 		'Saturated Fats'
 		];
-	
+
 	var reference_lo = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0];
 	var reference_hi = [5.0,5.0,5.0,5.0,10.0,10.0,5.0,5.0,10.0,10.0,10.0,10.0,10.0];
 	var dates = [new Date(2018,0,1), new Date(2018,1,1),new Date(2018,2,1),new Date(2018,3,1)];
 	var scores = [[], [], [], []];
-	
+
 	for(i = 0; i < dates.length; i++) {
 		for(j = 0; j < components.length; j++) {
 			scores[i][j] = getRandomFloat(reference_lo[j], reference_hi[j]);
 		}
 	}
-	
+
 	var retStruct = {comp: components, ref_lo: reference_lo, ref_hi: reference_hi, date: dates, score: scores};
 	return retStruct;
 }
@@ -455,18 +457,18 @@ function getAHEIData_randomized() {
 		'Duration of Multivitamin Use',
 		'Alcohol'
 		];
-		
+
 	var reference_lo = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,2.5,0.0];
 	var reference_hi = [10.0,10.0,10.0,10.0,10.0,10.0,10.0,7.5,10.0];
 	var dates = [new Date(2018,0,1), new Date(2018,1,1),new Date(2018,2,1),new Date(2018,3,1)];
 	var scores = [[], [], [], []];
-	
+
 	for(i = 0; i < dates.length; i++) {
 		for(j = 0; j < components.length; j++) {
 			scores[i][j] = getRandomFloat(reference_lo[j], reference_hi[j]);
 		}
 	}
-	
+
 	var retStruct = {comp: components, ref_lo: reference_lo, ref_hi: reference_hi, date: dates, score: scores};
 	return retStruct;
 }
@@ -483,14 +485,14 @@ function getDashData_randomized() {
 		'Cholesterol',
 		'Sodium'
 		];
-	
+
 	//var possValues = [0.0, 0.5, 1.0];
-		
+
 	var reference_lo = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0];
 	var reference_hi = [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0];
 	var dates = [new Date(2018,0,1), new Date(2018,1,1),new Date(2018,2,1),new Date(2018,3,1)];
 	var scores = [[], [], [], []];
-	
+
 	for(i = 0; i < dates.length; i++) {
 		for(j = 0; j < components.length; j++) {
 			//var index = getRandomInt(0,2);
@@ -498,7 +500,7 @@ function getDashData_randomized() {
 			scores[i][j] = getRandomFloat(reference_lo[j], reference_hi[j]);
 		}
 	}
-	
+
 	var retStruct = {comp: components, ref_lo: reference_lo, ref_hi: reference_hi, date: dates, score: scores};
 	return retStruct;
 }
