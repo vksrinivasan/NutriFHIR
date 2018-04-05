@@ -1,230 +1,252 @@
 <!--
 <h2 class="page-header" id="name-text">Summary</h2>
 -->
-<div class="col-lg12 mx-auto">
+<div class="col-lg12 mx-auto" id="summary">
 
 
-   <div class="card">
-     <div id=”container”>
-		<div id="demographicInformation" class="card-body" style="float:left; width: 50%">
-		  <h2 id="Patient_Name" class="card-title">Loading Patient</h2>
-		    <div id="borderDiv" style="border-right:1px solid black">
-			  <table id="demo1">
-				<tbody>
-					<tr>
-						<th id="dob_age_text" class="width-30">Unknown</th>
-						<th></th>
-						<th></th>
-						<th id="gender_text" class="width-30">Gender Unknown</th>
-					</tr>
+	<div class="card">
+		<div id="container">
+			<div id="demographicInformation" class="card-body" style="">
+				
+				<div class="row">
+        	<h2 id="Patient_Name" class="card-title col-sm-11">Loading Patient</h2>
+        	<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
+      	</div>
 
-					<tr>
-						<th id="race_text" class="width-30">Race Unknown</th>
-						<th></th>
-						<th></th>
-						<th id="hisp_or_lat_text" class="width-30">Hisp/Latino Unknown</th>
-					</tr>
 
-					<tr>
-						<th id="married_text" class="width-30">Unknown</th>
-					</tr>
+				<div id="borderDiv" style="border-right:1px solid black; float:left; width: 50%">
+					<table id="demo1">
+						<tbody>
+							<tr>
+								<th id="dob_age_text" class="width-30">Unknown</th>
+								<th></th>
+								<th></th>
+								<th id="gender_text" class="width-30">Gender Unknown</th>
+							</tr>
 
-				</tbody>
-			  </table>
+							<tr>
+								<th id="race_text" class="width-30">Race Unknown</th>
+								<th></th>
+								<th></th>
+								<th id="hisp_or_lat_text" class="width-30">Hisp/Latino Unknown</th>
+							</tr>
 
-			  <table id="demo2">
-				<tbody>
-					<tr>
-						<th id="addr_text" class="width-30">Unknown</th>
-					</tr>
-				</tbody>
-			  </table>
+							<tr>
+								<th id="married_text" class="width-30">Unknown</th>
+							</tr>
+
+						</tbody>
+					</table>
+
+					<table id="demo2">
+						<tbody>
+							<tr>
+								<th id="addr_text" class="width-30">Unknown</th>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<table id="demo3" style="float:right; width: 50%">
+					<tbody>
+
+						<tr>
+							<th class="width-30">Home Phone #:</th>
+							<th class="width-10">
+								<td id="home_phone_text">Unknown</td>
+						</tr>
+
+						<tr>
+							<th class="width-30">Cell Phone #:</th>
+							<th class="width-10">
+								<td id="cell_phone_text">Unknown</td>
+						</tr>
+
+						<tr>
+							<th class="width-30">Email:</th>
+							<th class="width-10">
+								<td id="email_text">Unknown</td>
+						</tr>
+
+					</tbody>
+				</table>
 			</div>
+			
 		</div>
-		<div id="contact_info" class="card-body" style="float:right; width: 50%">
-		  <br>
-		  <br>
-		  <table id="demo3">
-			<tbody>
+	</div>
 
-				<tr>
-					<th class="width-30">Home Phone #:</th>
-					<th class="width-10">
-					<td id="home_phone_text">Unknown</td>
-				</tr>
 
-				<tr>
-					<th class="width-30">Cell Phone #:</th>
-					<th class="width-10">
-					<td id="cell_phone_text">Unknown</td>
-				</tr>
-
-				<tr>
-					<th class="width-30">Email:</th>
-					<th class="width-10">
-					<td id="email_text">Unknown</td>
-				</tr>
-
-			</tbody>
-		  </table>
+	<div class="card" id='medicationTimeline'>
+		<div class="card-body">
+			<div class="row">
+        	<h2 class="card-title col-sm-11">Medication timeline</h2>
+        	<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
+      </div>
+			<div id="tooltips"></div>
 		</div>
-	 </div>
-  </div>
-
-
-  <div class="card" id='medicationTimeline'>
-    <div class="card-body">
-      <h2 class="card-title">Medication timeline</h2>
-      <div id="tooltips"></div>
-    </div>
-  </div>
-
-  <div id="DietCard" class="card">
-    <div class="card-body">
-
-		<h2 class="card-title">Diet Indicators</h2>
-
-		<table id="dietHeader">
-			<tbody>
-				<tr>
-					<th id="mrpp_text" class="width-30">Most Recent Purchase Period (xx/xx/xxxx)</th>
-				</tr>
-			</tbody>
-		</table>
-
-		<table>
-			<tbody>
-				<tr>
-					<th align="center" class="width-30">HEI</th>
-					<th></th>
-					<th></th>
-					<th></th>
-					<th align="center" class="width-30">AHEI</th>
-					<th></th>
-					<th></th>
-					<th></th>
-					<th align="center" class="width-30">DASH</th>
-				</tr>
-				<tr>
-					<td id="hei_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
-					<th></th>
-					<th></th>
-					<th></th>
-					<td id="ahei_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
-					<th></th>
-					<th></th>
-					<th></th>
-					<td id="dash_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
-				</tr>
-			</tbody>
-		</table>
-    </div>
-	<div id="DietChart" class="card-body">
-	
 	</div>
-  </div>
 
+	<div id="DietCard" class="card">
+		<div class="card-body">
+			<div class="row">
+        	<h2 class="card-title col-sm-11">Diet Indicators</h2>
+        	<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
+      </div>
 
-  <div class="card">
-	<div id=”container”>
-	<div class="card-body" style="float:left; width: 70%">
-		<h2 id="vitalTitle" class="card-title">Vital Signs</h2>
-		<table id="vitals">
-			<tbody>
-				<tr>
-					<th id="height-name" class="width-30" style="cursor: pointer;">Height:</th>
-					<td id="height-text" style="cursor: pointer;"></td>
-					<th class="width-30"></th>
-					<td></td>
-					<th class="width-30"></th>
-					<td></td>
-					<th id="sbp-name" class="width-30" style="cursor: pointer;">Systolic Blood Pressure:</th>
-					<td id="sbp-text" style="cursor: pointer;"></td>
-				</tr>
-				<tr>
-					<th class="width-30">Weight:</th>
-					<td id="weight-text"></td>
-					<th class="width-30"></th>
-					<td></td>
-					<th class="width-30"></th>
-					<td></td>
-					<th class="width-30">Diastolic Blood Pressure:</th>
-					<td id="dbp-text"></td>
-				</tr>
-				<tr>
-					<th class="width-30">BMI:</th>
-					<td id=bmi-score></td>
-					<th class="width-30"></th>
-					<td></td>
-					<th class="width-30"></th>
-					<td></td>
-					<th class="width-30">Cholesterol in Serum:</th>
-					<td id=chol></td>
-				</tr>
-				<tr>
-					<th class="width-30">Glucose:</th>
-					<td id=gluc-score></td>
-					<th class="width-30"></th>
-					<td></td>
-					<th class="width-30"></th>
-					<td></td>
-					<th class="width-30">High Density Lipoprotein:</th>
-					<td id=hdl-score></td>
-				</tr>
-				<tr>
-					<th class="width-30">HbA1c:</th>
-					<td id=hba1c-score></td>
-					<th class="width-30"></th>
-					<td></td>
-					<th class="width-30"></th>
-					<td></td>
-					<th class="width-30">Low Density Lipoprotein:</th>
-					<td id=ldl-score></td>
-				</tr>
-			</tbody>
-		</table>
+			<table id="dietHeader">
+				<tbody>
+					<tr>
+						<th id="mrpp_text" class="width-30">Most Recent Purchase Period (xx/xx/xxxx)</th>
+					</tr>
+				</tbody>
+			</table>
+
+			<table>
+				<tbody>
+					<tr>
+						<th align="center" class="width-30">HEI</th>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th align="center" class="width-30">AHEI</th>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th align="center" class="width-30">DASH</th>
+					</tr>
+					<tr>
+						<td id="hei_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<td id="ahei_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
+								<th></th>
+								<th></th>
+								<th></th>
+								<td id="dash_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div id="DietChart" class="card-body">
+
+		</div>
 	</div>
-	<div id="chartRegion" class="card-body" style="float:right; width: 30%"></div>
-  </div>
-</div>
-
-<script src="javascripts/summarySOF.js" type="text/javascript"></script>
-<script src="javascripts/plotFunctions.js" type="text/javascript"></script>
-<script src="javascripts/staticDDP.js" type="text/javascript"></script>
-<script src="javascripts/radarChart.js" type="text/javascript"></script>
-<script src="https://d3js.org/d3.v3.min.js"></script>
-<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
-<script src="/scripts/math.js" type="text/javascript"></script>
-<script>
-
-  /* Get static data - Eventually Johnny will have an api/specification for this */
-  populateDietaryData();
-
-  /* Get data from EHR */
-  FHIR.oauth2.ready(onReady, onError);
-
-  /* HEI Listeners */
-  document.getElementById("hei_value").addEventListener("mouseover", heiHandler_mouseover, false);
-  document.getElementById("hei_value").addEventListener("mouseout", handle_mouseout, false);
-  document.getElementById("hei_value").addEventListener("click", heiHandler_click, false);
-  
-  /* AHEI Listeners */
-  document.getElementById("ahei_value").addEventListener("mouseover", aheiHandler_mouseover, false);
-  document.getElementById("ahei_value").addEventListener("mouseout", handle_mouseout, false);
-  document.getElementById("ahei_value").addEventListener("click", aheiHandler_click, false);
-  
-  /* DASH Listeners */
-  document.getElementById("dash_value").addEventListener("mouseover", dashHandler_mouseover, false);
-  document.getElementById("dash_value").addEventListener("mouseout", handle_mouseout, false);
-  document.getElementById("dash_value").addEventListener("click", dashHandler_click, false);
- 
-  /* Height Listener */
-  document.getElementById("height-name").addEventListener("click", heightHandler, false);
-  document.getElementById("height-text").addEventListener("click", heightHandler, false);
-
-  /* SBP Listener */
-  document.getElementById("sbp-name").addEventListener("click", sbpHandler, false);
-  document.getElementById("sbp-text").addEventListener("click", sbpHandler, false);
 
 
-</script>
+	<div class="card">
+		<div id=”container”>
+			<div class="card-body">
+				<div class="row">
+        	<h2 id="vitalTitle" class="card-title col-sm-11">Vital Signs</h2>
+        	<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
+      	</div>
+				<table id="vitals" style="float:left; width: 70%">
+					<tbody>
+						<tr>
+							<th id="height-name" class="width-30" style="cursor: pointer;">Height:</th>
+							<td id="height-text" style="cursor: pointer;"></td>
+							<th class="width-30"></th>
+							<td></td>
+							<th class="width-30"></th>
+							<td></td>
+							<th id="sbp-name" class="width-30" style="cursor: pointer;">Systolic Blood Pressure:</th>
+							<td id="sbp-text" style="cursor: pointer;"></td>
+						</tr>
+						<tr>
+							<th class="width-30">Weight:</th>
+							<td id="weight-text"></td>
+							<th class="width-30"></th>
+							<td></td>
+							<th class="width-30"></th>
+							<td></td>
+							<th class="width-30">Diastolic Blood Pressure:</th>
+							<td id="dbp-text"></td>
+						</tr>
+						<tr>
+							<th class="width-30">BMI:</th>
+							<td id=bmi-score></td>
+							<th class="width-30"></th>
+							<td></td>
+							<th class="width-30"></th>
+							<td></td>
+							<th class="width-30">Cholesterol in Serum:</th>
+							<td id=chol></td>
+						</tr>
+						<tr>
+							<th class="width-30">Glucose:</th>
+							<td id=gluc-score></td>
+							<th class="width-30"></th>
+							<td></td>
+							<th class="width-30"></th>
+							<td></td>
+							<th class="width-30">High Density Lipoprotein:</th>
+							<td id=hdl-score></td>
+						</tr>
+						<tr>
+							<th class="width-30">HbA1c:</th>
+							<td id=hba1c-score></td>
+							<th class="width-30"></th>
+							<td></td>
+							<th class="width-30"></th>
+							<td></td>
+							<th class="width-30">Low Density Lipoprotein:</th>
+							<td id=ldl-score></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div id="chartRegion" class="card-body" style="float:right; width: 30%"></div>
+		</div>
+	</div>
+
+	<script src="javascripts/summarySOF.js" type="text/javascript"></script>
+	<script src="javascripts/plotFunctions.js" type="text/javascript"></script>
+	<script src="javascripts/staticDDP.js" type="text/javascript"></script>
+	<script src="javascripts/radarChart.js" type="text/javascript"></script>
+	<script src="https://d3js.org/d3.v3.min.js"></script>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+	<script src="/scripts/math.js" type="text/javascript"></script>
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+	<script>
+		/* Get static data - Eventually Johnny will have an api/specification for this */
+		populateDietaryData();
+
+		/* Get data from EHR */
+		FHIR.oauth2.ready(onReady, onError);
+
+		/* HEI Listeners */
+		document.getElementById("hei_value").addEventListener("mouseover", heiHandler_mouseover, false);
+		document.getElementById("hei_value").addEventListener("mouseout", handle_mouseout, false);
+		document.getElementById("hei_value").addEventListener("click", heiHandler_click, false);
+
+		/* AHEI Listeners */
+		document.getElementById("ahei_value").addEventListener("mouseover", aheiHandler_mouseover, false);
+		document.getElementById("ahei_value").addEventListener("mouseout", handle_mouseout, false);
+		document.getElementById("ahei_value").addEventListener("click", aheiHandler_click, false);
+
+		/* DASH Listeners */
+		document.getElementById("dash_value").addEventListener("mouseover", dashHandler_mouseover, false);
+		document.getElementById("dash_value").addEventListener("mouseout", handle_mouseout, false);
+		document.getElementById("dash_value").addEventListener("click", dashHandler_click, false);
+
+		/* Height Listener */
+		document.getElementById("height-name").addEventListener("click", heightHandler, false);
+		document.getElementById("height-text").addEventListener("click", heightHandler, false);
+
+		/* SBP Listener */
+		document.getElementById("sbp-name").addEventListener("click", sbpHandler, false);
+		document.getElementById("sbp-text").addEventListener("click", sbpHandler, false);
+
+		$( function() {
+			//$( ".card-hamburger" ).sortable();
+			
+			$( "#summary" ).sortable({
+				handle: ".card-hamburger"
+			});
+
+			$( ".card-hamburger" ).disableSelection();
+		} );
+	</script>
