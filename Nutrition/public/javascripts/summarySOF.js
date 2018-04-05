@@ -3,7 +3,7 @@ function onReady(smart) {
   var patient = smart.patient;
   var pt = patient.read();
   var obv = smart.patient.api.fetchAll({
-   
+
     // Note - I don't know how to sort results by time or anything. Someone
     // should figure that out
     type: 'Observation',
@@ -19,12 +19,12 @@ function onReady(smart) {
               'http://loinc.org|13457-7',//LDL
 			  'http://loinc.org|2345-7', // Glucose in Serum/Plasma
 			  'http://loinc.org|8480-6', // Systolic Blood Pressure
-			  'http://loinc.org|8462-4', // Diastolic Blood Pressure 
+			  'http://loinc.org|8462-4', // Diastolic Blood Pressure
             ]
       }
-    }                       
-                            
-  });                   
+    }
+
+  });
   var isDiabetic = 0;
   var hasHypertension = false;
 
@@ -32,7 +32,7 @@ function onReady(smart) {
   var meds = smart.patient.api.search({type: 'MedicationOrder'});
 
   //var allergies = smart.patient.api.search({type: 'AllergyIntolerance'});
- 
+
   // /* Generate Medication List */
   smart.patient.api.fetchAllWithReferences({type: "MedicationOrder"},["MedicationOrder.medicationReference"]).then(function(results, refs) {
     id = 0;
@@ -40,13 +40,21 @@ function onReady(smart) {
 
     //Trying timeline concept
    results.forEach(function(prescription){
-     //console.log(prescription)  
+     //console.log(prescription)
      item = {}
      try{
      item.id =  id
      item.start = new Date(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.start)
-     //item.end = new Date(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.end)
-     //item.content = prescription.medicationCodeableConcept.coding[0].display
+     if(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.end){
+        item.end = new Date(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.end)
+      }
+      if(item.end){
+        item.type = 'range'
+      }
+      else{
+        item.type = 'point'
+      }
+      //item.content = prescription.medicationCodeableConcept.coding[0].display
      if(prescription.dosageInstruction[0].route){
      item.route = prescription.dosageInstruction[0].route.text
       }
@@ -64,29 +72,48 @@ function onReady(smart) {
             item.content = getMedicationName(med && med.code.coding || [])
             //displayMedication(med && med.code.coding || []);
         }
+    //format tooltip dispalay
+    item.title = '<b>Medication</b> : '+item.content+'<br>'+
+                 '<b>Prescribed by</b> : '+item.prescriber+'<br>'+
+                 '<b>Status</b> : '+item.status+'<br>'+
+                 '<b>Route</b> : '+item.route+'<br>'+
+                 '<b>Dose</b> : '+item.dosageQuantity+'<br>'+
+                 '<b>Start</b> : '+item.start+'<br>'+
+                 '<b>End</b> : '+item.end+'<br>'
     }
+
 
     catch (e){
       console.log(e.name)
-    } 
+    }
 
     //console.log(item)
     meds.push(item)
     id =id +1;
 
-     });  
- 
+     });
+
      //Build timeline
-     var container = document.getElementById('medicationTimeline')
+     var cap_options = {
+         tooltip: {
+         followMouse: true,
+         overflowMethod: 'cap'
+       }
+     }
+
+
+     var container = document.getElementById('tooltips')
      var items = new vis.DataSet(meds)
      var options = {
        maxHeight : '400px'
-     } 
+     }
 
-     var Timeline = new vis.Timeline(container,items,options)
+
+     var toolT = new vis.Timeline(document.getElementById('tooltips'),items, cap_options);
+     //var Timeline = new vis.Timeline(container,items,options)
      console.log(items)
 
-     Timeline.on('select', function (properties) {
+     /*Timeline.on('select', function (properties) {
      if(properties.items[0]){
        document.getElementById("medTitle").innerHTML = meds[properties.items[0]].content
        document.getElementById("med-list-prescriber").innerHTML = meds[properties.items[0]].prescriber
@@ -95,12 +122,12 @@ function onReady(smart) {
        document.getElementById("med-list-status").innerHTML = meds[properties.items[0]].status
        document.getElementById("med-list-startDate").innerHTML = meds[properties.items[0]].start.toDateString()
      };
-     });  
+   });*/
 
    });
 
 
- 
+
   /* Generate Problem List */
   smart.patient.api.fetchAllWithReferences({type: 'Condition'}).then(function(results) {
    results.forEach(function(condition){
@@ -112,7 +139,7 @@ function onReady(smart) {
 	  isDiabetic += 1;
 	}
      });
-   });   
+   });
 
   /* Generate Allergy List */
   /*
@@ -123,7 +150,7 @@ function onReady(smart) {
 	}
      });
    });*/
-    
+
   $.when(pt, obv, cond, meds).fail(onError);
   $.when(pt, obv, cond, meds).done(
     function(patient, obv, conditions, prescriptions) {
@@ -146,24 +173,71 @@ function onReady(smart) {
       );
 
       /* Get Patient Gender */
-      //console.log(patient.gender);
       $("#gender_text").text(
-        titleCase(patient.gender)
+        titleCase(patient['gender'])
       );
 
-      /* Get Patient Birth Date */
-      var dob = new Date(patient.birthDate);
+      /* Hispanic or Latino? */
+
+      $("#hisp_or_lat_text").text(patient['extension'][1]['extension'][1].valueString);
+
+
+      /* Get Patient Marital Status */
+      $("#married_text").text(
+        titleCase(patient['maritalStatus'].text)
+      );
+
+
+      /* Get Patient Birth Date and Age*/
+      var dob = new Date(patient['birthDate']);
       var day = dob.getDate();
       var monthIndex = dob.getMonth() + 1;
       var year = dob.getFullYear();
+
+      var today = new Date();
+      var age = today.getFullYear() - year;
+      if (today.getMonth() < monthIndex || (today.getMonth() == monthIndex && today.getDate() < day)) {
+          age--;
+      }
+
+      if (day < 10) {
+        day = '0' + day;
+      }
+      if (monthIndex < 10) {
+        monthIndex = '0' + monthIndex;
+      }
+
       var dobStr = monthIndex + "/" + day + '/' + year;
       //console.log(dobStr);
-      $("#birth-text").text(dobStr);
 
-      /* Get Age */
-      var age = parseInt(calculateAge(dob));
-      //console.log(age);
-      $("#age-text").text(age + " yrs");
+      $("#dob_age_text").text(dobStr + " (" + age + "Y)");
+
+
+      /* Get Patient Address */
+      var adr = patient['address'][0]['line'][0];
+      var city = patient['address'][0].city;
+      var state = patient['address'][0].state;
+      var fullAddress = adr + ", " + city + ", " + state;
+      $("#addr_text").text(
+        (fullAddress)
+      );
+
+      function normalize(phone) {
+        //normalize string and remove all unnecessary characters
+        phone = phone.replace(/[^\d]/g, "");
+        //check if number length equals to 10
+        if (phone.length == 10) {
+            //reformat and return phone number
+            return phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1)-$2-$3");
+        }
+        return null;
+      }
+      var phoneNum = patient['telecom'][0]['value'];
+      phoneNum = normalize(phoneNum);
+
+      $("#home_phone_text").text(
+        (phoneNum)
+      );
 
       /* Print statuses for diabetes and hypertension */
       console.log("Diabetes: " + isDiabetic);
@@ -198,38 +272,38 @@ function onReady(smart) {
 
       /*Get Cholesterol(moles/volume) in Serum*/
       var cholesterol = byCodes('14647-2')
-  
+
       /*Get total HBA1C*/
       var hba1c = byCodes('4548-4')
       $("#hba1c-score").text(getQuantityValueAndUnit(hba1c[0]));
       colorField("#hba1c-score", hba1c[0]);
-  
+
       /*Get total cholesterol*/
       var chol = byCodes('2093-3')
       $("#chol").text(getQuantityValueAndUnit(chol[0]))
       console.log(obv)
       colorField("#chol", chol[0]);
-       
+
       /*Get HDL*/
       var hdl = byCodes('2085-9')
       $("#hdl-score").text(getQuantityValueAndUnit(hdl[0]))
       colorField("#hdl-score", hdl[0]);
- 
+
       /*Get HDL*/
       var ldl = byCodes('13457-7')
       $("#ldl-score").text(getQuantityValueAndUnit(ldl[0]))
       colorField("#ldl-score", ldl[0]);
-	  
+
       /*Get Glucose [Mass/volume] in serum or plasma*/
       var gluc = byCodes('2345-7')
       $("#gluc-score").text(getQuantityValueAndUnit(gluc[0]))
       colorField("#gluc-score", gluc[0]);
-	  
+
       /*Get Systolic Blood Pressure*/
       var sbp = byCodes('8480-6')
-      $("#sbp-text").text(getQuantityValueAndUnit(sbp[0]))  
-      colorField("#sbp-text", sbp[0]);  
-  
+      $("#sbp-text").text(getQuantityValueAndUnit(sbp[0]))
+      colorField("#sbp-text", sbp[0]);
+
       /*Get Diastolic Blood Pressure*/
       var dbp = byCodes('8462-4')
       $("#dbp-text").text(getQuantityValueAndUnit(dbp[0]))
@@ -237,7 +311,7 @@ function onReady(smart) {
     }
   )
 }
-     
+
 /* Required On Error function */
 function onError() {
   console.log('Loading error', arguments);
@@ -274,7 +348,7 @@ function calculateAge(date) {
     return undefined;
   }
 }
-  
+
 /* Helper Function to Get Quantity Value/Units for a Given Observation */
 function getQuantityValueAndUnit(ob) {
   if (typeof ob != 'undefined' &&
@@ -401,7 +475,7 @@ test= [
     //pointPlacement: 'on'
 }
 ];
- 
+
 /*Draw charts that are independant of FHIR calls*/
 window.onload=function() {
   //document.getElementById("nutrient-score").innerHTML = 42;//Cuz, answer to everything
