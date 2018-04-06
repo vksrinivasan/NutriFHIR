@@ -276,6 +276,7 @@ function onReady(smart) {
       /* Get Height */
       var height = byCodes('8302-2');
       $("#height-text").text(getQuantityValueAndUnit(height[0]));
+	  colorField('#height-text', height[0]);
 
       /* Get BMI */
       var BMI = byCodes('39156-5');
