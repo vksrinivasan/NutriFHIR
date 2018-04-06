@@ -305,3 +305,22 @@ footer{
 	font-family: sans-serif;
 	font-size: 11px;
 }
+
+
+.card-hamburger {
+  margin: 10px 20px; 
+  color:#2196f3; 
+  cursor: move
+}
+
+.sortable-ghost {
+  opacity: 0;
+}
+
+.sortable-chosen {
+  opacity: 1;
+}
+
+.sortable-drag {
+  opacity: 1;
+}
