@@ -324,3 +324,47 @@ footer{
 .sortable-drag {
   opacity: 1;
 }
+
+.vtTable {
+	border-spacing: 1px;
+	padding:0px;
+}
+
+.vtTableLabel {
+	color: #808080;
+	font-size: 0.75em;
+	text-align: center;
+	padding: 4.5px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.vtTableValue {
+	font-size:.85em;
+	text-align: center;
+	padding: 4.5px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.deepDiveTable {
+	border-spacing: 1px;
+	padding:2px;
+}
+
+.deepDiveTableLabel {
+	color: #808080;
+	font-size: 0.95em;
+	text-align: center;
+	padding: 15px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+.deepDiveTableValue {
+	font-size:.95em;
+	text-align: center;
+	padding: 15px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}

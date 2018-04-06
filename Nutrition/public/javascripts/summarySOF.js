@@ -1,8 +1,17 @@
 var pat_addr;
+var height_plot_data;
+var weight_plot_data; 
+var bmi_plot_data;
+var glucose_plot_data;
+var hba1c_plot_data;
+var bp_plot_data;
+var totChol_plot_data;
+var hdl_plot_data;
+var ldl_plot_data;
 
-
+ 
 /* Required Smart on Fhir On Ready Function */
-function onReady(smart) {
+function onReady(smart) {       
   var patient = smart.patient;
   var pt = patient.read();
   var obv = smart.patient.api.fetchAll({
@@ -10,7 +19,7 @@ function onReady(smart) {
     // Note - I don't know how to sort results by time or anything. Someone
     // should figure that out
     type: 'Observation',
-    query: {
+    query: { 
       code: {
         $or: ['http://loinc.org|3141-9', // Body weight measured
               'http://loinc.org|8302-2', // Body height
@@ -173,11 +182,11 @@ function onReady(smart) {
 
       $("#Patient_Name").text(
         titleCase(fname) + ' ' + titleCase(lname)
-      );
-
+      );        
+ 
       /* Get Patient Gender */
       $("#gender_text").text(
-        titleCase(patient['gender'])
+        titleCase(patient['gender'])          
       );
 
       /* Hispanic or Latino? */
@@ -259,7 +268,7 @@ function onReady(smart) {
       }
 
       /* Get Weight */
-      var byCodes = smart.byCodes(obv, 'code');
+      var byCodes = smart.byCodes(obv, 'code');   
       var weight = byCodes('3141-9');
       $("#weight-text").text(getQuantityValueAndUnit(weight[0]));
       colorField("#weight-text", weight[0]);
@@ -312,9 +321,21 @@ function onReady(smart) {
       $("#dbp-text").text(getQuantityValueAndUnit(dbp[0]))
       colorField("#dbp-text", dbp[0]);
 	    
-	var address = fullAddress; 
+	  var address = fullAddress; 
       var queryType = "Groceries";
       pat_addr = fullAddress;
+	  
+	  /* Fill out all plot data global variables we will use */
+	  height_plot_data = populatePlotData(height);
+	  weight_plot_data = populatePlotData(weight);
+	  bmi_plot_data = populatePlotData(BMI);
+	  glucose_plot_data = populatePlotData(gluc);
+	  hba1c_plot_data = populatePlotData(hba1c);
+	  bp_plot_data = populatePlotData({});
+	  totChol_plot_data = populatePlotData(chol);
+	  hdl_plot_data = populatePlotData(hdl);
+	  ldl_plot_data = populatePlotData(ldl);
+	  
     }
   )
 }
@@ -322,6 +343,33 @@ function onReady(smart) {
 /* Required On Error function */
 function onError() {
   console.log('Loading error', arguments);
+}
+
+/* Helper function to populate the structs we need for the deepdive cards */
+function populatePlotData(data) {
+	td = {Value: [], Date: [], EncounterID: [], headers: [], colors: []};
+	gd = {values: [], refHi: [], refLo: [], dates: [], units: []};
+	
+	for(i = 0; i < data.length; i++) {
+		
+		/* Push Table Data */
+		td['Value'].push(getQuantityValueAndUnit(data[i]));
+		var tDate = getDate(data[i]);
+		td['Date'].push(tDate.substring(0,10));
+		td['EncounterID'].push(data[i]['encounter']['reference'].replace('Encounter/', ''));
+		td['colors'].push(getColor(data[i])[1]);
+		
+		/* Push Graph Data */
+		gd['values'].push(getValue(data[i]));
+		gd['refHi'].push(getRefHi(data[i]));
+		gd['refLo'].push(getRefLo(data[i]));
+		gd['dates'].push(new Date(tDate));
+		gd['units'].push(getUnits(data[i]));
+	}
+	
+	td['headers'] = ['Value', 'Date', 'EncounterID']
+	
+	return {tableData: td, graphData: gd};
 }
 
 /* Helper Function To Convert Lower-case words to Upper Case First letter */
@@ -368,8 +416,65 @@ function getQuantityValueAndUnit(ob) {
   }
 }
 
-/* Helper Function to color Observation value appropriately (assumes lower is better, green is good and red is bad)*/
-function colorField(fieldID, ob) {
+/* Helper function to get value */
+function getValue(ob) {
+	if(typeof ob != 'undefined' &&
+	   typeof ob.valueQuantity != 'undefined' &&
+	   typeof ob.valueQuantity.value != 'undefined') {
+		   return ob.valueQuantity.value;
+   } else {
+	   return undefined;
+   }
+}
+
+/* Helper function to get dates */
+function getDate(ob) {
+	if(typeof ob != 'undefined' &&
+	   typeof ob.effectiveDateTime != 'undefined') {
+			return ob.effectiveDateTime;
+    } else {
+		return undefined;
+	}
+}
+
+/* Helper function to get refHi */
+function getRefHi(ob) {
+	if(typeof ob != 'undefined' &&
+	   typeof ob.referenceRange != 'undefined' &&
+	   typeof ob.referenceRange[0] != 'undefined' &&
+	   typeof ob.referenceRange[0].high != 'undefined' &&
+	   typeof ob.referenceRange[0].high.value != 'undefined') {
+		   return ob.referenceRange[0].high.value;
+   } else {
+	   return undefined;
+   } 
+}
+
+/* Helper function to get reflo */
+function getRefLo(ob) {
+	if(typeof ob != 'undefined' &&
+	   typeof ob.referenceRange != 'undefined' &&
+	   typeof ob.referenceRange[0] != 'undefined' &&
+	   typeof ob.referenceRange[0].low != 'undefined' &&
+	   typeof ob.referenceRange[0].low.value != 'undefined') {
+		   return ob.referenceRange[0].low.value;
+   } else {
+	   return undefined;
+   } 
+}
+
+/* Helper function to get units */
+function getUnits(ob) {
+	if(typeof ob != 'undefined' &&
+	   typeof ob.valueQuantity != 'undefined' &&
+	   typeof ob.valueQuantity.code != 'undefined') {
+		   return ob.valueQuantity.code;
+   } else {
+	   return undefined;
+   }
+}
+
+function getColor(ob) {
   if (typeof ob != 'undefined' &&
       typeof ob.valueQuantity != 'undefined' &&
       typeof ob.valueQuantity.value != 'undefined' &&
@@ -377,27 +482,40 @@ function colorField(fieldID, ob) {
       typeof ob['referenceRange'][0]['high'] != 'undefined' &&
       typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
       typeof ob['referenceRange'][0]['low'] != 'undefined' &&
-      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') 
+	  
+  {
         var color = d3.scale.linear().domain([ob['referenceRange'][0]['low']['value'], ob['referenceRange'][0]['high']['value']])
 			.interpolate(d3.interpolateHcl)
 			.range([d3.rgb('#4CBB17'), d3.rgb("#C21807")]);
-	if (ob.valueQuantity.value > ob['referenceRange'][0]['high']['value']) {
-	  var value_color = color(ob['referenceRange'][0]['high']['value']);
-	}
-	else if (ob.valueQuantity.value < ob['referenceRange'][0]['low']['value']) {
-	  var value_color = color(ob['referenceRange'][0]['low']['value']);
-	}
-	else {
-	  var value_color = color(ob.valueQuantity.value);
-	}
-	d3.select(fieldID).style("color", value_color);
+	
+		if (ob.valueQuantity.value > ob['referenceRange'][0]['high']['value']) {
+		  var value_color = color(ob['referenceRange'][0]['high']['value']);
+		} 
+		else if (ob.valueQuantity.value < ob['referenceRange'][0]['low']['value']) {
+		  var value_color = color(ob['referenceRange'][0]['low']['value']);
+		}
+		else {    
+		  var value_color = color(ob.valueQuantity.value);
+		}     
+		return [true, value_color];
   }
   else {
-	console.log("not coloring " + fieldID);
-	if (typeof ob != 'undefined') {
-	  console.log(typeof ob.referenceRange[0]['high']);
-	}
+	return [false, "#000000"]
   }
+}
+
+/* Helper Function to color Observation value appropriately (assumes lower is better, green is good and red is bad)*/
+function colorField(fieldID, ob) {
+	var value_color = getColor(ob);
+	if(value_color[0]) {
+		d3.select(fieldID).style("color", value_color[1]);
+	} else {
+		console.log("not coloring " + fieldID);
+		if (typeof ob != 'undefined') {
+		  console.log(typeof ob.referenceRange[0]['high']);
+		}
+	}
 }
 
 /* Helper Functions to Generate Medication List From Search Results for MedicationOrders */
