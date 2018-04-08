@@ -75,7 +75,27 @@
   <div class="card" id='medicationTimeline'>
     <div class="card-body">
       <h2 class="card-title">Medication timeline</h2>
-      <div id="tooltips"></div>
+      <div class="floating-box">
+      <h4 class="card-title">Source</h4>
+
+            <label class="radio-inline">
+                  <input type="radio" name="filter" id="prac">Practitioner
+            </label>
+            <label class="radio-inline">
+                  <input type="radio" name="filter" id="pat">Patient
+            </label>
+            <label class="radio-inline">
+                  <input type="radio" name="filter" id="all" checked="checked">All
+            </label>
+      </div>
+      <div class="floating-box">
+        <h4 class="card-title">Status</h4>
+        <div class="checkbox">
+            <label><input type="checkbox" id="statusCheck" value="" checked>Show inactive</label>
+        </div>
+      </div>
+      <div id="tooltips">
+      </div>
     </div>
   </div>
 
@@ -120,7 +140,7 @@
 		</table>
     </div>
 	<div id="DietChart" class="card-body">
-	
+
 	</div>
   </div>
 
@@ -207,17 +227,17 @@
   document.getElementById("hei_value").addEventListener("mouseover", heiHandler_mouseover, false);
   document.getElementById("hei_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("hei_value").addEventListener("click", heiHandler_click, false);
-  
+
   /* AHEI Listeners */
   document.getElementById("ahei_value").addEventListener("mouseover", aheiHandler_mouseover, false);
   document.getElementById("ahei_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("ahei_value").addEventListener("click", aheiHandler_click, false);
-  
+
   /* DASH Listeners */
   document.getElementById("dash_value").addEventListener("mouseover", dashHandler_mouseover, false);
   document.getElementById("dash_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("dash_value").addEventListener("click", dashHandler_click, false);
- 
+
   /* Height Listener */
   document.getElementById("height-name").addEventListener("click", heightHandler, false);
   document.getElementById("height-text").addEventListener("click", heightHandler, false);
@@ -225,6 +245,8 @@
   /* SBP Listener */
   document.getElementById("sbp-name").addEventListener("click", sbpHandler, false);
   document.getElementById("sbp-text").addEventListener("click", sbpHandler, false);
+
+
 
 
 </script>

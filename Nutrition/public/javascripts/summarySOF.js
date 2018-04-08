@@ -1,3 +1,6 @@
+//Global variable
+var meds=[]
+
 /* Required Smart on Fhir On Ready Function */
 function onReady(smart) {
   var patient = smart.patient;
@@ -29,52 +32,87 @@ function onReady(smart) {
   var hasHypertension = false;
 
   var cond = smart.patient.api.search({type: 'Condition'});
-  var meds = smart.patient.api.search({type: 'MedicationOrder'});
+  //var meds = smart.patient.api.search({type: 'MedicationOrder'});
+  //var allMeds = smart.patient.api.search({type: 'MedicationStatement'})
 
   //var allergies = smart.patient.api.search({type: 'AllergyIntolerance'});
 
+
+
   // /* Generate Medication List */
-  smart.patient.api.fetchAllWithReferences({type: "MedicationOrder"},["MedicationOrder.medicationReference"]).then(function(results, refs) {
+  smart.patient.api.fetchAllWithReferences({type: "MedicationStatement"}).then(function(results) {
     id = 0;
-    meds=[]
 
     //Trying timeline concept
-   results.forEach(function(prescription){
-     //console.log(prescription)
+   results.forEach(function(statement){
+     console.log(statement)
      item = {}
+
      try{
      item.id =  id
-     item.start = new Date(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.start)
-     if(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.end){
-        item.end = new Date(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.end)
-      }
-      if(item.end){
+     if(statement.effectivePeriod){
+     item.start = new Date(statement.effectivePeriod.start)
+     if(statement.effectivePeriod.end)
+        {
+        item.end = new Date(statement.effectivePeriod.end)
         item.type = 'range'
+        }
+        }
+     else{
+      item.start = new Date(statement.effectiveDateTime)
       }
-      else{
+
+      if(!item.type){
         item.type = 'point'
       }
-      //item.content = prescription.medicationCodeableConcept.coding[0].display
-     if(prescription.dosageInstruction[0].route){
-     item.route = prescription.dosageInstruction[0].route.text
+
+      if(statement.medicationCodeableConcept.coding){
+        item.content = statement.medicationCodeableConcept.coding[0].display
       }
-    if(prescription.dosageInstruction[0].dosageQuantity){
-     item.dosageQuantity = prescription.dosageInstruction[0].doseQuantity.value +" "+prescription.dosageInstruction[0].doseQuantity.unit
+      else{
+        item.content = statement.medicationCodeableConcept.text
+      }
+
+     if(statement.dosage[0].route){
+     item.route = statement.dosage[0].route.text
+      }
+
+    if(statement.dosage[0].quantityQuantity){
+     item.dosageQuantity = statement.dosage[0].quantityQuantity.value +" "+statement.dosage[0].quantityQuantity.unit
     }
 
-    item.status = prescription.status
-    item.prescriber = prescription.prescriber.display
-        if (prescription.medicationCodeableConcept) {
-            item.content = getMedicationName(prescription.medicationCodeableConcept.coding)
-            //displayMedication(prescription.medicationCodeableConcept.coding);
-        } else if (prescription.medicationReference) {
-            var med = refs(prescription, prescription.medicationReference);
-            item.content = getMedicationName(med && med.code.coding || [])
-            //displayMedication(med && med.code.coding || []);
+    item.status = statement.status
+    if(item.status == 'active'){
+      item.sflag = 'active'
+    }
+    else{
+      item.sflag = 'inactive'
+    }
+    if(statement.informationSource){
+      item.source = statement.informationSource.display
+      if(statement.informationSource.reference){
+        if(statement.informationSource.reference.split("/")[0] = "Practitioner")
+        {
+          item.reference = statement.informationSource.reference
+          item.flag = 'prac'
         }
+        else{
+          item.reference = statement.informationSource.reference
+          item.flag ='pat'
+        }
+      }
+    }
+
+    else{
+      item.reference = 'Patient'
+      item.flag = 'pat'
+    }
+    //show-hide thing
+    item.className = 'visible'
     //format tooltip dispalay
     item.title = '<b>Medication</b> : '+item.content+'<br>'+
-                 '<b>Prescribed by</b> : '+item.prescriber+'<br>'+
+                 '<b>Reference</b> : '+item.reference+'<br>'+
+                 '<b>Source</b> : '+item.source+'<br>'+
                  '<b>Status</b> : '+item.status+'<br>'+
                  '<b>Route</b> : '+item.route+'<br>'+
                  '<b>Dose</b> : '+item.dosageQuantity+'<br>'+
@@ -84,21 +122,24 @@ function onReady(smart) {
 
 
     catch (e){
-      console.log(e.name)
+      console.log(e)
     }
 
     //console.log(item)
+    console.log(item)
     meds.push(item)
     id =id +1;
 
      });
 
+    console.log(meds)
      //Build timeline
      var cap_options = {
          tooltip: {
          followMouse: true,
          overflowMethod: 'cap'
-       }
+       },
+       maxHeight : '400px'
      }
 
 
@@ -111,20 +152,74 @@ function onReady(smart) {
 
      var toolT = new vis.Timeline(document.getElementById('tooltips'),items, cap_options);
      //var Timeline = new vis.Timeline(container,items,options)
-     console.log(items)
 
-     /*Timeline.on('select', function (properties) {
-     if(properties.items[0]){
-       document.getElementById("medTitle").innerHTML = meds[properties.items[0]].content
-       document.getElementById("med-list-prescriber").innerHTML = meds[properties.items[0]].prescriber
-       document.getElementById("med-list-dose").innerHTML = meds[properties.items[0]].dosageQuantity
-       document.getElementById("med-list-route").innerHTML = meds[properties.items[0]].route
-       document.getElementById("med-list-status").innerHTML = meds[properties.items[0]].status
-       document.getElementById("med-list-startDate").innerHTML = meds[properties.items[0]].start.toDateString()
-     };
-   });*/
+
+     //Event handler for radio buttons
+     $(function(){
+       $("[name=filter]").change(function(){
+
+
+          if($(this).attr("id") == 'prac'){
+            update_timeline('prac',"visible",items)
+            update_timeline('pat',"hide",items)
+            console.log(items)
+          }
+
+          else if($(this).attr("id") == 'pat'){
+            update_timeline('pat',"visible",items)
+            update_timeline('prac',"hide",items)
+            console.log(items)
+          }
+
+          else{
+            update_timeline('all',"visible",items)
+          }
+
+
+          });
+
+          $('#statusCheck').change(function() {
+          if(this.checked){
+            items.forEach(function(each){
+              if(each.sflag == 'inactive'){
+                items.update({id : each.id, className : "visible"})
+              }
+            })
+          }
+          else{
+            items.forEach(function(each){
+              if(each.sflag == 'inactive'){
+                items.update({id : each.id, className : "hide"})
+              }
+            })
+          }
+
+          });
+
+     })
+
+
 
    });
+
+
+   /*Update function*/
+function update_timeline(selection,action,tItems){
+  if(selection == 'prac' || selection == 'pat'){
+   tItems.forEach(function(each){
+         if(each.flag == selection){
+           tItems.update({id : each.id, className : action})
+                        }
+          selected = selection
+        })
+  }
+  else{
+    tItems.forEach(function(each){
+            tItems.update({id : each.id, className : action})
+           selected = selection
+         })
+  }
+}
 
 
 
@@ -479,7 +574,7 @@ test= [
 /*Draw charts that are independant of FHIR calls*/
 window.onload=function() {
   //document.getElementById("nutrient-score").innerHTML = 42;//Cuz, answer to everything
-  drawSpider("progress-chart",test)
+  //drawSpider("progress-chart",test)
 }
 
 /*Draw line graph*/
