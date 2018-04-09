@@ -73,15 +73,32 @@
 	</div>
 
 
-	<div class="card" id='medicationTimeline'>
-		<div class="card-body">
-			<div class="row">
-        	<h2 class="card-title col-sm-11">Medication Timeline</h2>
-        	<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
+  <div class="card" id='medicationTimeline'>
+    <div class="card-body">
+      <h2 class="card-title">Medication timeline</h2>
+      <div class="floating-box">
+      <h4 class="card-title">Source</h4>
+
+            <label class="radio-inline">
+                  <input type="radio" name="filter" id="prac">Practitioner
+            </label>
+            <label class="radio-inline">
+                  <input type="radio" name="filter" id="pat">Patient
+            </label>
+            <label class="radio-inline">
+                  <input type="radio" name="filter" id="all" checked="checked">All
+            </label>
       </div>
-			<div id="tooltips"></div>
-		</div>
-	</div>
+      <div class="floating-box">
+        <h4 class="card-title">Status</h4>
+        <div class="checkbox">
+            <label><input type="checkbox" id="statusCheck" value="">Hide inactive</label>
+        </div>
+      </div>
+      <div id="tooltips">
+      </div>
+    </div>
+  </div>
 
 	<div id="DietCard" class="card">
 		<div class="card-body">
@@ -204,17 +221,17 @@
   document.getElementById("hei_value").addEventListener("mouseover", heiHandler_mouseover, false);
   document.getElementById("hei_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("hei_value").addEventListener("click", heiHandler_click, false);
-  
+
   /* AHEI Listeners */
   document.getElementById("ahei_value").addEventListener("mouseover", aheiHandler_mouseover, false);
   document.getElementById("ahei_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("ahei_value").addEventListener("click", aheiHandler_click, false);
-  
+
   /* DASH Listeners */
   document.getElementById("dash_value").addEventListener("mouseover", dashHandler_mouseover, false);
   document.getElementById("dash_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("dash_value").addEventListener("click", dashHandler_click, false);
- 
+
   /* Height Listener */
   document.getElementById("height-text").addEventListener("click", heightHandler, false);
   
@@ -264,7 +281,6 @@
     $( "#summary" ).sortable({
       handle: ".card-hamburger"
     });
-
     $( ".card-hamburger" ).disableSelection();
   } );
 </script>
