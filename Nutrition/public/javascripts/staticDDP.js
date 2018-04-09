@@ -1,11 +1,11 @@
 /* Global variables necessary for scatter/spider charts */
-var hei;
+var hei; 
 var ahei;
-var dash;
+var dash; 
 var x;
 var y;
-var margin;
-
+var margin;   
+ 
 // Keep track of whether user has clicked particular metric
 var score_click = false;
 // Keep track of which score was clicked
@@ -16,10 +16,12 @@ function heiHandler_mouseover() {
 	if(!score_click) {
 		if(d3.select("#AHEI").style('opacity') === "1") {
 			d3.select("#AHEI").style('opacity', 0.3);
+			d3.select("#AHEI_ideal").style('opacity', 0);
 		}
 
 		if(d3.select("#DASH").style('opacity') === "1") {
 			d3.select("#DASH").style('opacity', 0.3);
+			d3.select("#DASH_ideal").style('opacity', 0);
 		}
 	}
 }
@@ -28,12 +30,19 @@ function heiHandler_click() {
 	if(!score_click) {
 		d3.select("#AHEI").style('opacity', 0.3);
 		d3.select("#DASH").style('opacity', 0.3);
+		d3.select("#HEI_ideal").style('opacity', 1);
+		d3.select("#DASH_ideal").style('opacity', 0);
+		d3.select("#AHEI_ideal").style('opacity', 0);
 		plotScatter(hei);
 		score_click = !score_click;
 		score_click_type = "HEI";
 	} else {
 		if(score_click_type === "HEI") {
 			clearScatter();
+			d3.select("#HEI").style('opacity', 1.0);
+			d3.select("#AHEI").style('opacity', 1.0);
+			d3.select("#DASH").style('opacity', 1.0);
+			d3.select("#HEI_ideal").style('opacity', 0);
 			score_click = !score_click;
 			score_click_type = undefined;
 		}
@@ -45,10 +54,12 @@ function aheiHandler_mouseover() {
 	if(!score_click) {
 		if(d3.select("#HEI").style('opacity') === "1") {
 			d3.select("#HEI").style('opacity', 0.3);
+			d3.select("#HEI_ideal").style('opacity', 0);
 		}
 
 		if(d3.select("#DASH").style('opacity') === "1") {
 			d3.select("#DASH").style('opacity', 0.3);
+			d3.select("#DASH_ideal").style('opacity', 0);
 		}
 	}
 }
@@ -57,12 +68,19 @@ function aheiHandler_click() {
 	if(!score_click) {
 		d3.select("#HEI").style('opacity', 0.3);
 		d3.select("#DASH").style('opacity', 0.3);
+		d3.select("#HEI_ideal").style('opacity', 0);
+		d3.select("#DASH_ideal").style('opacity', 0);
+		d3.select("#AHEI_ideal").style('opacity', 1);
 		plotScatter(ahei);
 		score_click = !score_click;
 		score_click_type = "AHEI";
 	} else {
 		if(score_click_type === "AHEI") {
 			clearScatter();
+			d3.select("#HEI").style('opacity', 1.0);
+			d3.select("#AHEI").style('opacity', 1.0);
+			d3.select("#DASH").style('opacity', 1.0);
+			d3.select("#AHEI_ideal").style('opacity', 0);
 			score_click = !score_click;
 			score_click_type = undefined;
 		}
@@ -74,10 +92,12 @@ function dashHandler_mouseover() {
 	if(!score_click) {
 		if(d3.select("#HEI").style('opacity') === "1") {
 			d3.select("#HEI").style('opacity', 0.3);
+			d3.select("#HEI_ideal").style('opacity', 0);
 		}
 
 		if(d3.select("#AHEI").style('opacity') === "1") {
 			d3.select("#AHEI").style('opacity', 0.3);
+			d3.select("#AHEI_ideal").style('opacity', 0);
 		}
 	}
 }
@@ -86,12 +106,19 @@ function dashHandler_click() {
 	if(!score_click) {
 		d3.select("#HEI").style('opacity', 0.3);
 		d3.select("#AHEI").style('opacity', 0.3);
+		d3.select("#HEI_ideal").style('opacity', 0);
+		d3.select("#DASH_ideal").style('opacity', 1);
+		d3.select("#AHEI_ideal").style('opacity', 0);
 		plotScatter(dash);
 		score_click = !score_click;
 		score_click_type = "DASH";
 	} else {
 		if(score_click_type === "DASH") {
 			clearScatter();
+			d3.select("#HEI").style('opacity', 1.0);
+			d3.select("#AHEI").style('opacity', 1.0);
+			d3.select("#DASH").style('opacity', 1.0);
+			d3.select("#DASH_ideal").style('opacity', 0);
 			score_click = !score_click;
 			score_click_type = undefined;
 		}
@@ -104,6 +131,9 @@ function handle_mouseout() {
 		d3.select("#HEI").style('opacity', 1.0);
 		d3.select("#AHEI").style('opacity', 1.0);
 		d3.select("#DASH").style('opacity', 1.0);
+		d3.select("#HEI_ideal").style('opacity', 0);
+		d3.select("#DASH_ideal").style('opacity', 0);
+		d3.select("#AHEI_ideal").style('opacity', 0);
 	}
 }
 
@@ -142,24 +172,45 @@ function populateDietaryData() {
 				               "#mrpp_text",						     // ID of element for Most Recent Purchase Period
 							   "#dash_value");					         // ID of element for Most Recent DASH %
 
-	/* Calculate KL-Divergence Between Each Period's Scores and Ideal */
-	hei_divergence = getTimeSeriesDivergence(hei['score'], hei['ref_hi']);
-	ahei_divergence = getTimeSeriesDivergence(ahei['score'], ahei['ref_hi']);
-	dash_divergence = getTimeSeriesDivergence(dash['score'], dash['ref_hi']);
-
-	/* Add Divergences/Names/Colors to the structs */
-	hei['divergence'] = hei_divergence;
+	/* Get Sum of Scores At Each Period For Each Index */
+	hei_sum = getTimeSeriesSum(hei['score']);
+	hei_ideal = getTimeSeriesIdeal(hei['ref_hi'], hei['score'].length);
+	hei_percentage = [];
+	for (i = 0; i < hei['score'].length; i++) {
+		hei_percentage.push(hei_sum[i] / hei_ideal[i] * 100);
+	}
+	ahei_sum = getTimeSeriesSum(ahei['score']);
+	ahei_ideal = getTimeSeriesIdeal(ahei['ref_hi'], ahei['score'].length);
+	ahei_percentage = [];
+	for (i = 0; i < ahei['score'].length; i++) {
+		ahei_percentage.push(ahei_sum[i] / ahei_ideal[i] * 100);
+	}
+	dash_sum = getTimeSeriesSum(dash['score']);
+	dash_ideal = getTimeSeriesIdeal(dash['ref_hi'], dash['score'].length);
+	dash_percentage = [];
+	for (i = 0; i < dash['score'].length; i++) {
+		dash_percentage.push(dash_sum[i] / dash_ideal[i] * 100);
+	}
+	
+	/* Add Sums/Ideal/Names/Colors to the structs */
+	hei['sum'] = hei_sum;
+	hei['ideal'] = hei_ideal;
+	hei['percentage'] = hei_percentage;
 	hei['name'] = 'HEI';
 	hei['color'] = hei_color;
-	ahei['divergence'] = ahei_divergence;
+	ahei['sum'] = ahei_sum;
+	ahei['ideal'] = ahei_ideal;
+	ahei['percentage'] = ahei_percentage;
 	ahei['name'] = 'AHEI';
 	ahei['color'] = ahei_color;
-	dash['divergence'] = dash_divergence;
+	dash['sum'] = dash_sum;
+	dash['ideal'] = dash_ideal;
+	dash['percentage'] = dash_percentage;
 	dash['name'] = 'DASH';
 	dash['color'] = dash_color;
 
-	/* Plot KL Divergence */
-	plotDistributionDivergence([hei,ahei,dash]);
+	/* Plot Sums */
+	plotPercentages([hei,ahei,dash]);
 
 }
 
@@ -174,7 +225,7 @@ function plotScatter(scoreObj) {
 	// Put the data for this sore in an easy to use object
 	var plotVals = []
 	for(i = 0; i < scoreObj['date'].length; i++) {
-		plotVals.push([i, scoreObj['date'][i], scoreObj['divergence'][i], scoreObj]);
+		plotVals.push([i, scoreObj['date'][i], scoreObj['percentage'][i], scoreObj]);
 	}
 
 	var tool_tip = d3.tip()
@@ -182,7 +233,27 @@ function plotScatter(scoreObj) {
 	  .offset([-400, -150])
 	  .html("<div id='tipDiv'></div>");
 
+	var tool_tip_percent = d3.tip()
+	  .attr("class", "d3-tip")
+	  .offset([20, 10])
+	  .html("<div id='tipPercentDiv'></div>");
+	/*
+	var area = d3.svg.area()
+			.x(function(d,i) {return xScale(i);})
+			.y1(function(d) {console.log(d.ideal);return yScale(d.ideal);})
+			.y0(function(d) {console.log(d.sum);return yScale(d.sum);})
+			.interpolate("linear");
+
+	svg.append('path')
+		.style('fill', scoreObj['color'])
+		.style('fill-opacity', 0.3)
+		.attr('class', 'difference')
+		.attr('d', area(scoreObj));
+*/
 	svg.call(tool_tip);
+	svg.call(tool_tip_percent);
+
+	var showingSpider = false;
 
 	// Now create the circles
 	svg.selectAll("circle")
@@ -202,22 +273,40 @@ function plotScatter(scoreObj) {
 	   .attr("transform",
 				  "translate(" + margin.left + "," + margin.top + ")")
 	   .style("fill", scoreObj['color'])
-	   .on('mouseover', function(d) {
-		    tool_tip.show();
-		    var tipSVG = d3.select("#tipDiv")
+	   .on('click', function(d) {
+		if (!showingSpider) {
+		    	tool_tip.show();
+		    	var tipSVG = d3.select("#tipDiv")
 						  .append("svg")
 						  .attr("width", 300)
 						  .attr("height", 300)
 						  .attr("class", "tipBody")
+						  .style("opacity", 1)
 						  .style("background-color", "blue");
 
 			createSpider(tipSVG, d[0], d[3]);
-
-
+			showingSpider = true;
+		}
+		else {
+			d3.select("#tipDiv").remove();
+			showingSpider = false;
+		}
 
 	    })
-		.on('mouseout', function(){
-				d3.select("#tipDiv").remove()
+
+		.on('mouseover', function(d, i) {
+			tool_tip_percent.show();
+		    // Specify where to put label of text
+			//console.log(d[3]['name'][i] + ": " + d[3]['sum'][i] + ", " + d[3]['ideal'][i]);
+			var percentSVG = d3.select("#tipPercentDiv")
+					.append("text")
+					.text(function() {
+						return (d[3]['sum'][i]/d[3]['ideal'][i] * 100).toFixed(2) + "%";  // Value of the text
+					});
+		})
+
+		.on('mouseout', function(d, i){
+			d3.select("#tipPercentDiv").remove();  // Remove text location
 		});
 }
 
@@ -255,7 +344,7 @@ function createSpider(toolTip, index, data) {
 	RadarChart.draw("#tipDiv", d, mycfg);
 }
 
-function plotDistributionDivergence(arr_metrics) {
+function plotPercentages(arr_metrics) {
 	console.log(arr_metrics);
 	var cardData = document.getElementById('DietCard');
 	var cardDim = cardData.getBoundingClientRect();
@@ -269,14 +358,15 @@ function plotDistributionDivergence(arr_metrics) {
 	var height = height - margin.top - margin.bottom;
 
 	// Set Axis Scales
-	var y_min = arr_metrics[0]['divergence'][0];
-	var y_max = arr_metrics[0]['divergence'][0];
+	var y_min = arr_metrics[0]['percentage'][0];
+	var y_max = arr_metrics[0]['percentage'][0];
 	var x_min = arr_metrics[0]['date'][0];
 	var x_max = arr_metrics[0]['date'][0];
 
+	// Fixed y-ais since now plotting percentage which is always between 0 and 100%
 	for(i = 0; i < arr_metrics.length; i++) {
-		y_min = math.min(math.min(arr_metrics[i]['divergence']), y_min);
-		y_max = math.max(math.max(arr_metrics[i]['divergence']), y_max);
+		y_min = 0; //math.min(math.min(arr_metrics[i]['percentage']), y_min);
+		y_max = 100; //math.max(math.max(arr_metrics[i]['percentage']), y_max);
 
 		var x_min_t = new Date(Math.min.apply(null, arr_metrics[i]['date']));
 		x_min = new Date(Math.min.apply(null, [x_min_t, x_min]));
@@ -340,7 +430,7 @@ function plotDistributionDivergence(arr_metrics) {
 	for(i = 0; i < arr_metrics.length; i++) {
 		var plotVals = [];
 		for(j = 0; j < arr_metrics[i]['date'].length; j++) {
-			plotVals.push([arr_metrics[i]['date'][j], arr_metrics[i]['divergence'][j]]);
+			plotVals.push([arr_metrics[i]['date'][j], arr_metrics[i]['percentage'][j]]);
 		}
 		svg.append("path")
 			.attr('d', lineFunc(plotVals))
@@ -357,7 +447,7 @@ function plotDistributionDivergence(arr_metrics) {
         .attr("text-anchor", "middle")
 		.attr("font-family", "sans-serif")
         .style("font-size", "15px")
-        .text("Ideal Eating Index Divergence v. Time");
+        .text("Eating Index (percentage of ideal) v. Time");
 
 	// Add y-axis
     svg.append("text")
@@ -368,19 +458,27 @@ function plotDistributionDivergence(arr_metrics) {
 		.style("text-anchor", "middle")
 		.style("font-family", "sans-serif")
 		.style("font-size", 12)
-		.text("KL-Divergence");
-}
-
-function getTimeSeriesDivergence(actual, ideal) {
-	ret_timeSeries = [];
-	for(i = 0; i < actual.length; i++) {
-		ret_timeSeries.push(math.kldivergence(actual[i], ideal));
-	}
-	return ret_timeSeries;
+		.text("Eating Index (percentage of ideal)");
 }
 
 function add(a, b) {
     return a + b;
+}
+
+function getTimeSeriesSum(actual) {
+	ret_timeSeries = [];
+	for(i = 0; i < actual.length; i++) {
+		ret_timeSeries.push(actual[i].reduce(add));
+	}
+	return ret_timeSeries;
+}
+
+function getTimeSeriesIdeal(ideal, nTimesteps) {
+	ret_timeSeries = [];
+	for(i = 0; i < nTimesteps; i++) {
+		ret_timeSeries.push(ideal.reduce(add));
+	}
+	return ret_timeSeries;
 }
 
 function fillOutScores(actComponentScores, idealComponentScores, date, loc_mrpp, loc_val) {
@@ -506,6 +604,11 @@ function getDashData_randomized() {
 }
 
 function plotMap(address, queryType) {
+
+	var div = document.getElementById('mapChart');
+	while(div.firstChild){
+    div.removeChild(div.firstChild);
+	}
   var map = null;
   var gmarkers = [];
   var destMarkers = [];
@@ -544,34 +647,32 @@ function plotMap(address, queryType) {
         createMarker(results[i]);
       }
 
+      var marker = new google.maps.Marker({
+          position: startLoc,
+          map: map,
+          
+        });
+
       map.fitBounds(circle.getBounds());
-      map.setZoom(map.getZoom() + 1);
+      google.maps.event.trigger(map, 'resize');
+      map.panTo(startLoc);
+      //map.setZoom(map.getZoom() + 1);
       // if (markers.length == 1) map.setZoom(17);
       var destArray = [];
       destMarkers = [];
 
       var minDist = Number.MAX_VALUE;
 
-      var htmlString = "";
+      var htmlString = "Nearby " + queryType + " : " + "\n" ; 
 
       for (var i = 0; i < gmarkers.length; i++) {
         var currDist = google.maps.geometry.spherical.computeDistanceBetween(startLoc, gmarkers[i].getPosition());
         if (currDist < 5 * 1609.34) { // 1609.34 meters/mile
 
-          if (currDist < minDist) {
-            minDist = currDist;
-            var htmlString = "Nearest " + queryType + ": " + results[i].name + "(" + Math.round(currDist / 1609.34);
+        	htmlString = htmlString + "\n" + "\n" +results[i].name + "\n" + results[i].formatted_address +  "(" + Number(Math.round( currDist / 1609.34 +'e2')+'e-2') + " miles away)";
 
-            if (currDist < 1 * 1609.34) {
-              htmlString = htmlString + " mile away)"
-            } else {
-              htmlString = htmlString + " miles away)"
-            }
-
-
-          }
           destArray.push(gmarkers[i].getPosition());
-          destMarkers.push(gmarkers[i]);
+          destMarkers.push(gmarkers[i]); 
         }
       }
 
@@ -588,7 +689,7 @@ function plotMap(address, queryType) {
       mapTypeId: google.maps.MapTypeId.ROADMAP,
       streetViewControl: false
     });
-    circle.setMap(map);
+    //circle.setMap(map);
     service = new google.maps.places.PlacesService(map);
     initialService = new google.maps.places.PlacesService(map);
 
@@ -611,13 +712,20 @@ function plotMap(address, queryType) {
 
     var groceryCard = document.getElementById('GroceryCardMap');
     var groceryCardDim = groceryCard.getBoundingClientRect();
-    var height = groceryCardDim.height*2.7;
+    var height = groceryCardDim.height*3.0;
     var width = groceryCardDim.width*1.4;
 
 	var svg2 = d3.select("#mapChart")
 		.append("svg")
 		.attr("width", width)
 		.attr("height", height);
+
+	var svg3 = d3.select("#groceryInfo")
+		.append("svg")
+		.attr("width", 0.2*width)
+		.attr("height", 0.7*height);
+
+
 
   }
 
@@ -650,7 +758,7 @@ function plotMap(address, queryType) {
 
     google.maps.event.addListener(marker, 'click', function() {
       infowindow.marker = marker;
-      service.getDetails(request, function(place, status) {
+      service.getDetails(request, function(place, status) { 
         if (status == google.maps.places.PlacesServiceStatus.OK) {
           var contentStr = '<h5>' + place.name + '</h5><p>' + place.formatted_address;
           if (!!place.formatted_phone_number) contentStr += '<br>' + place.formatted_phone_number;
@@ -671,3 +779,11 @@ function plotMap(address, queryType) {
   }
 
 }
+
+function plotMarkers() {
+
+	var option = this.options[this.selectedIndex].text;
+	plotMap(pat_addr, option);
+
+}
+

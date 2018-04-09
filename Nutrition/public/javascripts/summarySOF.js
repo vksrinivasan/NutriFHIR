@@ -1,8 +1,18 @@
+//Global variable
+var meds=[]
 var pat_addr;
-
+var height_plot_data;
+var weight_plot_data; 
+var bmi_plot_data;
+var glucose_plot_data;
+var hba1c_plot_data;
+var bp_plot_data;
+var totChol_plot_data;
+var hdl_plot_data;
+var ldl_plot_data;
 
 /* Required Smart on Fhir On Ready Function */
-function onReady(smart) {
+function onReady(smart) {       
   var patient = smart.patient;
   var pt = patient.read();
   var obv = smart.patient.api.fetchAll({
@@ -10,7 +20,7 @@ function onReady(smart) {
     // Note - I don't know how to sort results by time or anything. Someone
     // should figure that out
     type: 'Observation',
-    query: {
+    query: { 
       code: {
         $or: ['http://loinc.org|3141-9', // Body weight measured
               'http://loinc.org|8302-2', // Body height
@@ -32,52 +42,87 @@ function onReady(smart) {
   var hasHypertension = false;
 
   var cond = smart.patient.api.search({type: 'Condition'});
-  var meds = smart.patient.api.search({type: 'MedicationOrder'});
+  //var meds = smart.patient.api.search({type: 'MedicationOrder'});
+  //var allMeds = smart.patient.api.search({type: 'MedicationStatement'})
 
   //var allergies = smart.patient.api.search({type: 'AllergyIntolerance'});
 
+
+
   // /* Generate Medication List */
-  smart.patient.api.fetchAllWithReferences({type: "MedicationOrder"},["MedicationOrder.medicationReference"]).then(function(results, refs) {
+  smart.patient.api.fetchAllWithReferences({type: "MedicationStatement"}).then(function(results) {
     id = 0;
-    meds=[]
 
     //Trying timeline concept
-   results.forEach(function(prescription){
-     //console.log(prescription)
+   results.forEach(function(statement){
+     console.log(statement)
      item = {}
+
      try{
      item.id =  id
-     item.start = new Date(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.start)
-     if(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.end){
-        item.end = new Date(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.end)
-      }
-      if(item.end){
+     if(statement.effectivePeriod){
+     item.start = new Date(statement.effectivePeriod.start)
+     if(statement.effectivePeriod.end)
+        {
+        item.end = new Date(statement.effectivePeriod.end)
         item.type = 'range'
+        }
+        }
+     else{
+      item.start = new Date(statement.effectiveDateTime)
       }
-      else{
+
+      if(!item.type){
         item.type = 'point'
       }
-      //item.content = prescription.medicationCodeableConcept.coding[0].display
-     if(prescription.dosageInstruction[0].route){
-     item.route = prescription.dosageInstruction[0].route.text
+
+      if(statement.medicationCodeableConcept.coding){
+        item.content = statement.medicationCodeableConcept.coding[0].display
       }
-    if(prescription.dosageInstruction[0].dosageQuantity){
-     item.dosageQuantity = prescription.dosageInstruction[0].doseQuantity.value +" "+prescription.dosageInstruction[0].doseQuantity.unit
+      else{
+        item.content = statement.medicationCodeableConcept.text
+      }
+
+     if(statement.dosage[0].route){
+     item.route = statement.dosage[0].route.text
+      }
+
+    if(statement.dosage[0].quantityQuantity){
+     item.dosageQuantity = statement.dosage[0].quantityQuantity.value +" "+statement.dosage[0].quantityQuantity.unit
     }
 
-    item.status = prescription.status
-    item.prescriber = prescription.prescriber.display
-        if (prescription.medicationCodeableConcept) {
-            item.content = getMedicationName(prescription.medicationCodeableConcept.coding)
-            //displayMedication(prescription.medicationCodeableConcept.coding);
-        } else if (prescription.medicationReference) {
-            var med = refs(prescription, prescription.medicationReference);
-            item.content = getMedicationName(med && med.code.coding || [])
-            //displayMedication(med && med.code.coding || []);
+    item.status = statement.status
+    if(item.status == 'active'){
+      item.sflag = 'active'
+    }
+    else{
+      item.sflag = 'inactive'
+    }
+    if(statement.informationSource){
+      item.source = statement.informationSource.display
+      if(statement.informationSource.reference){
+        if(statement.informationSource.reference.split("/")[0] = "Practitioner")
+        {
+          item.reference = statement.informationSource.reference
+          item.flag = 'prac'
         }
+        else{
+          item.reference = statement.informationSource.reference
+          item.flag ='pat'
+        }
+      }
+    }
+
+    else{
+      item.reference = 'Patient'
+      item.flag = 'pat'
+    }
+    //show-hide thing
+    item.className = 'visible'
     //format tooltip dispalay
     item.title = '<b>Medication</b> : '+item.content+'<br>'+
-                 '<b>Prescribed by</b> : '+item.prescriber+'<br>'+
+                 '<b>Reference</b> : '+item.reference+'<br>'+
+                 '<b>Source</b> : '+item.source+'<br>'+
                  '<b>Status</b> : '+item.status+'<br>'+
                  '<b>Route</b> : '+item.route+'<br>'+
                  '<b>Dose</b> : '+item.dosageQuantity+'<br>'+
@@ -87,21 +132,24 @@ function onReady(smart) {
 
 
     catch (e){
-      console.log(e.name)
+      console.log(e)
     }
 
     //console.log(item)
+    console.log(item)
     meds.push(item)
     id =id +1;
 
      });
 
+    console.log(meds)
      //Build timeline
      var cap_options = {
          tooltip: {
          followMouse: true,
          overflowMethod: 'cap'
-       }
+       },
+       maxHeight : '400px'
      }
 
 
@@ -114,20 +162,91 @@ function onReady(smart) {
 
      var toolT = new vis.Timeline(document.getElementById('tooltips'),items, cap_options);
      //var Timeline = new vis.Timeline(container,items,options)
-     console.log(items)
 
-     /*Timeline.on('select', function (properties) {
-     if(properties.items[0]){
-       document.getElementById("medTitle").innerHTML = meds[properties.items[0]].content
-       document.getElementById("med-list-prescriber").innerHTML = meds[properties.items[0]].prescriber
-       document.getElementById("med-list-dose").innerHTML = meds[properties.items[0]].dosageQuantity
-       document.getElementById("med-list-route").innerHTML = meds[properties.items[0]].route
-       document.getElementById("med-list-status").innerHTML = meds[properties.items[0]].status
-       document.getElementById("med-list-startDate").innerHTML = meds[properties.items[0]].start.toDateString()
-     };
-   });*/
+
+     //Event handler for radio buttons
+     $(function(){
+       $("[name=filter]").change(function(){
+
+          $('#statusCheck').prop('checked',false)
+
+          if($(this).attr("id") == 'prac'){
+            update_timeline('prac',"visible",items)
+            update_timeline('pat',"hide",items)
+            console.log(items)
+          }
+
+          else if($(this).attr("id") == 'pat'){
+            update_timeline('pat',"visible",items)
+            update_timeline('prac',"hide",items)
+            //console.log(items)
+          }
+
+          else{
+            update_timeline('all',"visible",items)
+          }
+
+
+          });
+
+          /*Checkbox*/
+
+          $('#statusCheck').change(function() {
+
+          chosenRadio = $('input[name=filter]:checked').attr('id');
+
+          if(this.checked){
+            items.forEach(function(each){
+                if(each.sflag == 'inactive' && each.flag == chosenRadio){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "hide"})
+                }
+                else if(each.sflag == 'inactive' && chosenRadio == 'all'){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "hide"})
+                }
+            })
+          }
+
+          if(!this.checked){
+            items.forEach(function(each){
+                if(each.sflag == 'inactive' && each.flag == chosenRadio){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "visible"})
+                }
+                else if(each.sflag == 'inactive' && chosenRadio == 'all'){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "visible"})
+                }
+            })
+          }
+
+          });
+
+     })
+
+
 
    });
+
+
+   /*Update function*/
+function update_timeline(selection,action,tItems){
+  if(selection == 'prac' || selection == 'pat'){
+   tItems.forEach(function(each){
+         if(each.flag == selection){
+           tItems.update({id : each.id, className : action})
+                        }
+          selected = selection
+        })
+  }
+  else{
+    tItems.forEach(function(each){
+            tItems.update({id : each.id, className : action})
+           selected = selection
+         })
+  }
+}
 
 
 
@@ -173,11 +292,11 @@ function onReady(smart) {
 
       $("#Patient_Name").text(
         titleCase(fname) + ' ' + titleCase(lname)
-      );
-
+      );        
+ 
       /* Get Patient Gender */
       $("#gender_text").text(
-        titleCase(patient['gender'])
+        titleCase(patient['gender'])          
       );
 
       /* Hispanic or Latino? */
@@ -259,7 +378,7 @@ function onReady(smart) {
       }
 
       /* Get Weight */
-      var byCodes = smart.byCodes(obv, 'code');
+      var byCodes = smart.byCodes(obv, 'code');   
       var weight = byCodes('3141-9');
       $("#weight-text").text(getQuantityValueAndUnit(weight[0]));
       colorField("#weight-text", weight[0]);
@@ -267,6 +386,7 @@ function onReady(smart) {
       /* Get Height */
       var height = byCodes('8302-2');
       $("#height-text").text(getQuantityValueAndUnit(height[0]));
+	  colorField('#height-text', height[0]);
 
       /* Get BMI */
       var BMI = byCodes('39156-5');
@@ -312,9 +432,21 @@ function onReady(smart) {
       $("#dbp-text").text(getQuantityValueAndUnit(dbp[0]))
       colorField("#dbp-text", dbp[0]);
 	    
-	var address = fullAddress; 
+	  var address = fullAddress; 
       var queryType = "Groceries";
       pat_addr = fullAddress;
+	  
+	  /* Fill out all plot data global variables we will use */
+	  height_plot_data = populatePlotData(height);
+	  weight_plot_data = populatePlotData(weight);
+	  bmi_plot_data = populatePlotData(BMI);
+	  glucose_plot_data = populatePlotData(gluc);
+	  hba1c_plot_data = populatePlotData(hba1c);
+	  bp_plot_data = populatePlotData({});
+	  totChol_plot_data = populatePlotData(chol);
+	  hdl_plot_data = populatePlotData(hdl);
+	  ldl_plot_data = populatePlotData(ldl);
+	  
     }
   )
 }
@@ -322,6 +454,33 @@ function onReady(smart) {
 /* Required On Error function */
 function onError() {
   console.log('Loading error', arguments);
+}
+
+/* Helper function to populate the structs we need for the deepdive cards */
+function populatePlotData(data) {
+	td = {Value: [], Date: [], EncounterID: [], headers: [], colors: []};
+	gd = {values: [], refHi: [], refLo: [], dates: [], units: []};
+	
+	for(i = 0; i < data.length; i++) {
+		
+		/* Push Table Data */
+		td['Value'].push(getQuantityValueAndUnit(data[i]));
+		var tDate = getDate(data[i]);
+		td['Date'].push(tDate.substring(0,10));
+		td['EncounterID'].push(data[i]['encounter']['reference'].replace('Encounter/', ''));
+		td['colors'].push(getColor(data[i])[1]);
+		
+		/* Push Graph Data */
+		gd['values'].push(getValue(data[i]));
+		gd['refHi'].push(getRefHi(data[i]));
+		gd['refLo'].push(getRefLo(data[i]));
+		gd['dates'].push(new Date(tDate));
+		gd['units'].push(getUnits(data[i]));
+	}
+	
+	td['headers'] = ['Value', 'Date', 'EncounterID']
+	
+	return {tableData: td, graphData: gd};
 }
 
 /* Helper Function To Convert Lower-case words to Upper Case First letter */
@@ -368,8 +527,65 @@ function getQuantityValueAndUnit(ob) {
   }
 }
 
-/* Helper Function to color Observation value appropriately (assumes lower is better, green is good and red is bad)*/
-function colorField(fieldID, ob) {
+/* Helper function to get value */
+function getValue(ob) {
+	if(typeof ob != 'undefined' &&
+	   typeof ob.valueQuantity != 'undefined' &&
+	   typeof ob.valueQuantity.value != 'undefined') {
+		   return ob.valueQuantity.value;
+   } else {
+	   return undefined;
+   }
+}
+
+/* Helper function to get dates */
+function getDate(ob) {
+	if(typeof ob != 'undefined' &&
+	   typeof ob.effectiveDateTime != 'undefined') {
+			return ob.effectiveDateTime;
+    } else {
+		return undefined;
+	}
+}
+
+/* Helper function to get refHi */
+function getRefHi(ob) {
+	if(typeof ob != 'undefined' &&
+	   typeof ob.referenceRange != 'undefined' &&
+	   typeof ob.referenceRange[0] != 'undefined' &&
+	   typeof ob.referenceRange[0].high != 'undefined' &&
+	   typeof ob.referenceRange[0].high.value != 'undefined') {
+		   return ob.referenceRange[0].high.value;
+   } else {
+	   return undefined;
+   } 
+}
+
+/* Helper function to get reflo */
+function getRefLo(ob) {
+	if(typeof ob != 'undefined' &&
+	   typeof ob.referenceRange != 'undefined' &&
+	   typeof ob.referenceRange[0] != 'undefined' &&
+	   typeof ob.referenceRange[0].low != 'undefined' &&
+	   typeof ob.referenceRange[0].low.value != 'undefined') {
+		   return ob.referenceRange[0].low.value;
+   } else {
+	   return undefined;
+   } 
+}
+
+/* Helper function to get units */
+function getUnits(ob) {
+	if(typeof ob != 'undefined' &&
+	   typeof ob.valueQuantity != 'undefined' &&
+	   typeof ob.valueQuantity.code != 'undefined') {
+		   return ob.valueQuantity.code;
+   } else {
+	   return undefined;
+   }
+}
+
+function getColor(ob) {
   if (typeof ob != 'undefined' &&
       typeof ob.valueQuantity != 'undefined' &&
       typeof ob.valueQuantity.value != 'undefined' &&
@@ -377,27 +593,40 @@ function colorField(fieldID, ob) {
       typeof ob['referenceRange'][0]['high'] != 'undefined' &&
       typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
       typeof ob['referenceRange'][0]['low'] != 'undefined' &&
-      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') {
+      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') 
+	  
+  {
         var color = d3.scale.linear().domain([ob['referenceRange'][0]['low']['value'], ob['referenceRange'][0]['high']['value']])
 			.interpolate(d3.interpolateHcl)
 			.range([d3.rgb('#4CBB17'), d3.rgb("#C21807")]);
-	if (ob.valueQuantity.value > ob['referenceRange'][0]['high']['value']) {
-	  var value_color = color(ob['referenceRange'][0]['high']['value']);
-	}
-	else if (ob.valueQuantity.value < ob['referenceRange'][0]['low']['value']) {
-	  var value_color = color(ob['referenceRange'][0]['low']['value']);
-	}
-	else {
-	  var value_color = color(ob.valueQuantity.value);
-	}
-	d3.select(fieldID).style("color", value_color);
+	
+		if (ob.valueQuantity.value > ob['referenceRange'][0]['high']['value']) {
+		  var value_color = color(ob['referenceRange'][0]['high']['value']);
+		} 
+		else if (ob.valueQuantity.value < ob['referenceRange'][0]['low']['value']) {
+		  var value_color = color(ob['referenceRange'][0]['low']['value']);
+		}
+		else {    
+		  var value_color = color(ob.valueQuantity.value);
+		}     
+		return [true, value_color];
   }
   else {
-	console.log("not coloring " + fieldID);
-	if (typeof ob != 'undefined') {
-	  console.log(typeof ob.referenceRange[0]['high']);
-	}
+	return [false, "#000000"]
   }
+}
+
+/* Helper Function to color Observation value appropriately (assumes lower is better, green is good and red is bad)*/
+function colorField(fieldID, ob) {
+	var value_color = getColor(ob);
+	if(value_color[0]) {
+		d3.select(fieldID).style("color", value_color[1]);
+	} else {
+		console.log("not coloring " + fieldID);
+		if (typeof ob != 'undefined') {
+		  console.log(typeof ob.referenceRange[0]['high']);
+		}
+	}
 }
 
 /* Helper Functions to Generate Medication List From Search Results for MedicationOrders */
@@ -486,7 +715,7 @@ test= [
 /*Draw charts that are independant of FHIR calls*/
 window.onload=function() {
   //document.getElementById("nutrient-score").innerHTML = 42;//Cuz, answer to everything
-  drawSpider("progress-chart",test)
+  //drawSpider("progress-chart",test)
 }
 
 /*Draw line graph*/
