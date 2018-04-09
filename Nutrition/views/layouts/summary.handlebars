@@ -129,18 +129,23 @@
 		</div>
 	</div>
 
-
 <div class="card">
-	<div id="grocery-container">
-		<div id="GroceryCardMap" class="card-body">
-			<div class="row">
-				<h2 id="groceryTitle" class="card-title col-sm-11">Groceries Map</h2>
-				<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
-			</div>
-			<div id = "groceryInfo" class="card-body" style="float:left; width: 30%"></div>
-			<div id="mapChart" class="card-body" style="float:right; width: 70%"></div>
+  <div id="GroceryCardMap" class="card-body">
+		<div id=”grocery-container”>
+		<h2 id="groceryTitle" class="card-title">Groceries Map</h2>
+		<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
 		</div>
-	</div>
+		<select onchange="plotMarkers.call(this, event)">
+   		<option>Groceries</option>
+   		<option>Super Market</option>
+   		<option>Farmers Market</option>
+		</select>
+		<div id = "groceryInfo" class="card-body" style="float:left; white-space: pre-wrap; height: 100px;
+    overflow-y: scroll;width: 30%">
+		</div>
+		<div id="mapChart" class="card-body" style="float:right; width: 70%"></div>
+
+  </div>
 </div>
 
 <div class="card">
