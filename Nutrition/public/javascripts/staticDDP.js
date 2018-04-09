@@ -1,11 +1,11 @@
 /* Global variables necessary for scatter/spider charts */
-var hei;
+var hei; 
 var ahei;
-var dash;
+var dash; 
 var x;
 var y;
-var margin;
-
+var margin;   
+ 
 // Keep track of whether user has clicked particular metric
 var score_click = false;
 // Keep track of which score was clicked
@@ -611,7 +611,7 @@ function plotMap(address, queryType) {
 
     var groceryCard = document.getElementById('GroceryCardMap');
     var groceryCardDim = groceryCard.getBoundingClientRect();
-    var height = groceryCardDim.height*2.7;
+    var height = groceryCardDim.height*3.0;
     var width = groceryCardDim.width*1.4;
 
 	var svg2 = d3.select("#mapChart")
