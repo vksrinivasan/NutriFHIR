@@ -1,3 +1,14 @@
+/* Globals to help determine whether I should allow new card creation */
+var height_i = false;
+var weight_i = false;
+var bmi_i = false;
+var glucose_i = false;
+var hba1c_i = false;
+var bp_i = false;
+var tchol_i = false;
+var hdl_i = false;
+var ldl_i = false;
+
 /* Generic create the card */
 function createCard(id) {
 	/* Create card itself */
@@ -184,247 +195,308 @@ function createPlot(side, data, cardName) {
 	   .attr('d', lineFunc(plotHi))
 	   .attr('class', 'pathRef');
 	   
+	
+	// Plot scatter plot circles
+	
+	svg.selectAll("circle")
+	   .data(plotVals)
+	   .enter()
+	   .append("circle")
+	   .attr("cx", function(d) {
+		   return x(d[0]);
+	   })
+	   .attr("cy", function(d) {
+		   return y(d[1]);
+	   })
+	   .attr("r", 3)
+	   .attr('class', 'pointActual');
+	   
 }
 
 function heightHandler() {
 	
-	var cardId = 'heightDrawdown';
-	var cardTitle = 'Height';
+	if(!height_i) {
 	
-	/* Create the card */
-	cardBody = createCard(cardId);
-	
-	/* Add title to the card */
-	createTitleBurger(cardBody, cardTitle);
-	
-	/* Add sides */
-	var lhs = createSide(cardBody, '100%', 'left');
-	var rhs = createSide(cardBody, '0%', 'right');
-	
-	/* Add LHS Table */
-	createTable(lhs, height_plot_data);
-	
-	/* Add RHS Plot */
-	createPlot(rhs, height_plot_data, '#'+cardId);
-	
-	/* Potential DeepDive Card Listener */
-	document.getElementById("Height").addEventListener("click", function() {
-		document.getElementById(cardId).remove();
-	});
+		var cardId = 'heightDrawdown';
+		var cardTitle = 'Height';
+		
+		/* Create the card */
+		cardBody = createCard(cardId);
+		height_i = !height_i;
+		
+		/* Add title to the card */
+		createTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = createSide(cardBody, '100%', 'left');
+		var rhs = createSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		createTable(lhs, height_plot_data);
+		
+		/* Add RHS Plot */
+		createPlot(rhs, height_plot_data, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("Height").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			height_i = !height_i;
+		});
+	}
 }
 
 function weightHandler() {
 	
-	var cardId = 'weightDrawdown';
-	var cardTitle = 'Weight';
-	
-	/* Create the card */
-	cardBody = createCard(cardId);
-	
-	/* Add title to the card */
-	createTitleBurger(cardBody, cardTitle);
-	
-	/* Add sides */
-	var lhs = createSide(cardBody, '100%', 'left');
-	var rhs = createSide(cardBody, '0%', 'right');
-	
-	/* Add LHS Table */
-	createTable(lhs, weight_plot_data);
-	
-	/* Add RHS Plot */
-	createPlot(rhs, weight_plot_data, '#'+cardId);
-	
-	/* Potential DeepDive Card Listener */
-	document.getElementById("Weight").addEventListener("click", function() {
-		document.getElementById(cardId).remove();
-	});
+	if(!weight_i) {
+		
+		var cardId = 'weightDrawdown';
+		var cardTitle = 'Weight';
+		
+		/* Create the card */
+		cardBody = createCard(cardId);
+		weight_i = !weight_i;
+		
+		/* Add title to the card */
+		createTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = createSide(cardBody, '100%', 'left');
+		var rhs = createSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		createTable(lhs, weight_plot_data);
+		
+		/* Add RHS Plot */
+		createPlot(rhs, weight_plot_data, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("Weight").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			weight_i = !weight_i;
+		});
+	}
 }
 
 function bmiHandler() {
 	
-	var cardId = 'bmiDrawdown';
-	var cardTitle = 'BMI';
+	if(!bmi_i) {
 	
-	/* Create the card */
-	cardBody = createCard(cardId);
-	
-	/* Add title to the card */
-	createTitleBurger(cardBody, cardTitle);
-	
-	/* Add sides */
-	var lhs = createSide(cardBody, '100%', 'left');
-	var rhs = createSide(cardBody, '0%', 'right');
-	
-	/* Add LHS Table */
-	createTable(lhs, bmi_plot_data);
-	
-	/* Add RHS Plot */
-	createPlot(rhs, bmi_plot_data, '#'+cardId);
-	
-	/* Potential DeepDive Card Listener */
-	document.getElementById("BMI").addEventListener("click", function() {
-		document.getElementById(cardId).remove();
-	});
+		var cardId = 'bmiDrawdown';
+		var cardTitle = 'BMI';
+		
+		/* Create the card */
+		cardBody = createCard(cardId);
+		bmi_i = !bmi_i;
+		
+		/* Add title to the card */
+		createTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = createSide(cardBody, '100%', 'left');
+		var rhs = createSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		createTable(lhs, bmi_plot_data);
+		
+		/* Add RHS Plot */
+		createPlot(rhs, bmi_plot_data, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("BMI").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			bmi_i = !bmi_i;
+		});
+	}
 }
 
 function glucoseHandler() {
 	
-	var cardId = 'glucoseDrawdown';
-	var cardTitle = 'Glucose';
+	if(!glucose_i) {
 	
-	/* Create the card */
-	cardBody = createCard(cardId);
-	
-	/* Add title to the card */
-	createTitleBurger(cardBody, cardTitle);
-	
-	/* Add sides */
-	var lhs = createSide(cardBody, '100%', 'left');
-	var rhs = createSide(cardBody, '0%', 'right');
-	
-	/* Add LHS Table */
-	createTable(lhs, glucose_plot_data);
-	
-	/* Add RHS Plot */
-	createPlot(rhs, glucose_plot_data, '#'+cardId);
-	
-	/* Potential DeepDive Card Listener */
-	document.getElementById("Glucose").addEventListener("click", function() {
-		document.getElementById(cardId).remove();
-	});
+		var cardId = 'glucoseDrawdown';
+		var cardTitle = 'Glucose';
+		
+		/* Create the card */
+		cardBody = createCard(cardId);
+		glucose_i = !glucose_i;
+		
+		/* Add title to the card */
+		createTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = createSide(cardBody, '100%', 'left');
+		var rhs = createSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		createTable(lhs, glucose_plot_data);
+		
+		/* Add RHS Plot */
+		createPlot(rhs, glucose_plot_data, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("Glucose").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			glucose_i = !glucose_i;
+		});
+	}
 }
 
 function hba1cHandler() {
 	
-	var cardId = 'hba1cDrawdown';
-	var cardTitle = 'HbA1c';
+	if(!hba1c_i) {
 	
-	/* Create the card */
-	cardBody = createCard(cardId);
-	
-	/* Add title to the card */
-	createTitleBurger(cardBody, cardTitle);
-	
-	/* Add sides */
-	var lhs = createSide(cardBody, '100%', 'left');
-	var rhs = createSide(cardBody, '0%', 'right');
-	
-	/* Add LHS Table */
-	createTable(lhs, hba1c_plot_data);
-	
-	/* Add RHS Plot */
-	createPlot(rhs, hba1c_plot_data, '#'+cardId);
-	
-	/* Potential DeepDive Card Listener */
-	document.getElementById("HbA1c").addEventListener("click", function() {
-		document.getElementById(cardId).remove();
-	});
+		var cardId = 'hba1cDrawdown';
+		var cardTitle = 'HbA1c';
+		
+		/* Create the card */
+		cardBody = createCard(cardId);
+		hba1c_i = !hba1c_i;
+		
+		/* Add title to the card */
+		createTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = createSide(cardBody, '100%', 'left');
+		var rhs = createSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		createTable(lhs, hba1c_plot_data);
+		
+		/* Add RHS Plot */
+		createPlot(rhs, hba1c_plot_data, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("HbA1c").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			hba1c_i = !hba1c_i;
+		});
+	}
 }
 
 function bpHandler() {
 	
-	var cardId = 'bpDrawdown';
-	var cardTitle = 'Blood Pressure';
+	if(!bp_i) {
 	
-	/* Create the card */
-	cardBody = createCard(cardId);
-	
-	/* Add title to the card */
-	createTitleBurger(cardBody, cardTitle);
-	
-	/* Add sides */
-	var lhs = createSide(cardBody, '100%', 'left');
-	var rhs = createSide(cardBody, '0%', 'right');
-	
-	/* Add LHS Table */
-	createTable(lhs, bp_plot_data);
-	
-	/* Add RHS Plot */
-	createPlot(rhs, bp_plot_data, '#'+cardId);
-	
-	/* Potential DeepDive Card Listener */
-	document.getElementById("Blood Pressure").addEventListener("click", function() {
-		document.getElementById(cardId).remove();
-	});
+		var cardId = 'bpDrawdown';
+		var cardTitle = 'Blood Pressure';
+		
+		/* Create the card */
+		cardBody = createCard(cardId);
+		bp_i = !bp_i;
+		
+		/* Add title to the card */
+		createTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = createSide(cardBody, '100%', 'left');
+		var rhs = createSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		createTable(lhs, bp_plot_data);
+		
+		/* Add RHS Plot */
+		createPlot(rhs, bp_plot_data, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("Blood Pressure").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			bp_i = !bp_i;
+		});
+	}
 }
 
 function cholHandler() {
 	
-	var cardId = 'cholDrawdown';
-	var cardTitle = 'Total Cholesterol';
+	if(!tchol_i) {
 	
-	/* Create the card */
-	cardBody = createCard(cardId);
-	
-	/* Add title to the card */
-	createTitleBurger(cardBody, cardTitle);
-	
-	/* Add sides */
-	var lhs = createSide(cardBody, '100%', 'left');
-	var rhs = createSide(cardBody, '0%', 'right');
-	
-	/* Add LHS Table */
-	createTable(lhs, totChol_plot_data);
-	
-	/* Add RHS Plot */
-	createPlot(rhs, totChol_plot_data, '#'+cardId);
-	
-	/* Potential DeepDive Card Listener */
-	document.getElementById("Total Cholesterol").addEventListener("click", function() {
-		document.getElementById(cardId).remove();
-	});
+		var cardId = 'cholDrawdown';
+		var cardTitle = 'Total Cholesterol';
+		
+		/* Create the card */
+		cardBody = createCard(cardId);
+		tchol_i = !tchol_i;
+		
+		/* Add title to the card */
+		createTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = createSide(cardBody, '100%', 'left');
+		var rhs = createSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		createTable(lhs, totChol_plot_data);
+		
+		/* Add RHS Plot */
+		createPlot(rhs, totChol_plot_data, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("Total Cholesterol").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			tchol_i = !tchol_i;
+		});
+	}
 }
 
 function hdlHandler() {
 	
-	var cardId = 'hdlDrawdown';
-	var cardTitle = 'HDL';
+	if(!hdl_i) {
 	
-	/* Create the card */
-	cardBody = createCard(cardId);
-	
-	/* Add title to the card */
-	createTitleBurger(cardBody, cardTitle);
-	
-	/* Add sides */
-	var lhs = createSide(cardBody, '100%', 'left');
-	var rhs = createSide(cardBody, '0%', 'right');
-	
-	/* Add LHS Table */
-	createTable(lhs, hdl_plot_data);
-	
-	/* Add RHS Plot */
-	createPlot(rhs, hdl_plot_data, '#'+cardId);
-	
-	/* Potential DeepDive Card Listener */
-	document.getElementById("HDL").addEventListener("click", function() {
-		document.getElementById(cardId).remove();
-	});
+		var cardId = 'hdlDrawdown';
+		var cardTitle = 'HDL';
+		
+		/* Create the card */
+		cardBody = createCard(cardId);
+		hdl_i = !hdl_i;
+		
+		/* Add title to the card */
+		createTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = createSide(cardBody, '100%', 'left');
+		var rhs = createSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		createTable(lhs, hdl_plot_data);
+		
+		/* Add RHS Plot */
+		createPlot(rhs, hdl_plot_data, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("HDL").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			hdl_i = !hdl_i;
+		});
+	}
 } 
 
 function ldlHandler() {
 	
-	var cardId = 'ldlDrawdown';
-	var cardTitle = 'LDL';
+	if(!ldl_i) {
 	
-	/* Create the card */
-	cardBody = createCard(cardId);
-	
-	/* Add title to the card */
-	createTitleBurger(cardBody, cardTitle);
-	
-	/* Add sides */
-	var lhs = createSide(cardBody, '100%', 'left');
-	var rhs = createSide(cardBody, '0%', 'right');
-	
-	/* Add LHS Table */
-	createTable(lhs, ldl_plot_data);
-	
-	/* Add RHS Plot */
-	createPlot(rhs, ldl_plot_data, '#'+cardId);
-	
-	/* Potential DeepDive Card Listener */
-	document.getElementById("LDL").addEventListener("click", function() {
-		document.getElementById(cardId).remove();
-	});
+		var cardId = 'ldlDrawdown';
+		var cardTitle = 'LDL';
+		
+		/* Create the card */
+		cardBody = createCard(cardId);
+		ldl_i = !ldl_i;
+		
+		/* Add title to the card */
+		createTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = createSide(cardBody, '100%', 'left');
+		var rhs = createSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		createTable(lhs, ldl_plot_data);
+		
+		/* Add RHS Plot */
+		createPlot(rhs, ldl_plot_data, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("LDL").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			ldl_i = !ldl_i;
+		});
+	}
 } 
