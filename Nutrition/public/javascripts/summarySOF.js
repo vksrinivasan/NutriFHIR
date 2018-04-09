@@ -158,6 +158,7 @@ function onReady(smart) {
      $(function(){
        $("[name=filter]").change(function(){
 
+          $('#statusCheck').prop('checked',false)
 
           if($(this).attr("id") == 'prac'){
             update_timeline('prac',"visible",items)
@@ -168,7 +169,7 @@ function onReady(smart) {
           else if($(this).attr("id") == 'pat'){
             update_timeline('pat',"visible",items)
             update_timeline('prac',"hide",items)
-            console.log(items)
+            //console.log(items)
           }
 
           else{
@@ -178,19 +179,35 @@ function onReady(smart) {
 
           });
 
+          /*Checkbox*/
+
           $('#statusCheck').change(function() {
+
+          chosenRadio = $('input[name=filter]:checked').attr('id');
+
           if(this.checked){
             items.forEach(function(each){
-              if(each.sflag == 'inactive'){
-                items.update({id : each.id, className : "visible"})
-              }
+                if(each.sflag == 'inactive' && each.flag == chosenRadio){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "hide"})
+                }
+                else if(each.sflag == 'inactive' && chosenRadio == 'all'){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "hide"})
+                }
             })
           }
-          else{
+
+          if(!this.checked){
             items.forEach(function(each){
-              if(each.sflag == 'inactive'){
-                items.update({id : each.id, className : "hide"})
-              }
+                if(each.sflag == 'inactive' && each.flag == chosenRadio){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "visible"})
+                }
+                else if(each.sflag == 'inactive' && chosenRadio == 'all'){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "visible"})
+                }
             })
           }
 
