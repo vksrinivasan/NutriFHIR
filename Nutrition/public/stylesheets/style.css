@@ -404,3 +404,13 @@ footer{
 	stroke-width: 2;
 	fill: none;
 }
+
+.pointActual {
+	stroke: #2196f3;
+	fill: #2196f3;
+}
+
+.pointRef {
+	stroke: #cc0000;
+	fill: #cc0000;
+}
