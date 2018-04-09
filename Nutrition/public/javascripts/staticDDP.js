@@ -28,8 +28,8 @@ function heiHandler_mouseover() {
 
 function heiHandler_click() {
 	if(!score_click) {
-		d3.select("#AHEI").style('opacity', 0);
-		d3.select("#DASH").style('opacity', 0);
+		d3.select("#AHEI").style('opacity', 0.3);
+		d3.select("#DASH").style('opacity', 0.3);
 		d3.select("#HEI_ideal").style('opacity', 1);
 		d3.select("#DASH_ideal").style('opacity', 0);
 		d3.select("#AHEI_ideal").style('opacity', 0);
@@ -66,8 +66,8 @@ function aheiHandler_mouseover() {
 
 function aheiHandler_click() {
 	if(!score_click) {
-		d3.select("#HEI").style('opacity', 0);
-		d3.select("#DASH").style('opacity', 0);
+		d3.select("#HEI").style('opacity', 0.3);
+		d3.select("#DASH").style('opacity', 0.3);
 		d3.select("#HEI_ideal").style('opacity', 0);
 		d3.select("#DASH_ideal").style('opacity', 0);
 		d3.select("#AHEI_ideal").style('opacity', 1);
@@ -104,8 +104,8 @@ function dashHandler_mouseover() {
 
 function dashHandler_click() {
 	if(!score_click) {
-		d3.select("#HEI").style('opacity', 0);
-		d3.select("#AHEI").style('opacity', 0);
+		d3.select("#HEI").style('opacity', 0.3);
+		d3.select("#AHEI").style('opacity', 0.3);
 		d3.select("#HEI_ideal").style('opacity', 0);
 		d3.select("#DASH_ideal").style('opacity', 1);
 		d3.select("#AHEI_ideal").style('opacity', 0);
