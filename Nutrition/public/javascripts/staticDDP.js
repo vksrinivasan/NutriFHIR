@@ -506,6 +506,11 @@ function getDashData_randomized() {
 }
 
 function plotMap(address, queryType) {
+
+	var div = document.getElementById('mapChart');
+	while(div.firstChild){
+    div.removeChild(div.firstChild);
+	}
   var map = null;
   var gmarkers = [];
   var destMarkers = [];
@@ -544,34 +549,32 @@ function plotMap(address, queryType) {
         createMarker(results[i]);
       }
 
+      var marker = new google.maps.Marker({
+          position: startLoc,
+          map: map,
+          
+        });
+
       map.fitBounds(circle.getBounds());
-      map.setZoom(map.getZoom() + 1);
+      google.maps.event.trigger(map, 'resize');
+      map.panTo(startLoc);
+      //map.setZoom(map.getZoom() + 1);
       // if (markers.length == 1) map.setZoom(17);
       var destArray = [];
       destMarkers = [];
 
       var minDist = Number.MAX_VALUE;
 
-      var htmlString = "";
+      var htmlString = "Nearby " + queryType + " : " + "\n" ; 
 
       for (var i = 0; i < gmarkers.length; i++) {
         var currDist = google.maps.geometry.spherical.computeDistanceBetween(startLoc, gmarkers[i].getPosition());
         if (currDist < 5 * 1609.34) { // 1609.34 meters/mile
 
-          if (currDist < minDist) {
-            minDist = currDist;
-            var htmlString = "Nearest " + queryType + ": " + results[i].name + "(" + Math.round(currDist / 1609.34);
+        	htmlString = htmlString + "\n" + "\n" +results[i].name + "\n" + results[i].formatted_address +  "(" + Number(Math.round( currDist / 1609.34 +'e2')+'e-2') + " miles away)";
 
-            if (currDist < 1 * 1609.34) {
-              htmlString = htmlString + " mile away)"
-            } else {
-              htmlString = htmlString + " miles away)"
-            }
-
-
-          }
           destArray.push(gmarkers[i].getPosition());
-          destMarkers.push(gmarkers[i]);
+          destMarkers.push(gmarkers[i]); 
         }
       }
 
@@ -588,7 +591,7 @@ function plotMap(address, queryType) {
       mapTypeId: google.maps.MapTypeId.ROADMAP,
       streetViewControl: false
     });
-    circle.setMap(map);
+    //circle.setMap(map);
     service = new google.maps.places.PlacesService(map);
     initialService = new google.maps.places.PlacesService(map);
 
@@ -618,6 +621,13 @@ function plotMap(address, queryType) {
 		.append("svg")
 		.attr("width", width)
 		.attr("height", height);
+
+	var svg3 = d3.select("#groceryInfo")
+		.append("svg")
+		.attr("width", 0.2*width)
+		.attr("height", 0.7*height);
+
+
 
   }
 
@@ -650,7 +660,7 @@ function plotMap(address, queryType) {
 
     google.maps.event.addListener(marker, 'click', function() {
       infowindow.marker = marker;
-      service.getDetails(request, function(place, status) {
+      service.getDetails(request, function(place, status) { 
         if (status == google.maps.places.PlacesServiceStatus.OK) {
           var contentStr = '<h5>' + place.name + '</h5><p>' + place.formatted_address;
           if (!!place.formatted_phone_number) contentStr += '<br>' + place.formatted_phone_number;
@@ -671,3 +681,11 @@ function plotMap(address, queryType) {
   }
 
 }
+
+function plotMarkers() {
+
+	var option = this.options[this.selectedIndex].text;
+	plotMap(pat_addr, option);
+
+}
+
