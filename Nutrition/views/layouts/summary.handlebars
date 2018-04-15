@@ -137,15 +137,15 @@
 			<table>
 				<tbody>
 					<tr>
-						<th align="center" class="width-30">HEI</th>
+						<th align="center" class="width-30"><font color="#3E74A5">HEI</font></th>
 						<th></th>
 						<th></th>
 						<th></th>
-						<th align="center" class="width-30">AHEI</th>
+						<th align="center" class="width-30"><font color="#DB7100">AHEI</font></th>
 						<th></th>
 						<th></th>
 						<th></th>
-						<th align="center" class="width-30">DASH</th>
+						<th align="center" class="width-30"><font color="#45B20E">DASH</font></th>
 					</tr>
 					<tr>
 						<td id="hei_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
@@ -225,18 +225,18 @@
   FHIR.oauth2.ready(onReady, onError);
 
   /* HEI Listeners */
-  document.getElementById("hei_value").addEventListener("mouseover", heiHandler_mouseover, false);
-  document.getElementById("hei_value").addEventListener("mouseout", handle_mouseout, false);
+  //document.getElementById("hei_value").addEventListener("mouseover", heiHandler_mouseover, false);
+  //document.getElementById("hei_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("hei_value").addEventListener("click", heiHandler_click, false);
 
   /* AHEI Listeners */
-  document.getElementById("ahei_value").addEventListener("mouseover", aheiHandler_mouseover, false);
-  document.getElementById("ahei_value").addEventListener("mouseout", handle_mouseout, false);
+  //document.getElementById("ahei_value").addEventListener("mouseover", aheiHandler_mouseover, false);
+  //document.getElementById("ahei_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("ahei_value").addEventListener("click", aheiHandler_click, false);
 
   /* DASH Listeners */
-  document.getElementById("dash_value").addEventListener("mouseover", dashHandler_mouseover, false);
-  document.getElementById("dash_value").addEventListener("mouseout", handle_mouseout, false);
+  //document.getElementById("dash_value").addEventListener("mouseover", dashHandler_mouseover, false);
+  //document.getElementById("dash_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("dash_value").addEventListener("click", dashHandler_click, false);
 
   /* Height Listener */
