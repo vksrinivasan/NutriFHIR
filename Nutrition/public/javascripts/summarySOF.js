@@ -10,6 +10,7 @@ var bp_plot_data;
 var totChol_plot_data;
 var hdl_plot_data;
 var ldl_plot_data;
+var encounterId_Locations = {};
 
 /* Required Smart on Fhir On Ready Function */
 function onReady(smart) {       
@@ -53,7 +54,7 @@ function onReady(smart) {
   smart.patient.api.fetchAllWithReferences({type: "MedicationStatement"}).then(function(results) {
     id = 0;
 
-    //Trying timeline concept
+   //Trying timeline concept
    results.forEach(function(statement){
      console.log(statement)
      item = {}
@@ -247,6 +248,16 @@ function update_timeline(selection,action,tItems){
          })
   }
 }
+
+  /* Go through encounters */
+  console.log('on encounters');
+  smart.patient.api.fetchAllWithReferences({type: "Encounter"}).then(function(results) {
+    results.forEach(function(statement){
+      encounterId_Locations[statement.id] = statement['location'][0]['location']['display'];
+    });
+  });
+  
+  console.log(encounterId_Locations);
 
 
 
@@ -458,7 +469,7 @@ function onError() {
 
 /* Helper function to populate the structs we need for the deepdive cards */
 function populatePlotData(data) {
-	td = {Value: [], Date: [], EncounterID: [], headers: [], colors: []};
+	td = {Value: [], Date: [], Method: [], Location: [], headers: [], colors: []};
 	gd = {values: [], refHi: [], refLo: [], dates: [], units: []};
 	
 	for(i = 0; i < data.length; i++) {
@@ -467,8 +478,14 @@ function populatePlotData(data) {
 		td['Value'].push(getQuantityValueAndUnit(data[i]));
 		var tDate = getDate(data[i]);
 		td['Date'].push(tDate.substring(0,10));
-		td['EncounterID'].push(data[i]['encounter']['reference'].replace('Encounter/', ''));
 		td['colors'].push(getColor(data[i])[1]);
+		
+		// Use our encounter dictionary to find out where the encounter occured 
+		var encounter_num = parseInt(data[i]['encounter']['reference'].replace('Encounter/', ''));
+		td['Location'].push(encounterId_Locations[encounter_num]);
+		
+		// Try to get method
+		td['Method'].push(getMethod(data[i]));
 		
 		/* Push Graph Data */
 		gd['values'].push(getValue(data[i]));
@@ -478,8 +495,8 @@ function populatePlotData(data) {
 		gd['units'].push(getUnits(data[i]));
 	}
 	
-	td['headers'] = ['Value', 'Date', 'EncounterID']
-	
+	td['headers'] = ['Value', 'Date', 'Method', 'Location'];
+	console.log(td);
 	return {tableData: td, graphData: gd};
 }
 
@@ -513,6 +530,16 @@ function calculateAge(date) {
   else {
     return undefined;
   }
+}
+
+/* Helper Function to Get Method of Observation */
+function getMethod(ob) {
+	if (typeof ob != 'undefined' && 
+		typeof ob.method != 'undefined') {
+			return ob.method;
+	} else {
+		return '-'
+	}
 }
 
 /* Helper Function to Get Quantity Value/Units for a Given Observation */

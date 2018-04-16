@@ -110,11 +110,71 @@ function createPlot(side, data, cardName) {
 	height = height - margin.top - margin.bottom;
 	
 	// Set y axis scales
-	var y_minmax_act = math.min(pData['values']);
-	var y_min_ref = math.min(pData['refLo']);
-	var y_max_ref = math.max(pData['refHi']);
-	var y_min = math.min(y_minmax_act, y_min_ref);
-	var y_max = math.max(y_minmax_act, y_max_ref);
+	var y_min_act;
+	var y_max_act;
+	var y_min_ref;
+	var y_max_ref;
+	var y_min;
+	var y_max;
+	
+	try { 
+		y_min_act = math.min(pData['values']);
+	} 
+	catch (err) {
+		y_min_act = undefined;
+	}
+	
+	try {
+		var y_max_act = math.max(pData['values']);
+	}
+	catch (err) {
+		y_max_act = undefined;
+	}
+	
+	try {
+		var y_min_ref = math.min(pData['refLo']);
+	}
+	catch (err) {
+		y_min_ref = undefined;
+	}
+	
+	try {
+		var y_max_ref = math.max(pData['refHi']);
+	} catch (err) {
+		y_max_ref = undefined;
+	}
+	
+	if(y_min_act != undefined && y_min_ref != undefined) {
+		y_min = math.min(y_min_act, y_min_ref);
+	} 
+	else if (y_min_act != undefined) {
+		y_min = y_min_act;
+	} 
+	else if (y_min_ref != undefined) {
+		y_min = y_min_ref;
+	} 
+	else {
+		y_min = 0;
+	}
+		
+	if(y_max_act != undefined && y_max_ref != undefined) {
+		y_max = math.max(y_max_act, y_max_ref);
+	} 
+	else if (y_max_act != undefined) {
+		y_max = y_max_act;
+	} 
+	else if (y_max_ref != undefined) {
+		y_max = y_max_ref;
+	} 
+	else {
+		y_max = 0;
+	}
+	
+	if(y_min === y_max) {
+		var t_minmax = y_min;
+		y_min = t_minmax - t_minmax;
+		y_max = t_minmax + t_minmax;
+	}
 	
 	y = d3.scale.linear()
 				.domain([y_min, y_max])
