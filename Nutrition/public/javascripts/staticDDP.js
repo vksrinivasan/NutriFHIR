@@ -10,100 +10,269 @@ var margin;
 var score_click = false;
 // Keep track of which score was clicked
 var score_click_type = undefined;
+var hei_i = false; 
+var ahei_i = false;
+var dash_i = false; 
 
-/* HEI listeners */
-function heiHandler_mouseover() {
-	if(!score_click) {
-		if(d3.select("#AHEI").style('opacity') === "1") {
-			d3.select("#AHEI").style('opacity', 0.3);
-		}
-
-		if(d3.select("#DASH").style('opacity') === "1") {
-			d3.select("#DASH").style('opacity', 0.3);
-		}
-	}
+/* Generic create the card */
+function dietCreateCard(id) {
+	/* Create card itself */
+	var drawdownCard = d3.select('#DietChart')
+						 .append('div')
+							.attr('class', 'card')
+							.attr('id', id);
+						 
+	/* Create the card container */
+	var drawdownContainer = drawdownCard.append('div')
+											.attr('id', 'container');
+											
+	/* Create the card body */
+	var cardBody = drawdownContainer.append('div')
+										.attr('id', 'drawDownInformation')
+										.attr('class', 'card-body');
+	
+	return cardBody; 
 }
 
+/* Generic create title row with burger */
+function dietCreateTitleBurger(cardBody, title) {
+	var row = cardBody.append('div')
+					  .attr('class', 'row');
+						
+	row.append('h2') 
+	       .attr('class', 'card-title col-sm-11')
+	       .attr('id', title)
+		   .attr('style', 'cursor: pointer')
+	       .text(title);
+
+	row.append('div') 
+	       .attr('class', 'glyphicon glyphicon-menu-hamburger pull-right card-hamburger')
+	       .attr('aria-hidden', 'true');
+}
+
+/* Generic create card sides/divisions */
+function dietCreateSide(cardBody, perc, side) {
+	var side = cardBody.append('div')
+							.attr('style', 'float:' + side + '; width: ' + perc);
+	return side;
+}
+
+/* Generic plot data */
+function dietCreatePlot(side, data, cardName) {
+	var pData = data['percentage'];
+	var cardData = document.getElementById(cardName.replace('#', ''));
+	var cardDim = cardData.getBoundingClientRect();
+	
+	var width = cardDim.width;
+	var height = math.max(cardDim.height, 200);
+	
+	//Get margin and weidth height
+	margin = {top: 30, right: 50, bottom: 30, left: 50};
+	var width = width - margin.left - margin.right;
+	var height = height - margin.top - margin.bottom;
+
+	y_min = 0; //math.min(math.min(arr_metrics[i]['percentage']), y_min);
+	y_max = 100; //math.max(math.max(arr_metrics[i]['percentage']), y_max);
+
+	var x_min = new Date(Math.min.apply(null, data['date']));
+
+	var x_max = new Date(Math.max.apply(null, data['date']));
+
+	console.log(x_min);
+	console.log(x_max);
+	var adj_factor = (y_max - y_min)/4.0;
+	y_min = y_min - adj_factor;
+	y_max = y_max + adj_factor;
+
+	x = d3.time.scale()
+			   .domain([x_min, x_max])
+			   .range([0, width]);
+
+	y = d3.scale.linear()
+					  .domain([y_min, y_max])
+					  .range([height, 0]);
+
+	// Define the axes
+	var xAxis = d3.svg.axis().scale(x)
+    .orient("bottom").ticks(5);
+
+	var yAxis = d3.svg.axis().scale(y)
+    .orient("left").ticks(5);
+
+	// Define the line
+	var lineFunc = d3.svg.line()
+		.x(function(d) {
+			return x(d[0]);
+		})
+		.y(function(d) {
+			return y(d[1]);
+		})
+	  .interpolate('linear');
+						 
+	// Add svg canvas
+	var svg = d3.select(cardName)
+				.append("svg")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom)
+				.append("g")
+					.attr("transform",
+								"translate(" + margin.left + "," + margin.top + ")");
+								
+	// Add x axis
+	svg.append("g")
+	.attr("class", "x axis")
+	.attr("transform", "translate(0," + height + ")")
+	.call(xAxis);
+	
+	// Add y axis
+	svg.append("g")
+	.attr("class", "y axis")
+	.call(yAxis);
+	
+	// Plot Actual Data
+ 	var plotVals = [];
+	for(j = 0; j < data['date'].length; j++) {
+		plotVals.push([data['date'][j], data['percentage'][j]]);
+	}
+	svg.append("path")
+		.attr('d', lineFunc(plotVals))
+		.attr('stroke', data['color'])
+		.attr('stroke-width', 2)
+		.attr('fill', 'none')
+		.attr('id', data['name']);
+	
+	svg.append("path")
+	   .attr('d', lineFunc(plotVals))
+	   .attr('class', 'pathActual');
+
+	// Give title
+	svg.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 4))
+        .attr("text-anchor", "middle")
+		.attr("font-family", "sans-serif")
+        .style("font-size", "15px")
+        .text("Eating Index (percentage of ideal) v. Time");
+
+	// Add y-axis
+    	svg.append("text")
+		.attr("transform", "rotate(-90)")
+		.attr("y", 0 - margin.left)
+		.attr("x",0 - (height / 2))
+		.attr("dy", "1em")
+		.style("text-anchor", "middle")
+		.style("font-family", "sans-serif")
+		.style("font-size", 12)
+		.text("Eating Index (percentage of ideal)");
+	   
+	
+	// Plot scatter plot circles
+	
+	/*svg.selectAll("circle")
+	   .data(plotVals)
+	   .enter()
+	   .append("circle")
+	   .attr("cx", function(d) {
+		   return x(d[0]);
+	   })
+	   .attr("cy", function(d) {
+		   return y(d[1]);
+	   })
+	   .attr("r", 3)
+	   .attr('class', 'pointActual');*/
+	   
+}
+
+/* HEI listeners */
 function heiHandler_click() {
-	if(!score_click) {
-		d3.select("#AHEI").style('opacity', 0.3);
-		d3.select("#DASH").style('opacity', 0.3);
-		plotScatter(hei);
-		score_click = !score_click;
-		score_click_type = "HEI";
-	} else {
-		if(score_click_type === "HEI") {
-			clearScatter();
-			score_click = !score_click;
-			score_click_type = undefined;
-		}
+	
+	if(!hei_i) {
+	
+		var cardId = 'heiDrawdown';
+		var cardTitle = 'HEI';
+		
+		/* Create the card */
+		cardBody = dietCreateCard(cardId);
+		hei_i = !hei_i;
+		
+		/* Add title to the card */
+		dietCreateTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = dietCreateSide(cardBody, '100%', 'left');
+		var rhs = dietCreateSide(cardBody, '0%', 'right');
+		
+		/* Add RHS Plot */
+		dietCreatePlot(rhs, hei, '#'+cardId);
+		plotScatter(hei, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("HEI").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			clearScatter('#'+cardId);
+			hei_i = !hei_i;
+		});
 	}
 }
 
 /* AHEI Listeners */
-function aheiHandler_mouseover() {
-	if(!score_click) {
-		if(d3.select("#HEI").style('opacity') === "1") {
-			d3.select("#HEI").style('opacity', 0.3);
-		}
-
-		if(d3.select("#DASH").style('opacity') === "1") {
-			d3.select("#DASH").style('opacity', 0.3);
-		}
-	}
-}
-
 function aheiHandler_click() {
-	if(!score_click) {
-		d3.select("#HEI").style('opacity', 0.3);
-		d3.select("#DASH").style('opacity', 0.3);
-		plotScatter(ahei);
-		score_click = !score_click;
-		score_click_type = "AHEI";
-	} else {
-		if(score_click_type === "AHEI") {
-			clearScatter();
-			score_click = !score_click;
-			score_click_type = undefined;
-		}
-	}
-}
-
-/* DASH Listeners */
-function dashHandler_mouseover() {
-	if(!score_click) {
-		if(d3.select("#HEI").style('opacity') === "1") {
-			d3.select("#HEI").style('opacity', 0.3);
-		}
-
-		if(d3.select("#AHEI").style('opacity') === "1") {
-			d3.select("#AHEI").style('opacity', 0.3);
-		}
+	if(!ahei_i) {
+	
+		var cardId = 'aheiDrawdown';
+		var cardTitle = 'AHEI';
+		
+		/* Create the card */
+		cardBody = dietCreateCard(cardId);
+		ahei_i = !ahei_i;
+		
+		/* Add title to the card */
+		dietCreateTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = dietCreateSide(cardBody, '100%', 'left');
+		var rhs = dietCreateSide(cardBody, '0%', 'right');
+		
+		/* Add RHS Plot */
+		dietCreatePlot(rhs, ahei, '#'+cardId);
+		plotScatter(ahei, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("AHEI").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			clearScatter('#'+cardId);
+			ahei_i = !ahei_i;
+		});
 	}
 }
 
 function dashHandler_click() {
-	if(!score_click) {
-		d3.select("#HEI").style('opacity', 0.3);
-		d3.select("#AHEI").style('opacity', 0.3);
-		plotScatter(dash);
-		score_click = !score_click;
-		score_click_type = "DASH";
-	} else {
-		if(score_click_type === "DASH") {
-			clearScatter();
-			score_click = !score_click;
-			score_click_type = undefined;
-		}
-	}
-}
-
-/* Handle generic mouseout for all score types */
-function handle_mouseout() {
-	if(!score_click) {
-		d3.select("#HEI").style('opacity', 1.0);
-		d3.select("#AHEI").style('opacity', 1.0);
-		d3.select("#DASH").style('opacity', 1.0);
+	if(!dash_i) {
+	
+		var cardId = 'dashDrawdown';
+		var cardTitle = 'DASH';
+		
+		/* Create the card */
+		cardBody = dietCreateCard(cardId);
+		dash_i = !dash_i;
+		
+		/* Add title to the card */
+		dietCreateTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = dietCreateSide(cardBody, '100%', 'left');
+		var rhs = dietCreateSide(cardBody, '0%', 'right');
+		
+		/* Add RHS Plot */
+		dietCreatePlot(rhs, dash, '#'+cardId);
+		plotScatter(dash, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("DASH").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			clearScatter('#'+cardId);
+			dash_i = !dash_i;
+		});
 	}
 }
 
@@ -142,39 +311,61 @@ function populateDietaryData() {
 				               "#mrpp_text",						     // ID of element for Most Recent Purchase Period
 							   "#dash_value");					         // ID of element for Most Recent DASH %
 
-	/* Calculate KL-Divergence Between Each Period's Scores and Ideal */
-	hei_divergence = getTimeSeriesDivergence(hei['score'], hei['ref_hi']);
-	ahei_divergence = getTimeSeriesDivergence(ahei['score'], ahei['ref_hi']);
-	dash_divergence = getTimeSeriesDivergence(dash['score'], dash['ref_hi']);
-
-	/* Add Divergences/Names/Colors to the structs */
-	hei['divergence'] = hei_divergence;
+	/* Get Sum of Scores At Each Period For Each Index */
+	hei_sum = getTimeSeriesSum(hei['score']);
+	hei_ideal = getTimeSeriesIdeal(hei['ref_hi'], hei['score'].length);
+	hei_percentage = [];
+	for (i = 0; i < hei['score'].length; i++) {
+		hei_percentage.push(hei_sum[i] / hei_ideal[i] * 100);
+	}
+	ahei_sum = getTimeSeriesSum(ahei['score']);
+	ahei_ideal = getTimeSeriesIdeal(ahei['ref_hi'], ahei['score'].length);
+	ahei_percentage = [];
+	for (i = 0; i < ahei['score'].length; i++) {
+		ahei_percentage.push(ahei_sum[i] / ahei_ideal[i] * 100);
+	}
+	dash_sum = getTimeSeriesSum(dash['score']);
+	dash_ideal = getTimeSeriesIdeal(dash['ref_hi'], dash['score'].length);
+	dash_percentage = [];
+	for (i = 0; i < dash['score'].length; i++) {
+		dash_percentage.push(dash_sum[i] / dash_ideal[i] * 100);
+	}
+	
+	/* Add Sums/Ideal/Names/Colors to the structs */
+	hei['sum'] = hei_sum;
+	hei['ideal'] = hei_ideal;
+	hei['percentage'] = hei_percentage;
 	hei['name'] = 'HEI';
-	hei['color'] = hei_color;
-	ahei['divergence'] = ahei_divergence;
+	hei['color'] = "#3E74A5";
+	ahei['sum'] = ahei_sum;
+	ahei['ideal'] = ahei_ideal;
+	ahei['percentage'] = ahei_percentage;
 	ahei['name'] = 'AHEI';
-	ahei['color'] = ahei_color;
-	dash['divergence'] = dash_divergence;
+	ahei['color'] = "#DB7100";
+	dash['sum'] = dash_sum;
+	dash['ideal'] = dash_ideal;
+	dash['percentage'] = dash_percentage;
 	dash['name'] = 'DASH';
-	dash['color'] = dash_color;
+	dash['color'] = "#45B20E";
 
-	/* Plot KL Divergence */
-	plotDistributionDivergence([hei,ahei,dash]);
+	/* Plot Percentages */
+	//plotPercentages([hei,ahei,dash]);
 
 }
 
-function clearScatter() {
-	var svg = d3.select('#DietChart').select("svg");
+function clearScatter(cardId) {
+	var svg = d3.select(cardID).select("svg");
 	svg.selectAll("circle").remove();
 }
 
-function plotScatter(scoreObj) {
-	var svg = d3.select('#DietChart').select("svg");
+function plotScatter(scoreObj, cardId) {
+	console.log(cardId);
+	var svg = d3.select(cardId).select("svg");
 
 	// Put the data for this sore in an easy to use object
 	var plotVals = []
 	for(i = 0; i < scoreObj['date'].length; i++) {
-		plotVals.push([i, scoreObj['date'][i], scoreObj['divergence'][i], scoreObj]);
+		plotVals.push([i, scoreObj['date'][i], scoreObj['percentage'][i], scoreObj]);
 	}
 
 	var tool_tip = d3.tip()
@@ -182,7 +373,15 @@ function plotScatter(scoreObj) {
 	  .offset([-400, -150])
 	  .html("<div id='tipDiv'></div>");
 
+	var tool_tip_percent = d3.tip()
+	  .attr("class", "d3-tip")
+	  .offset([20, 10])
+	  .html("<div id='tipPercentDiv'></div>");
+
 	svg.call(tool_tip);
+	svg.call(tool_tip_percent);
+
+	var showingSpider = false;
 
 	// Now create the circles
 	svg.selectAll("circle")
@@ -202,23 +401,52 @@ function plotScatter(scoreObj) {
 	   .attr("transform",
 				  "translate(" + margin.left + "," + margin.top + ")")
 	   .style("fill", scoreObj['color'])
-	   .on('mouseover', function(d) {
-		    tool_tip.show();
-		    var tipSVG = d3.select("#tipDiv")
+	   .on('click', function(d) {
+		if (!showingSpider) {
+		    	tool_tip.show();
+		    	var tipSVG = d3.select("#tipDiv")
 						  .append("svg")
 						  .attr("width", 300)
 						  .attr("height", 300)
 						  .attr("class", "tipBody")
+						  .style("opacity", 1)
+						  .style("border", 2)
 						  .style("background-color", "blue");
 
 			createSpider(tipSVG, d[0], d[3]);
-
-
+			showingSpider = true;
+		}
+		else {
+			d3.select("#tipDiv").remove();
+			showingSpider = false;
+		}
 
 	    })
-		.on('mouseout', function(){
-				d3.select("#tipDiv").remove()
+
+		.on('mouseover', function(d, i) {
+			tool_tip_percent.show();
+		    // Specify where to put label of text
+			//console.log(d[3]['name'][i] + ": " + d[3]['sum'][i] + ", " + d[3]['ideal'][i]);
+			var percentSVG = d3.select("#tipPercentDiv")
+					.append("text")
+					.text(function() {
+						return (d[3]['sum'][i]/d[3]['ideal'][i] * 100).toFixed(2) + "%";  // Value of the text
+					});
+		})
+
+		.on('mouseout', function(d, i){
+			d3.select("#tipPercentDiv").remove();  // Remove text location
 		});
+	/*
+	var borderPath = svg.append("rect")
+       			.attr("x", 0)
+       			.attr("y", 0)
+       			.attr("height", 250)
+       			.attr("width", 300)
+       			.style("stroke", 'black')
+       			.style("fill", "none")
+       			.style("stroke-width", 1);
+	*/
 }
 
 /* Create the spider chart on mouseover */
@@ -255,7 +483,7 @@ function createSpider(toolTip, index, data) {
 	RadarChart.draw("#tipDiv", d, mycfg);
 }
 
-function plotDistributionDivergence(arr_metrics) {
+function plotPercentages(arr_metrics) {
 	console.log(arr_metrics);
 	var cardData = document.getElementById('DietCard');
 	var cardDim = cardData.getBoundingClientRect();
@@ -269,14 +497,15 @@ function plotDistributionDivergence(arr_metrics) {
 	var height = height - margin.top - margin.bottom;
 
 	// Set Axis Scales
-	var y_min = arr_metrics[0]['divergence'][0];
-	var y_max = arr_metrics[0]['divergence'][0];
+	var y_min = arr_metrics[0]['percentage'][0];
+	var y_max = arr_metrics[0]['percentage'][0];
 	var x_min = arr_metrics[0]['date'][0];
 	var x_max = arr_metrics[0]['date'][0];
 
+	// Fixed y-ais since now plotting percentage which is always between 0 and 100%
 	for(i = 0; i < arr_metrics.length; i++) {
-		y_min = math.min(math.min(arr_metrics[i]['divergence']), y_min);
-		y_max = math.max(math.max(arr_metrics[i]['divergence']), y_max);
+		y_min = 0; //math.min(math.min(arr_metrics[i]['percentage']), y_min);
+		y_max = 100; //math.max(math.max(arr_metrics[i]['percentage']), y_max);
 
 		var x_min_t = new Date(Math.min.apply(null, arr_metrics[i]['date']));
 		x_min = new Date(Math.min.apply(null, [x_min_t, x_min]));
@@ -340,7 +569,7 @@ function plotDistributionDivergence(arr_metrics) {
 	for(i = 0; i < arr_metrics.length; i++) {
 		var plotVals = [];
 		for(j = 0; j < arr_metrics[i]['date'].length; j++) {
-			plotVals.push([arr_metrics[i]['date'][j], arr_metrics[i]['divergence'][j]]);
+			plotVals.push([arr_metrics[i]['date'][j], arr_metrics[i]['percentage'][j]]);
 		}
 		svg.append("path")
 			.attr('d', lineFunc(plotVals))
@@ -357,7 +586,7 @@ function plotDistributionDivergence(arr_metrics) {
         .attr("text-anchor", "middle")
 		.attr("font-family", "sans-serif")
         .style("font-size", "15px")
-        .text("Ideal Eating Index Divergence v. Time");
+        .text("Eating Index (percentage of ideal) v. Time");
 
 	// Add y-axis
     svg.append("text")
@@ -368,19 +597,27 @@ function plotDistributionDivergence(arr_metrics) {
 		.style("text-anchor", "middle")
 		.style("font-family", "sans-serif")
 		.style("font-size", 12)
-		.text("KL-Divergence");
-}
-
-function getTimeSeriesDivergence(actual, ideal) {
-	ret_timeSeries = [];
-	for(i = 0; i < actual.length; i++) {
-		ret_timeSeries.push(math.kldivergence(actual[i], ideal));
-	}
-	return ret_timeSeries;
+		.text("Eating Index (percentage of ideal)");
 }
 
 function add(a, b) {
     return a + b;
+}
+
+function getTimeSeriesSum(actual) {
+	ret_timeSeries = [];
+	for(i = 0; i < actual.length; i++) {
+		ret_timeSeries.push(actual[i].reduce(add));
+	}
+	return ret_timeSeries;
+}
+
+function getTimeSeriesIdeal(ideal, nTimesteps) {
+	ret_timeSeries = [];
+	for(i = 0; i < nTimesteps; i++) {
+		ret_timeSeries.push(ideal.reduce(add));
+	}
+	return ret_timeSeries;
 }
 
 function fillOutScores(actComponentScores, idealComponentScores, date, loc_mrpp, loc_val) {

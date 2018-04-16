@@ -1,3 +1,5 @@
+//Global variable
+var meds=[]
 var pat_addr;
 var height_plot_data;
 var weight_plot_data; 
@@ -8,8 +10,8 @@ var bp_plot_data;
 var totChol_plot_data;
 var hdl_plot_data;
 var ldl_plot_data;
+var encounterId_Locations = {};
 
- 
 /* Required Smart on Fhir On Ready Function */
 function onReady(smart) {       
   var patient = smart.patient;
@@ -41,52 +43,87 @@ function onReady(smart) {
   var hasHypertension = false;
 
   var cond = smart.patient.api.search({type: 'Condition'});
-  var meds = smart.patient.api.search({type: 'MedicationOrder'});
+  //var meds = smart.patient.api.search({type: 'MedicationOrder'});
+  //var allMeds = smart.patient.api.search({type: 'MedicationStatement'})
 
   //var allergies = smart.patient.api.search({type: 'AllergyIntolerance'});
 
-  // /* Generate Medication List */
-  smart.patient.api.fetchAllWithReferences({type: "MedicationOrder"},["MedicationOrder.medicationReference"]).then(function(results, refs) {
-    id = 0;
-    meds=[]
 
-    //Trying timeline concept
-   results.forEach(function(prescription){
-     //console.log(prescription)
+
+  // /* Generate Medication List */
+  smart.patient.api.fetchAllWithReferences({type: "MedicationStatement"}).then(function(results) {
+    id = 0;
+
+   //Trying timeline concept
+   results.forEach(function(statement){
+     console.log(statement)
      item = {}
+
      try{
      item.id =  id
-     item.start = new Date(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.start)
-     if(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.end){
-        item.end = new Date(prescription.dosageInstruction[0].timing.repeat.boundsPeriod.end)
-      }
-      if(item.end){
+     if(statement.effectivePeriod){
+     item.start = new Date(statement.effectivePeriod.start)
+     if(statement.effectivePeriod.end)
+        {
+        item.end = new Date(statement.effectivePeriod.end)
         item.type = 'range'
+        }
+        }
+     else{
+      item.start = new Date(statement.effectiveDateTime)
       }
-      else{
+
+      if(!item.type){
         item.type = 'point'
       }
-      //item.content = prescription.medicationCodeableConcept.coding[0].display
-     if(prescription.dosageInstruction[0].route){
-     item.route = prescription.dosageInstruction[0].route.text
+
+      if(statement.medicationCodeableConcept.coding){
+        item.content = statement.medicationCodeableConcept.coding[0].display
       }
-    if(prescription.dosageInstruction[0].dosageQuantity){
-     item.dosageQuantity = prescription.dosageInstruction[0].doseQuantity.value +" "+prescription.dosageInstruction[0].doseQuantity.unit
+      else{
+        item.content = statement.medicationCodeableConcept.text
+      }
+
+     if(statement.dosage[0].route){
+     item.route = statement.dosage[0].route.text
+      }
+
+    if(statement.dosage[0].quantityQuantity){
+     item.dosageQuantity = statement.dosage[0].quantityQuantity.value +" "+statement.dosage[0].quantityQuantity.unit
     }
 
-    item.status = prescription.status
-    item.prescriber = prescription.prescriber.display
-        if (prescription.medicationCodeableConcept) {
-            item.content = getMedicationName(prescription.medicationCodeableConcept.coding)
-            //displayMedication(prescription.medicationCodeableConcept.coding);
-        } else if (prescription.medicationReference) {
-            var med = refs(prescription, prescription.medicationReference);
-            item.content = getMedicationName(med && med.code.coding || [])
-            //displayMedication(med && med.code.coding || []);
+    item.status = statement.status
+    if(item.status == 'active'){
+      item.sflag = 'active'
+    }
+    else{
+      item.sflag = 'inactive'
+    }
+    if(statement.informationSource){
+      item.source = statement.informationSource.display
+      if(statement.informationSource.reference){
+        if(statement.informationSource.reference.split("/")[0] = "Practitioner")
+        {
+          item.reference = statement.informationSource.reference
+          item.flag = 'prac'
         }
+        else{
+          item.reference = statement.informationSource.reference
+          item.flag ='pat'
+        }
+      }
+    }
+
+    else{
+      item.reference = 'Patient'
+      item.flag = 'pat'
+    }
+    //show-hide thing
+    item.className = 'visible'
     //format tooltip dispalay
     item.title = '<b>Medication</b> : '+item.content+'<br>'+
-                 '<b>Prescribed by</b> : '+item.prescriber+'<br>'+
+                 '<b>Reference</b> : '+item.reference+'<br>'+
+                 '<b>Source</b> : '+item.source+'<br>'+
                  '<b>Status</b> : '+item.status+'<br>'+
                  '<b>Route</b> : '+item.route+'<br>'+
                  '<b>Dose</b> : '+item.dosageQuantity+'<br>'+
@@ -96,21 +133,24 @@ function onReady(smart) {
 
 
     catch (e){
-      console.log(e.name)
+      console.log(e)
     }
 
     //console.log(item)
+    console.log(item)
     meds.push(item)
     id =id +1;
 
      });
 
+    console.log(meds)
      //Build timeline
      var cap_options = {
          tooltip: {
          followMouse: true,
          overflowMethod: 'cap'
-       }
+       },
+       maxHeight : '400px'
      }
 
 
@@ -123,20 +163,101 @@ function onReady(smart) {
 
      var toolT = new vis.Timeline(document.getElementById('tooltips'),items, cap_options);
      //var Timeline = new vis.Timeline(container,items,options)
-     console.log(items)
 
-     /*Timeline.on('select', function (properties) {
-     if(properties.items[0]){
-       document.getElementById("medTitle").innerHTML = meds[properties.items[0]].content
-       document.getElementById("med-list-prescriber").innerHTML = meds[properties.items[0]].prescriber
-       document.getElementById("med-list-dose").innerHTML = meds[properties.items[0]].dosageQuantity
-       document.getElementById("med-list-route").innerHTML = meds[properties.items[0]].route
-       document.getElementById("med-list-status").innerHTML = meds[properties.items[0]].status
-       document.getElementById("med-list-startDate").innerHTML = meds[properties.items[0]].start.toDateString()
-     };
-   });*/
+
+     //Event handler for radio buttons
+     $(function(){
+       $("[name=filter]").change(function(){
+
+          $('#statusCheck').prop('checked',false)
+
+          if($(this).attr("id") == 'prac'){
+            update_timeline('prac',"visible",items)
+            update_timeline('pat',"hide",items)
+            console.log(items)
+          }
+
+          else if($(this).attr("id") == 'pat'){
+            update_timeline('pat',"visible",items)
+            update_timeline('prac',"hide",items)
+            //console.log(items)
+          }
+
+          else{
+            update_timeline('all',"visible",items)
+          }
+
+
+          });
+
+          /*Checkbox*/
+
+          $('#statusCheck').change(function() {
+
+          chosenRadio = $('input[name=filter]:checked').attr('id');
+
+          if(this.checked){
+            items.forEach(function(each){
+                if(each.sflag == 'inactive' && each.flag == chosenRadio){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "hide"})
+                }
+                else if(each.sflag == 'inactive' && chosenRadio == 'all'){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "hide"})
+                }
+            })
+          }
+
+          if(!this.checked){
+            items.forEach(function(each){
+                if(each.sflag == 'inactive' && each.flag == chosenRadio){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "visible"})
+                }
+                else if(each.sflag == 'inactive' && chosenRadio == 'all'){
+                  console.log(each.flag,each.sflag)
+                  items.update({id : each.id , className : "visible"})
+                }
+            })
+          }
+
+          });
+
+     })
+
+
 
    });
+
+
+   /*Update function*/
+function update_timeline(selection,action,tItems){
+  if(selection == 'prac' || selection == 'pat'){
+   tItems.forEach(function(each){
+         if(each.flag == selection){
+           tItems.update({id : each.id, className : action})
+                        }
+          selected = selection
+        })
+  }
+  else{
+    tItems.forEach(function(each){
+            tItems.update({id : each.id, className : action})
+           selected = selection
+         })
+  }
+}
+
+  /* Go through encounters */
+  console.log('on encounters');
+  smart.patient.api.fetchAllWithReferences({type: "Encounter"}).then(function(results) {
+    results.forEach(function(statement){
+      encounterId_Locations[statement.id] = statement['location'][0]['location']['display'];
+    });
+  });
+  
+  console.log(encounterId_Locations);
 
 
 
@@ -348,7 +469,7 @@ function onError() {
 
 /* Helper function to populate the structs we need for the deepdive cards */
 function populatePlotData(data) {
-	td = {Value: [], Date: [], EncounterID: [], headers: [], colors: []};
+	td = {Value: [], Date: [], Method: [], Location: [], headers: [], colors: []};
 	gd = {values: [], refHi: [], refLo: [], dates: [], units: []};
 	
 	for(i = 0; i < data.length; i++) {
@@ -357,8 +478,14 @@ function populatePlotData(data) {
 		td['Value'].push(getQuantityValueAndUnit(data[i]));
 		var tDate = getDate(data[i]);
 		td['Date'].push(tDate.substring(0,10));
-		td['EncounterID'].push(data[i]['encounter']['reference'].replace('Encounter/', ''));
 		td['colors'].push(getColor(data[i])[1]);
+		
+		// Use our encounter dictionary to find out where the encounter occured 
+		var encounter_num = parseInt(data[i]['encounter']['reference'].replace('Encounter/', ''));
+		td['Location'].push(encounterId_Locations[encounter_num]);
+		
+		// Try to get method
+		td['Method'].push(getMethod(data[i]));
 		
 		/* Push Graph Data */
 		gd['values'].push(getValue(data[i]));
@@ -368,8 +495,8 @@ function populatePlotData(data) {
 		gd['units'].push(getUnits(data[i]));
 	}
 	
-	td['headers'] = ['Value', 'Date', 'EncounterID']
-	
+	td['headers'] = ['Value', 'Date', 'Method', 'Location'];
+	console.log(td);
 	return {tableData: td, graphData: gd};
 }
 
@@ -403,6 +530,16 @@ function calculateAge(date) {
   else {
     return undefined;
   }
+}
+
+/* Helper Function to Get Method of Observation */
+function getMethod(ob) {
+	if (typeof ob != 'undefined' && 
+		typeof ob.method != 'undefined') {
+			return ob.method;
+	} else {
+		return '-'
+	}
 }
 
 /* Helper Function to Get Quantity Value/Units for a Given Observation */
@@ -605,7 +742,7 @@ test= [
 /*Draw charts that are independant of FHIR calls*/
 window.onload=function() {
   //document.getElementById("nutrient-score").innerHTML = 42;//Cuz, answer to everything
-  drawSpider("progress-chart",test)
+  //drawSpider("progress-chart",test)
 }
 
 /*Draw line graph*/
