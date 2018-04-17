@@ -690,13 +690,13 @@ function getAHEIData_randomized() {
 		'Duration of Multivitamin Use',
 		'Alcohol'
 		];
-
+   
 	var reference_lo = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,2.5,0.0];
 	var reference_hi = [10.0,10.0,10.0,10.0,10.0,10.0,10.0,7.5,10.0];
 	var dates = [new Date(2018,0,1), new Date(2018,1,1),new Date(2018,2,1),new Date(2018,3,1)];
 	var scores = [[], [], [], []];
-
-	for(i = 0; i < dates.length; i++) {
+  
+	for(i = 0; i < dates.length; i++) { 
 		for(j = 0; j < components.length; j++) {
 			scores[i][j] = getRandomFloat(reference_lo[j], reference_hi[j]);
 		}
@@ -717,7 +717,7 @@ function getDashData_randomized() {
 		'Saturated Fat',
 		'Cholesterol',
 		'Sodium'
-		];
+		];   
 
 	//var possValues = [0.0, 0.5, 1.0];
 
@@ -732,22 +732,19 @@ function getDashData_randomized() {
 			//scores[i][j] = possValues[index];
 			scores[i][j] = getRandomFloat(reference_lo[j], reference_hi[j]);
 		}
-	}
-
+	}                   
+                  
 	var retStruct = {comp: components, ref_lo: reference_lo, ref_hi: reference_hi, date: dates, score: scores};
 	return retStruct;
-}
+}  
 
 function plotMap(address, queryType) {
+ 
 
-	var div = document.getElementById('mapChart');
-	while(div.firstChild){
-    div.removeChild(div.firstChild);
-	}
   var map = null;
   var gmarkers = [];
   var destMarkers = [];
-  var service = null;
+  var service = null; 
   var noAutoComplete = true;
   var noQuery = true;
   var initialService = null;
@@ -767,7 +764,7 @@ function plotMap(address, queryType) {
     clickable: false,
     map: map
   });
-
+ 
   function callback(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
       var places = [];
@@ -804,8 +801,10 @@ function plotMap(address, queryType) {
         var currDist = google.maps.geometry.spherical.computeDistanceBetween(startLoc, gmarkers[i].getPosition());
         if (currDist < 5 * 1609.34) { // 1609.34 meters/mile
 
-        	htmlString = htmlString + "\n" + "\n" +results[i].name + "\n" + results[i].formatted_address +  "(" + Number(Math.round( currDist / 1609.34 +'e2')+'e-2') + " miles away)";
+        	//htmlString = htmlString + "\n" + "\n" +results[i].name + "\n" + results[i].formatted_address +  "(" + Number(Math.round( currDist / 1609.34 +'e2')+'e-2') + " miles away)";
 
+			createTableRows(results[i].name, results[i].formatted_address.split(',')[0]);
+			
           destArray.push(gmarkers[i].getPosition());
           destMarkers.push(gmarkers[i]); 
         }
@@ -813,17 +812,16 @@ function plotMap(address, queryType) {
 
       $("#groceryInfo").text(htmlString);
 
-    }
+    }   
   }
 
   function initialize() {
-    //document.getElementById('target').value = "Starbucks";
 		
-    map = new google.maps.Map(document.getElementById('mapChart'), {
+    map = new google.maps.Map(document.getElementById('map'), {
       center: new google.maps.LatLng(40.65, -73.95), // Brooklyn, NY
       mapTypeId: google.maps.MapTypeId.ROADMAP,
       streetViewControl: false
-    });
+    }); 
     //circle.setMap(map);
     service = new google.maps.places.PlacesService(map);
     initialService = new google.maps.places.PlacesService(map);
@@ -844,7 +842,7 @@ function plotMap(address, queryType) {
         alert("geocode failed:" + status); 
       }
     });
-
+ 
     var groceryCard = document.getElementById('GroceryCardMap');
     var groceryCardDim = groceryCard.getBoundingClientRect();
     var height = groceryCardDim.height*3.0;
@@ -872,7 +870,7 @@ function plotMap(address, queryType) {
 
   function createMarker(place) {
     var placeLoc = place.geometry.location;
-    if (place.icon) {
+    if (place.icon) {  
       var image = {
         url: place.icon,
         // size:new google.maps.Size(71, 71),
@@ -889,7 +887,7 @@ function plotMap(address, queryType) {
     });
     var request = {
       reference: place.reference
-    };
+    };   
 
     google.maps.event.addListener(marker, 'click', function() {
       infowindow.marker = marker;
@@ -901,18 +899,18 @@ function plotMap(address, queryType) {
           contentStr += '<br>' + place.types + '</p>';
           infowindow.setContent(contentStr + '<input type="button" value="zoom in" onclick="map.setCenter(infowindow.marker.getPosition());map.setZoom(map.getZoom()+1);"/><input type="button" value="zoom out" onclick="map.fitBounds(circle.getBounds());"/>');
           infowindow.open(map, marker);
-        } else {
+        } else { 
           var contentStr = "<h5>No Result, status=" + status + "</h5>";
           infowindow.setContent(contentStr);
-          infowindow.open(map, marker);
+          infowindow.open(map, marker); 
         }
-      });
-
-    });
-
+      }); 
+    
+    });  
+    
     gmarkers.push(marker);
-  }
-
+  } 
+ 
 }
 
 function plotMarkers() {
@@ -922,3 +920,16 @@ function plotMarkers() {
 
 }
 
+/* Generic create table rows for Grocery */
+function createTableRows(businessName, streetAddr) {
+	var tableBody = document.getElementById("groceryTableData").getElementsByTagName('tbody')[0];
+	var newRow = tableBody.insertRow(tableBody.rows.length);
+	var newCell = newRow.insertCell(0);
+	newCell.className = "groceryTableRow";
+	var bName = document.createTextNode(businessName);
+	var nLine = document.createElement("br");
+	var sAddr = document.createTextNode(streetAddr);
+	newCell.appendChild(bName);
+	newCell.append(nLine);
+	newCell.appendChild(sAddr);
+}
