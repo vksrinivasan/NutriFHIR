@@ -350,7 +350,7 @@ function populateDietaryData() {
 }
 
 function clearScatter(cardId) {
-	var svg = d3.select(cardID).select("svg");
+	var svg = d3.select(cardId).select("svg");
 	svg.selectAll("circle").remove();
 }
 
