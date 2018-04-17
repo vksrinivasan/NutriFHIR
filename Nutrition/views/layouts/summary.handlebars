@@ -66,27 +66,33 @@
 
 					</tbody>
 				</table>
-			</div>
+			</div> 
 			
 		</div>
 	</div>
-	
-<div class="card">
-  <div id="GroceryCardMap" class="card-body">
-		<div id=”grocery-container”>
-		<h2 id="groceryTitle" class="card-title">Groceries Map</h2>
-		</div>
-		<select onchange="plotMarkers.call(this, event)">
-   		<option>Groceries</option>
-   		<option>Super Market</option>
-   		<option>Farmers Market</option>
-		</select>
-		<div id = "groceryInfo" class="card-body" style="float:left; white-space: pre-wrap; height: 100px;
-    overflow-y: scroll;width: 30%">
-		</div>
-		<div id="mapChart" class="card-body" style="float:right; width: 70%"></div>
+ 
+<div class="card groceryCard">
 
-  </div>
+	<div id="GroceryCardMap" class="card-body">
+		<div id=”grocery-container”>
+			<h2 id="groceryTitle" class="card-title">Diet Environment</h2>
+		</div>
+		
+		<div class="cardBlankBorder GroceryContentsContainer">
+			<div id="map"></div>
+			<div class="rightGrocery">
+				<th>Shopping Outlets:</th>
+				<input id="searchInput" class="controls" type="text" placeholder="Enter a location">
+				<table id="groceryTableData" class="groceryTable">
+					<tbody class = "groceryTableBody">
+					</tbody>
+				</table>
+				
+			</div>
+		</div>
+		
+	</div>
+	
 </div>
 
 
@@ -215,6 +221,7 @@
 
 <script>
 
+
   /* Get static data - Eventually Johnny will have an api/specification for this */
   populateDietaryData();
 
@@ -222,18 +229,12 @@
   FHIR.oauth2.ready(onReady, onError);
 
   /* HEI Listeners */
-  //document.getElementById("hei_value").addEventListener("mouseover", heiHandler_mouseover, false);
-  //document.getElementById("hei_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("hei_value").addEventListener("click", heiHandler_click, false);
 
   /* AHEI Listeners */
-  //document.getElementById("ahei_value").addEventListener("mouseover", aheiHandler_mouseover, false);
-  //document.getElementById("ahei_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("ahei_value").addEventListener("click", aheiHandler_click, false);
 
   /* DASH Listeners */
-  //document.getElementById("dash_value").addEventListener("mouseover", dashHandler_mouseover, false);
-  //document.getElementById("dash_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("dash_value").addEventListener("click", dashHandler_click, false);
 
   /* Height Listener */

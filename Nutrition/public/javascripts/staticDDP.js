@@ -887,7 +887,7 @@ function plotMap(address, queryType) {
     });
     var request = {
       reference: place.reference
-    };
+    };   
 
     google.maps.event.addListener(marker, 'click', function() {
       infowindow.marker = marker;
@@ -899,18 +899,18 @@ function plotMap(address, queryType) {
           contentStr += '<br>' + place.types + '</p>';
           infowindow.setContent(contentStr + '<input type="button" value="zoom in" onclick="map.setCenter(infowindow.marker.getPosition());map.setZoom(map.getZoom()+1);"/><input type="button" value="zoom out" onclick="map.fitBounds(circle.getBounds());"/>');
           infowindow.open(map, marker);
-        } else {
+        } else { 
           var contentStr = "<h5>No Result, status=" + status + "</h5>";
           infowindow.setContent(contentStr);
-          infowindow.open(map, marker);
+          infowindow.open(map, marker); 
         }
-      });
-
-    });
-
+      }); 
+    
+    });  
+    
     gmarkers.push(marker);
-  }
-
+  } 
+ 
 }
 
 function plotMarkers() {
@@ -925,7 +925,11 @@ function createTableRows(businessName, streetAddr) {
 	var tableBody = document.getElementById("groceryTableData").getElementsByTagName('tbody')[0];
 	var newRow = tableBody.insertRow(tableBody.rows.length);
 	var newCell = newRow.insertCell(0);
-	var newText = document.createTextNode('New Row');
-	newCell.appendChild(newText);
+	newCell.className = "groceryTableRow";
+	var bName = document.createTextNode(businessName);
+	var nLine = document.createElement("br");
+	var sAddr = document.createTextNode(streetAddr);
+	newCell.appendChild(bName);
+	newCell.append(nLine);
+	newCell.appendChild(sAddr);
 }
-
