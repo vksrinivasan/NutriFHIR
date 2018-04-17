@@ -906,10 +906,10 @@ function plotMap(address, queryType) {
         }
       }); 
     
-    });  
+    });     
     
     gmarkers.push(marker);
-  } 
+  }       
  
 }
 
@@ -924,8 +924,18 @@ function plotMarkers() {
 function createTableRows(businessName, streetAddr) {
 	var tableBody = document.getElementById("groceryTableData").getElementsByTagName('tbody')[0];
 	var newRow = tableBody.insertRow(tableBody.rows.length);
-	var newCell = newRow.insertCell(0);
-	newCell.className = "groceryTableRow";
+	newRow.className = "groceryTableRow";
+	
+	/* Create space for star */
+	var starCell = newRow.insertCell(0);
+	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	svg.setAttribute('height','20px');
+	svg.setAttribute('width','20px');
+	svg.setAttribute('style', 'background-color:none');
+	starCell.append(svg);
+	
+	/* Create space for data */
+	var newCell = newRow.insertCell(1);
 	var bName = document.createTextNode(businessName);
 	var nLine = document.createElement("br");
 	var sAddr = document.createTextNode(streetAddr);
