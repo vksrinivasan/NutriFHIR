@@ -369,6 +369,11 @@ footer{
 	background-color: #EBEBEB;
 }
 
+.groceryTypeTable {
+	border-spacing: 1px;
+	padding: 0px;
+}
+
 .vtTable {
 	border-spacing: 1px;
 	padding:0px;
