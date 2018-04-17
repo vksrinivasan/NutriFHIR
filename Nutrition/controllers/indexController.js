@@ -24,6 +24,11 @@ module.exports = {
   launchPatient: function(req, res, next) {
     res.sendFile(path.join(__dirname+ '//..//views//launch-patient.html'));
   },
+  
+  // GET /launchProvider
+  launchProvider: function(req, res, next) {
+	  res.sendFile(path.join(__dirname+ '//..//views//launch.html'));
+  },
 
   // GET /history
   history: function(req, res, next) {
