@@ -39,10 +39,6 @@ function createTitleBurger(cardBody, title) {
 	       .attr('id', title)
 		   .attr('style', 'cursor: pointer')
 	       .text(title);
-
-	row.append('div') 
-	       .attr('class', 'glyphicon glyphicon-menu-hamburger pull-right card-hamburger')
-	       .attr('aria-hidden', 'true');
 }
  
 /* Generic create card sides/divisions */

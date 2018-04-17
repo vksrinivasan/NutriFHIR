@@ -44,10 +44,6 @@ function dietCreateTitleBurger(cardBody, title) {
 	       .attr('id', title)
 		   .attr('style', 'cursor: pointer')
 	       .text(title);
-
-	row.append('div') 
-	       .attr('class', 'glyphicon glyphicon-menu-hamburger pull-right card-hamburger')
-	       .attr('aria-hidden', 'true');
 }
 
 /* Generic create card sides/divisions */
@@ -354,7 +350,7 @@ function populateDietaryData() {
 }
 
 function clearScatter(cardId) {
-	var svg = d3.select(cardID).select("svg");
+	var svg = d3.select(cardId).select("svg");
 	svg.selectAll("circle").remove();
 }
 

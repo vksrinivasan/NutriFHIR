@@ -9,7 +9,6 @@
 			<div id="demographicInformation" class="card-body" style="">
 				<div class="row">
 					<h2 id="Patient_Name" class="card-title col-sm-11">Loading Patient</h2>
-					<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
 				</div>
 				<div id="borderDiv" style="border-right:1px solid black; float:left; width: 50%">
 					<table id="demo1">
@@ -76,7 +75,6 @@
   <div id="GroceryCardMap" class="card-body">
 		<div id=”grocery-container”>
 		<h2 id="groceryTitle" class="card-title">Groceries Map</h2>
-		<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
 		</div>
 		<select onchange="plotMarkers.call(this, event)">
    		<option>Groceries</option>
@@ -123,7 +121,6 @@
 		<div class="card-body">
 			<div class="row">
 				<h2 class="card-title col-sm-11">Diet Indicators</h2>
-				<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
 			</div>
 
 			<table id="dietHeader">
@@ -283,12 +280,16 @@
 	waitForElement();
   
   $( function() {
-    //$( ".card-hamburger" ).sortable();
-
     $( "#summary" ).sortable({
-      handle: ".card-hamburger"
-    });
-    $( ".card-hamburger" ).disableSelection();
+	  overflow: "visible"
+	});
+
+    //$( "#summary" ).sortable({
+    //  handle: ".card"
+    //});
+    $( "#summary" ).disableSelection({
+	  overflow: "visible"
+	});
   } );
 </script>
 
