@@ -73,11 +73,11 @@
 
 					</tbody>
 				</table>
-			</div> 
-			
+			</div>
+
 		</div>
 	</div>
- 
+
 <div class="card groceryCard">
 
 	<div id="GroceryCardMap" class="card-body">
@@ -97,7 +97,7 @@
 				</tbody>
 			</table>
 		</div>
-		
+
 		<div class="cardBlankBorder GroceryContentsContainer">
 			<div id="map"></div>
 			<div class="rightGrocery">
@@ -107,12 +107,12 @@
 					<tbody class = "groceryTableBody">
 					</tbody>
 				</table>
-				
+
 			</div>
 		</div>
-		
+
 	</div>
-	
+
 </div>
 
 
@@ -271,32 +271,32 @@
 
   /* Height Listener */
   document.getElementById("height-text").addEventListener("click", heightHandler, false);
-  
+
   /* Weight Listener */
   document.getElementById("weight-text").addEventListener("click", weightHandler, false);
-  
+
   /* BMI Listener */
   document.getElementById("bmi-score").addEventListener("click", bmiHandler, false);
-  
+
   /* Glucose Listener */
   document.getElementById("gluc-score").addEventListener("click", glucoseHandler, false);
-  
+
   /* HbA1c Listener */
   document.getElementById("hba1c-score").addEventListener("click", hba1cHandler, false);
-  
+
   /* BP Listener */
   document.getElementById("bp-overall").addEventListener("click", bpHandler, false);
-  
+
   /* Total Cholesterol Listener */
   document.getElementById("chol").addEventListener("click", cholHandler, false);
-  
+
   /* HDL Listener */
   document.getElementById("hdl-score").addEventListener("click", hdlHandler, false);
 
   /* LDL Listener */
   document.getElementById("ldl-score").addEventListener("click", ldlHandler, false);
-  
-  
+
+
   function waitForElement(){
     if(typeof pat_addr !== "undefined"){
     	console.log("got it!");
@@ -311,7 +311,7 @@
 }
 
 	waitForElement();
-  
+
   $( function() {
     $( "#summary" ).sortable({
 	  overflow: "visible"
@@ -325,4 +325,3 @@
 	});
   } );
 </script>
-
