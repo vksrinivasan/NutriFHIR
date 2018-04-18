@@ -355,6 +355,31 @@ footer{
   opacity: 1;
 }
 
+.groceryTable {
+	border-spacing: 1px;
+	padding: 0px;
+}
+
+.groceryTableBody {
+	overflow: auto;
+	width: 100%;
+	height: 250px;
+	display: block;
+}
+
+.groceryTableRow {
+	background: #ffffff;
+}
+
+.groceryTableRow:hover {
+	background-color: #EBEBEB;
+}
+
+.groceryTypeTable {
+	border-spacing: 1px;
+	padding: 0px;
+}
+
 .vtTable {
 	border-spacing: 1px;
 	padding:0px;

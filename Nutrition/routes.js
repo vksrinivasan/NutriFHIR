@@ -14,6 +14,7 @@ app.get('/nutrients', indexController.nutrients);
 app.get('/goals', indexController.goals);
 app.get('/notes', indexController.notes);
 app.get('/launchPatient', indexController.launchPatient);
+app.get('/launchProvider', indexController.launchProvider);
 
 // Fhir Routes
 

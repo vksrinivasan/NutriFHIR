@@ -9,7 +9,6 @@
 			<div id="demographicInformation" class="card-body" style="">
 				<div class="row">
 					<h2 id="Patient_Name" class="card-title col-sm-11">Loading Patient</h2>
-					<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
 				</div>
 				<div id="borderDiv" style="float:left; width: 48%; padding-bottom:2em" >
 					<table id="demo1">
@@ -74,28 +73,46 @@
 
 					</tbody>
 				</table>
-			</div>
+			</div> 
 			
 		</div>
 	</div>
-	
-<div class="card">
-  <div id="GroceryCardMap" class="card-body">
-		<div id=”grocery-container”>
-		<h2 id="groceryTitle" class="card-title">Diet Environment</h2>
-		<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
-		</div>
-		<select onchange="plotMarkers.call(this, event)">
-   		<option>Groceries</option>
-   		<option>Super Market</option>
-   		<option>Farmers Market</option>
-		</select>
-		<div id = "groceryInfo" class="card-body" style="float:left; white-space: pre-wrap; height: 100px;
-    overflow-y: scroll;width: 30%">
-		</div>
-		<div id="mapChart" class="card-body" style="float:right; width: 70%"></div>
+ 
+<div class="card groceryCard">
 
-  </div>
+	<div id="GroceryCardMap" class="card-body">
+		<div id=”grocery-container”>
+			<h2 id="groceryTitle" class="card-title">Diet Environment</h2>
+			<table>
+				<tbody>
+					<tr class="groceryTableLabel">
+						<td id="convenienceStores">Convenience Stores</td>
+						<td></td>
+						<td></td>
+						<td id="supermarkets">Supermarkets</td>
+						<td></td>
+						<td></td>
+						<td id="farmersMarkets">Farmers Markets</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<div class="cardBlankBorder GroceryContentsContainer">
+			<div id="map"></div>
+			<div class="rightGrocery">
+				<th>Shopping Outlets:</th>
+				<input id="searchInput" class="controls" type="text" placeholder="Enter a location">
+				<table id="groceryTableData" class="groceryTable">
+					<tbody class = "groceryTableBody">
+					</tbody>
+				</table>
+				
+			</div>
+		</div>
+		
+	</div>
+	
 </div>
 
 
@@ -130,7 +147,6 @@
 		<div class="card-body">
 			<div class="row">
 				<h2 class="card-title col-sm-11">Personal Diet</h2>
-				<div class="glyphicon glyphicon-menu-hamburger pull-right card-hamburger" aria-hidden="true"></div>
 			</div>
 
 			<table id="dietHeader">
@@ -225,13 +241,14 @@
 <script src="javascripts/radarChart.js" type="text/javascript"></script>
 <script src="javascripts/vitalHandlers.js" type="text/javascript"></script>
 <script src="https://d3js.org/d3.v3.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false&amp;libraries=places,geometry"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false&amp;libraries=places,geometry&key=AIzaSyBzfiBP8bqaT6uuPPoBCGNiO5HC0JXkNOk"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script src="/scripts/math.js" type="text/javascript"></script>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <script>
+
 
   /* Get static data - Eventually Johnny will have an api/specification for this */
   populateDietaryData();
@@ -240,18 +257,12 @@
   FHIR.oauth2.ready(onReady, onError);
 
   /* HEI Listeners */
-  //document.getElementById("hei_value").addEventListener("mouseover", heiHandler_mouseover, false);
-  //document.getElementById("hei_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("hei_value").addEventListener("click", heiHandler_click, false);
 
   /* AHEI Listeners */
-  //document.getElementById("ahei_value").addEventListener("mouseover", aheiHandler_mouseover, false);
-  //document.getElementById("ahei_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("ahei_value").addEventListener("click", aheiHandler_click, false);
 
   /* DASH Listeners */
-  //document.getElementById("dash_value").addEventListener("mouseover", dashHandler_mouseover, false);
-  //document.getElementById("dash_value").addEventListener("mouseout", handle_mouseout, false);
   document.getElementById("dash_value").addEventListener("click", dashHandler_click, false);
 
   /* NutriSavings Listeners */
@@ -302,12 +313,16 @@
 	waitForElement();
   
   $( function() {
-    //$( ".card-hamburger" ).sortable();
-
     $( "#summary" ).sortable({
-      handle: ".card-hamburger"
-    });
-    $( ".card-hamburger" ).disableSelection();
+	  overflow: "visible"
+	});
+
+    //$( "#summary" ).sortable({
+    //  handle: ".card"
+    //});
+    $( "#summary" ).disableSelection({
+	  overflow: "visible"
+	});
   } );
 </script>
 
