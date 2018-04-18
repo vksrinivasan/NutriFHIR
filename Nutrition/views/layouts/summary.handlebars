@@ -10,25 +10,25 @@
 				<div class="row">
 					<h2 id="Patient_Name" class="card-title col-sm-11">Loading Patient</h2>
 				</div>
-				<div id="borderDiv" style="border-right:1px solid black; float:left; width: 50%">
+				<div id="borderDiv" style="float:left; width: 48%; padding-bottom:2em" >
 					<table id="demo1">
 						<tbody>
 							<tr>
-								<th id="dob_age_text" class="width-30">Unknown</th>
+								<td id="dob_age_text" class="width-30">Unknown</td>
 								<th></th>
 								<th></th>
-								<th id="gender_text" class="width-30">Gender Unknown</th>
+								<td id="gender_text" class="width-30">Gender Unknown</td>
 							</tr>
 
 							<tr>
-								<th id="race_text" class="width-30">Race Unknown</th>
+								<td id="race_text" class="width-30">Race Unknown</td>
 								<th></th>
 								<th></th>
-								<th id="hisp_or_lat_text" class="width-30">Hisp/Latino Unknown</th>
+								<td id="hisp_or_lat_text" class="width-30">Hisp/Latino Unknown</td>
 							</tr>
 
 							<tr>
-								<th id="married_text" class="width-30">Unknown</th>
+								<td id="married_text" class="width-30">Unknown</td>
 							</tr>
 
 						</tbody>
@@ -37,31 +37,38 @@
 					<table id="demo2">
 						<tbody>
 							<tr>
-								<th id="addr_text" class="width-30">Unknown</th>
+								<td id="addr_text" class="width-30">Unknown</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 
-				<table id="demo3" style="float:right; width: 50%">
+				<div id="aborderDiv" style="float:left; width: 1%;" >
+					<svg height="100" width="5">
+						<line x1="0" y1="0" x2="0" y2="100" style="stroke:rgb(55,71,79);stroke-width:2;opacity:0.4" />
+						Sorry, your browser does not support inline SVG.
+					</svg>
+				</div>
+
+				<table id="demo3" style="float:right; width: 50%; ">
 					<tbody>
 
 						<tr>
-							<th class="width-30">Home Phone #:</th>
+							<td class="width-30">Home Phone #:</td>
 							<th class="width-10">
-								<td id="home_phone_text">Unknown</td>
+								<td id="home_phone_text"></td>
 						</tr>
 
 						<tr>
-							<th class="width-30">Cell Phone #:</th>
+							<td class="width-30">Cell Phone #:</td>
 							<th class="width-10">
-								<td id="cell_phone_text">Unknown</td>
+								<td id="cell_phone_text"></td>
 						</tr>
 
 						<tr>
-							<th class="width-30">Email:</th>
+							<td class="width-30">Email:</td>
 							<th class="width-10">
-								<td id="email_text">Unknown</td>
+								<td id="email_text"></td>
 						</tr>
 
 					</tbody>
@@ -111,7 +118,7 @@
 
   <div class="card" id='medicationTimeline'>
     <div class="card-body">
-      <h2 class="card-title">Medication timeline</h2>
+      <h2 class="card-title">Medications</h2>
       <div class="floating-box">
       <h4 class="card-title">Source</h4>
 
@@ -139,7 +146,7 @@
 	<div id="DietCard" class="card">
 		<div class="card-body">
 			<div class="row">
-				<h2 class="card-title col-sm-11">Diet Indicators</h2>
+				<h2 class="card-title col-sm-11">Personal Diet</h2>
 			</div>
 
 			<table id="dietHeader">
@@ -162,6 +169,10 @@
 						<th></th>
 						<th></th>
 						<th align="center" class="width-30"><font color="#45B20E">DASH</font></th>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th align="center" class="width-30"><font color="#DB2354">NutriSavings</font></th>
 					</tr>
 					<tr>
 						<td id="hei_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
@@ -173,6 +184,10 @@
 								<th></th>
 								<th></th>
 								<td id="dash_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
+								<th></th>
+								<th></th>
+								<th></th>
+								<td id="nutrisavings_value" align="center" valign="middle" class="width-30" style="cursor: pointer;">-</th>
 					</tr>
 				</tbody>
 			</table>
@@ -185,12 +200,12 @@
 
 <div class="card">
 	<div id=”container”>
-		<div class="card-body" style="float:left; width: 24%">
+		<div class="card-body" style="float:left; width: 25%">
 			<div class="row">
-				<h2 id="vitalTitle" class="card-title col-sm-11">Vital Signs</h2>
+				<h2 id="vitalTitle" class="card-title col-sm-11">Vitals/Labs</h2>
 			</div>
 		</div>
-		<div class="card-body" style="float:right; width: 76%">
+		<div class="card-body" style="float:right; width: 75%">
 			<table id="vitalsNew" class="vtTable">
 				<tbody>
 					<tr>
@@ -249,6 +264,10 @@
 
   /* DASH Listeners */
   document.getElementById("dash_value").addEventListener("click", dashHandler_click, false);
+
+  /* NutriSavings Listeners */
+  document.getElementById("nutrisavings_value").addEventListener("click", nutrisavingsHandler_click, false);
+
 
   /* Height Listener */
   document.getElementById("height-text").addEventListener("click", heightHandler, false);
