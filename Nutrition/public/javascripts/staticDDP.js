@@ -2,6 +2,7 @@
 var hei; 
 var ahei;
 var dash; 
+var nutrisavings;
 var x;
 var y;
 var margin;   
@@ -13,6 +14,9 @@ var score_click_type = undefined;
 var hei_i = false; 
 var ahei_i = false;
 var dash_i = false; 
+var nutrisavings_i = false; 
+
+var showingSpider = false;
 
 /* Generic create the card */
 function dietCreateCard(id) {
@@ -207,6 +211,10 @@ function heiHandler_click() {
 			document.getElementById(cardId).remove();
 			clearScatter('#'+cardId);
 			hei_i = !hei_i;
+			if (showingSpider) {
+				d3.select("#tipDiv").remove();
+				showingSpider = false;
+			}
 		});
 	}
 }
@@ -238,6 +246,10 @@ function aheiHandler_click() {
 			document.getElementById(cardId).remove();
 			clearScatter('#'+cardId);
 			ahei_i = !ahei_i;
+			if (showingSpider) {
+				d3.select("#tipDiv").remove();
+				showingSpider = false;
+			}
 		});
 	}
 }
@@ -268,6 +280,38 @@ function dashHandler_click() {
 			document.getElementById(cardId).remove();
 			clearScatter('#'+cardId);
 			dash_i = !dash_i;
+			if (showingSpider) {
+				d3.select("#tipDiv").remove();
+				showingSpider = false;
+			}
+		});
+	}
+}
+
+function nutrisavingsHandler_click() {
+	if(!nutrisavings_i) {
+	
+		var cardId = 'nutrisavingsDrawdown';
+		var cardTitle = 'NutriSavings';
+		
+		/* Create the card */
+		cardBody = dietCreateCard(cardId);
+		nutrisavings_i = !nutrisavings_i;
+		
+		/* Add title to the card */
+		dietCreateTitleBurger(cardBody, cardTitle);
+		
+		/* Add sides */
+		var lhs = dietCreateSide(cardBody, '100%', 'left');
+		var rhs = dietCreateSide(cardBody, '0%', 'right');
+		
+		/* Add RHS Plot */
+		dietCreatePlot(rhs, nutrisavings, '#'+cardId);
+		
+		/* Potential DeepDive Card Listener */
+		document.getElementById("NutriSavings").addEventListener("click", function() {
+			document.getElementById(cardId).remove();
+			nutrisavings_i = !nutrisavings_i;
 		});
 	}
 }
@@ -288,6 +332,9 @@ function populateDietaryData() {
 	/* Get DASH Data */
 	dash = getDashData_randomized();
 
+	/* Get DASH Data */
+	nutrisavings = getNutriSavingsData_randomized();
+
 	/* Fill out current scores */
 	hei_color =	fillOutScores(hei['score'][hei['score'].length-1], // Score For Most Recent Month
 							  hei['ref_hi'], 					   // Reference Ideal Score
@@ -304,8 +351,13 @@ function populateDietaryData() {
 	dash_color = fillOutScores(dash['score'][dash['score'].length-1],    // Score For Most Recent Month
 							   dash['ref_hi'], 					         // Reference Ideal Score
 							   dash['date'][dash['date'].length-1],      // Date on Nearest Most Recent Period
-				               "#mrpp_text",						     // ID of element for Most Recent Purchase Period
-							   "#dash_value");					         // ID of element for Most Recent DASH %
+				               		   "#mrpp_text",						     // ID of element for Most Recent Purchase Period
+							   "#dash_value");
+	nutrisavings_color = fillOutScores(nutrisavings['score'][nutrisavings['score'].length-1],    // Score For Most Recent Month
+							   nutrisavings['ref_hi'], 					         // Reference Ideal Score
+							   nutrisavings['date'][nutrisavings['date'].length-1],      // Date on Nearest Most Recent Period
+				               		   "#mrpp_text",						     // ID of element for Most Recent Purchase Period
+							   "#nutrisavings_value");					         // ID of element for Most Recent DASH %
 
 	/* Get Sum of Scores At Each Period For Each Index */
 	hei_sum = getTimeSeriesSum(hei['score']);
@@ -326,6 +378,12 @@ function populateDietaryData() {
 	for (i = 0; i < dash['score'].length; i++) {
 		dash_percentage.push(dash_sum[i] / dash_ideal[i] * 100);
 	}
+	nutrisavings_sum = getTimeSeriesSum(nutrisavings['score']);
+	nutrisavings_ideal = getTimeSeriesIdeal(nutrisavings['ref_hi'], nutrisavings['score'].length);
+	nutrisavings_percentage = [];
+	for (i = 0; i < nutrisavings['score'].length; i++) {
+		nutrisavings_percentage.push(nutrisavings_sum[i] / nutrisavings_ideal[i] * 100);
+	}
 	
 	/* Add Sums/Ideal/Names/Colors to the structs */
 	hei['sum'] = hei_sum;
@@ -343,6 +401,11 @@ function populateDietaryData() {
 	dash['percentage'] = dash_percentage;
 	dash['name'] = 'DASH';
 	dash['color'] = "#45B20E";
+	nutrisavings['sum'] = nutrisavings_sum;
+	nutrisavings['ideal'] = nutrisavings_ideal;
+	nutrisavings['percentage'] = nutrisavings_percentage;
+	nutrisavings['name'] = 'NutriSavings';
+	nutrisavings['color'] = "#DB2354";
 
 	/* Plot Percentages */
 	//plotPercentages([hei,ahei,dash]);
@@ -377,8 +440,6 @@ function plotScatter(scoreObj, cardId) {
 	svg.call(tool_tip);
 	svg.call(tool_tip_percent);
 
-	var showingSpider = false;
-
 	// Now create the circles
 	svg.selectAll("circle")
 	   .data(plotVals)
@@ -397,6 +458,7 @@ function plotScatter(scoreObj, cardId) {
 	   .attr("transform",
 				  "translate(" + margin.left + "," + margin.top + ")")
 	   .style("fill", scoreObj['color'])
+	   .style("cursor", 'pointer')
 	   .on('click', function(d) {
 		if (!showingSpider) {
 		    	tool_tip.show();
@@ -629,7 +691,7 @@ function fillOutScores(actComponentScores, idealComponentScores, date, loc_mrpp,
 								 .range([d3.rgb("#C21807"), d3.rgb('#4CBB17')]);
 
 	var value_color = color(propOfIdeal);
-	$(loc_val).text(String(((propOfIdeal) * 100).toFixed(0) + '%'));
+	$(loc_val).text(String("" + actTotal.toFixed(2) + "/" + idealTotal));
 	d3.select(loc_val).style("color",value_color);
 	return value_color;
 }
@@ -737,6 +799,23 @@ function getDashData_randomized() {
 	var retStruct = {comp: components, ref_lo: reference_lo, ref_hi: reference_hi, date: dates, score: scores};
 	return retStruct;
 }  
+
+function getNutriSavingsData_randomized() {
+
+	//var possValues = [0.0, 0.5, 1.0];
+
+	var reference_lo = [0];
+	var reference_hi = [100];
+	var dates = [new Date(2018,0,1), new Date(2018,1,1),new Date(2018,2,1),new Date(2018,3,1)];
+	var scores = [[], [], [], []];
+
+	for(i = 0; i < dates.length; i++) {
+		scores[i][0] = getRandomInt(reference_lo[0], reference_hi[0]);
+	}
+
+	var retStruct = {comp: [], ref_lo: reference_lo, ref_hi: reference_hi, date: dates, score: scores};
+	return retStruct;
+}
 
 function plotMap(address, queryType) {
  
