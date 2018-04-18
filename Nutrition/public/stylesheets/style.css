@@ -439,3 +439,8 @@ footer{
 	stroke: #cc0000;
 	fill: #cc0000;
 }
+
+.star {
+	fill: #C8C8C8;
+	fill-opacity: 0.3;
+}

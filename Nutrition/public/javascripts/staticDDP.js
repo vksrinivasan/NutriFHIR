@@ -928,11 +928,28 @@ function createTableRows(businessName, streetAddr) {
 	
 	/* Create space for star */
 	var starCell = newRow.insertCell(0);
+	var starDiv = document.createElement('div');
+	starDiv.setAttribute('style', 'height:20px;width:20px');
+	
+	/* Create empty star */
 	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	svg.setAttribute('height','20px');
-	svg.setAttribute('width','20px');
-	svg.setAttribute('style', 'background-color:none');
-	starCell.append(svg);
+	svg.setAttribute('width', '100%');
+	svg.setAttribute('height', '100%');
+	svg.setAttribute('viewBox', '0 0 100 100');
+	svg.setAttribute('preserveAspectRatio', 'none');
+	svg.setAttribute('style','background-color: none');
+	
+	starCell.appendChild(starDiv);
+	starDiv.appendChild(svg);
+	
+	var star = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+	star.setAttribute('points', '47.6190476190476,4.76190476190476 19.047619047619,94.2857142857143 90.4761904761905,37.1428571428571 4.76190476190476,37.1428571428571 76.1904761904762,94.2857142857143');
+	star.setAttribute('class', 'star');
+	
+	/* Set the id of the star to be address so we can reference it */
+	star.setAttribute('id', 'A' + streetAddr.split(' ').join('_'));
+	
+	svg.appendChild(star);
 	
 	/* Create space for data */
 	var newCell = newRow.insertCell(1);
@@ -942,4 +959,19 @@ function createTableRows(businessName, streetAddr) {
 	newCell.appendChild(bName);
 	newCell.append(nLine);
 	newCell.appendChild(sAddr);
+	
+	var starRef = d3.select('#'+ 'A' + streetAddr.split(' ').join('_'));
+	starRef.on("click", 
+		function(){
+			if(parseFloat(d3.select(this).style('fill-opacity'))==0.3) {
+				d3.select(this).transition().duration(10)
+							   .style('fill', '#ffdd42')
+							   .style('fill-opacity', 1.0);			   
+			} else {
+				d3.select(this).transition().duration(10)
+							   .style('fill', '#C8C8C8')
+							   .style('fill-opacity', 0.3);
+			}
+		}
+	);
 }
