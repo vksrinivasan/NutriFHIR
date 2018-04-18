@@ -2,7 +2,7 @@
 var meds=[]
 var pat_addr;
 var height_plot_data;
-var weight_plot_data; 
+var weight_plot_data;
 var bmi_plot_data;
 var glucose_plot_data;
 var hba1c_plot_data;
@@ -13,7 +13,7 @@ var ldl_plot_data;
 var encounterId_Locations = {};
 
 /* Required Smart on Fhir On Ready Function */
-function onReady(smart) {       
+function onReady(smart) {
   var patient = smart.patient;
   var pt = patient.read();
   var obv = smart.patient.api.fetchAll({
@@ -21,7 +21,7 @@ function onReady(smart) {
     // Note - I don't know how to sort results by time or anything. Someone
     // should figure that out
     type: 'Observation',
-    query: { 
+    query: {
       code: {
         $or: ['http://loinc.org|3141-9', // Body weight measured
               'http://loinc.org|8302-2', // Body height
@@ -62,15 +62,15 @@ function onReady(smart) {
      try{
      item.id =  id
      if(statement.effectivePeriod){
-     item.start = new Date(statement.effectivePeriod.start)
+     item.start =  new Date(statement.effectivePeriod.start).toLocaleDateString()
      if(statement.effectivePeriod.end)
         {
-        item.end = new Date(statement.effectivePeriod.end)
+        item.end = new Date(statement.effectivePeriod.end).toLocaleDateString()
         item.type = 'range'
         }
         }
      else{
-      item.start = new Date(statement.effectiveDateTime)
+      item.start = new Date(statement.effectiveDateTime).toLocaleDateString()
       }
 
       if(!item.type){
@@ -95,9 +95,11 @@ function onReady(smart) {
     item.status = statement.status
     if(item.status == 'active'){
       item.sflag = 'active'
+      item.className = 'active'
     }
     else{
       item.sflag = 'inactive'
+      item.className = 'inactive'
     }
     if(statement.informationSource){
       item.source = statement.informationSource.display
@@ -118,8 +120,8 @@ function onReady(smart) {
       item.reference = 'Patient'
       item.flag = 'pat'
     }
-    //show-hide thing
-    item.className = 'visible'
+
+
     //format tooltip dispalay
     item.title = '<b>Medication</b> : '+item.content+'<br>'+
                  '<b>Reference</b> : '+item.reference+'<br>'+
@@ -150,7 +152,8 @@ function onReady(smart) {
          followMouse: true,
          overflowMethod: 'cap'
        },
-       maxHeight : '400px'
+       maxHeight : '400px',
+       minHeight : '400px'
      }
 
 
@@ -163,7 +166,6 @@ function onReady(smart) {
 
      var toolT = new vis.Timeline(document.getElementById('tooltips'),items, cap_options);
      //var Timeline = new vis.Timeline(container,items,options)
-
 
      //Event handler for radio buttons
      $(function(){
@@ -199,12 +201,12 @@ function onReady(smart) {
           if(this.checked){
             items.forEach(function(each){
                 if(each.sflag == 'inactive' && each.flag == chosenRadio){
-                  console.log(each.flag,each.sflag)
-                  items.update({id : each.id , className : "hide"})
+                  console.log(each.flag,each.sflag,each.className)
+                  items.update({id : each.id , className : "hide "+each.status})
                 }
                 else if(each.sflag == 'inactive' && chosenRadio == 'all'){
-                  console.log(each.flag,each.sflag)
-                  items.update({id : each.id , className : "hide"})
+                  console.log(each.flag,each.sflag,each.className)
+                  items.update({id : each.id , className : "hide "+each.status})
                 }
             })
           }
@@ -212,12 +214,12 @@ function onReady(smart) {
           if(!this.checked){
             items.forEach(function(each){
                 if(each.sflag == 'inactive' && each.flag == chosenRadio){
-                  console.log(each.flag,each.sflag)
-                  items.update({id : each.id , className : "visible"})
+                  console.log(each.flag,each.sflag,each.className)
+                  items.update({id : each.id , className : "visible "+each.status})
                 }
                 else if(each.sflag == 'inactive' && chosenRadio == 'all'){
-                  console.log(each.flag,each.sflag)
-                  items.update({id : each.id , className : "visible"})
+                  console.log(each.flag,each.sflag,each.className)
+                  items.update({id : each.id , className : "visible "+each.status})
                 }
             })
           }
@@ -236,14 +238,14 @@ function update_timeline(selection,action,tItems){
   if(selection == 'prac' || selection == 'pat'){
    tItems.forEach(function(each){
          if(each.flag == selection){
-           tItems.update({id : each.id, className : action})
+           tItems.update({id : each.id, className : action+" "+each.status})
                         }
           selected = selection
         })
   }
   else{
     tItems.forEach(function(each){
-            tItems.update({id : each.id, className : action})
+            tItems.update({id : each.id, className : action+" "+each.status})
            selected = selection
          })
   }
@@ -256,7 +258,7 @@ function update_timeline(selection,action,tItems){
       encounterId_Locations[statement.id] = statement['location'][0]['location']['display'];
     });
   });
-  
+
   console.log(encounterId_Locations);
 
 
@@ -303,11 +305,11 @@ function update_timeline(selection,action,tItems){
 
       $("#Patient_Name").text(
         titleCase(fname) + ' ' + titleCase(lname)
-      );        
- 
+      );
+
       /* Get Patient Gender */
       $("#gender_text").text(
-        titleCase(patient['gender'])          
+        titleCase(patient['gender'])
       );
 
       /* Hispanic or Latino? */
@@ -389,7 +391,7 @@ function update_timeline(selection,action,tItems){
       }
 
       /* Get Weight */
-      var byCodes = smart.byCodes(obv, 'code');   
+      var byCodes = smart.byCodes(obv, 'code');
       var weight = byCodes('3141-9');
       $("#weight-text").text(getQuantityValueAndUnit(weight[0]));
       colorField("#weight-text", weight[0]);
@@ -442,11 +444,11 @@ function update_timeline(selection,action,tItems){
       var dbp = byCodes('8462-4')
       $("#dbp-text").text(getQuantityValueAndUnit(dbp[0]))
       colorField("#dbp-text", dbp[0]);
-	    
-	  var address = fullAddress; 
+
+	  var address = fullAddress;
       var queryType = "Groceries";
       pat_addr = fullAddress;
-	  
+
 	  /* Fill out all plot data global variables we will use */
 	  height_plot_data = populatePlotData(height);
 	  weight_plot_data = populatePlotData(weight);
@@ -457,7 +459,7 @@ function update_timeline(selection,action,tItems){
 	  totChol_plot_data = populatePlotData(chol);
 	  hdl_plot_data = populatePlotData(hdl);
 	  ldl_plot_data = populatePlotData(ldl);
-	  
+
     }
   )
 }
@@ -471,22 +473,22 @@ function onError() {
 function populatePlotData(data) {
 	td = {Value: [], Date: [], Method: [], Location: [], headers: [], colors: []};
 	gd = {values: [], refHi: [], refLo: [], dates: [], units: []};
-	
+
 	for(i = 0; i < data.length; i++) {
-		
+
 		/* Push Table Data */
 		td['Value'].push(getQuantityValueAndUnit(data[i]));
 		var tDate = getDate(data[i]);
 		td['Date'].push(tDate.substring(0,10));
 		td['colors'].push(getColor(data[i])[1]);
-		
-		// Use our encounter dictionary to find out where the encounter occured 
+
+		// Use our encounter dictionary to find out where the encounter occured
 		var encounter_num = parseInt(data[i]['encounter']['reference'].replace('Encounter/', ''));
 		td['Location'].push(encounterId_Locations[encounter_num]);
-		
+
 		// Try to get method
 		td['Method'].push(getMethod(data[i]));
-		
+
 		/* Push Graph Data */
 		gd['values'].push(getValue(data[i]));
 		gd['refHi'].push(getRefHi(data[i]));
@@ -494,7 +496,7 @@ function populatePlotData(data) {
 		gd['dates'].push(new Date(tDate));
 		gd['units'].push(getUnits(data[i]));
 	}
-	
+
 	td['headers'] = ['Value', 'Date', 'Method', 'Location'];
 	console.log(td);
 	return {tableData: td, graphData: gd};
@@ -534,7 +536,7 @@ function calculateAge(date) {
 
 /* Helper Function to Get Method of Observation */
 function getMethod(ob) {
-	if (typeof ob != 'undefined' && 
+	if (typeof ob != 'undefined' &&
 		typeof ob.method != 'undefined') {
 			return ob.method;
 	} else {
@@ -585,7 +587,7 @@ function getRefHi(ob) {
 		   return ob.referenceRange[0].high.value;
    } else {
 	   return undefined;
-   } 
+   }
 }
 
 /* Helper function to get reflo */
@@ -598,7 +600,7 @@ function getRefLo(ob) {
 		   return ob.referenceRange[0].low.value;
    } else {
 	   return undefined;
-   } 
+   }
 }
 
 /* Helper function to get units */
@@ -620,22 +622,22 @@ function getColor(ob) {
       typeof ob['referenceRange'][0]['high'] != 'undefined' &&
       typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
       typeof ob['referenceRange'][0]['low'] != 'undefined' &&
-      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') 
-	  
+      typeof ob['referenceRange'][0]['low']['value'] != 'undefined')
+
   {
         var color = d3.scale.linear().domain([ob['referenceRange'][0]['low']['value'], ob['referenceRange'][0]['high']['value']])
 			.interpolate(d3.interpolateHcl)
 			.range([d3.rgb('#4CBB17'), d3.rgb("#C21807")]);
-	
+
 		if (ob.valueQuantity.value > ob['referenceRange'][0]['high']['value']) {
 		  var value_color = color(ob['referenceRange'][0]['high']['value']);
-		} 
+		}
 		else if (ob.valueQuantity.value < ob['referenceRange'][0]['low']['value']) {
 		  var value_color = color(ob['referenceRange'][0]['low']['value']);
 		}
-		else {    
+		else {
 		  var value_color = color(ob.valueQuantity.value);
-		}     
+		}
 		return [true, value_color];
   }
   else {

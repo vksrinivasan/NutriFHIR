@@ -35,6 +35,16 @@
   visibility: hidden;
 }
 
+.vis-item.active{
+  color : green;
+  border-color: green;
+}
+
+.vis-item.inactive{
+  color : grey;
+  border-color: grey;
+}
+
 #title {
   font-family: 'Lobster', cursive;
 }
@@ -338,8 +348,8 @@ footer{
 
 
 .card-hamburger {
-  margin: 10px 20px; 
-  color:#2196f3; 
+  margin: 10px 20px;
+  color:#2196f3;
   cursor: move
 }
 
@@ -425,13 +435,13 @@ footer{
 }
 
 .pathActual {
-	stroke: #2196f3; 
+	stroke: #2196f3;
 	stroke-width: 1;
 	fill: none;
 }
 
 .pathRef {
-	stroke: #cc0000; 
+	stroke: #cc0000;
 	stroke-width: 2;
 	fill: none;
 }
