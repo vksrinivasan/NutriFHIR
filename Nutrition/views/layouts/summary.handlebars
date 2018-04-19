@@ -230,6 +230,7 @@
 <script src="javascripts/staticDDP.js" type="text/javascript"></script>
 <script src="javascripts/radarChart.js" type="text/javascript"></script>
 <script src="javascripts/vitalHandlers.js" type="text/javascript"></script>
+<script src="javascripts/dietEnvironment.js" type="text/javascript"></script>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?v=3&amp;sensor=false&amp;libraries=places,geometry&key=AIzaSyBzfiBP8bqaT6uuPPoBCGNiO5HC0JXkNOk"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
@@ -285,6 +286,13 @@
 
   /* LDL Listener */
   document.getElementById("ldl-score").addEventListener("click", ldlHandler, false);
+
+  /* Toggle Handlers */
+  document.getElementById("CS").addEventListener("click", csHandler, false);
+
+  document.getElementById("SM").addEventListener("click", smHandler, false);
+
+  document.getElementById("FM").addEventListener("click", fmHandler, false);
 
 
   function waitForElement(){
