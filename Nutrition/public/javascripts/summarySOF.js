@@ -394,12 +394,10 @@ function update_timeline(selection,action,tItems){
       var byCodes = smart.byCodes(obv, 'code');
       var weight = byCodes('3141-9');
       $("#weight-text").text(getQuantityValueAndUnit(weight[0]));
-      colorField("#weight-text", weight[0]);
 
       /* Get Height */
       var height = byCodes('8302-2');
       $("#height-text").text(getQuantityValueAndUnit(height[0]));
-	  colorField('#height-text', height[0]);
 
       /* Get BMI */
       var BMI = byCodes('39156-5');
@@ -450,15 +448,15 @@ function update_timeline(selection,action,tItems){
       pat_addr = fullAddress;
 
 	  /* Fill out all plot data global variables we will use */
-	  height_plot_data = populatePlotData(height);
-	  weight_plot_data = populatePlotData(weight);
-	  bmi_plot_data = populatePlotData(BMI);
-	  glucose_plot_data = populatePlotData(gluc);
-	  hba1c_plot_data = populatePlotData(hba1c);
-	  bp_plot_data = populatePlotData({});
-	  totChol_plot_data = populatePlotData(chol);
-	  hdl_plot_data = populatePlotData(hdl);
-	  ldl_plot_data = populatePlotData(ldl);
+	  height_plot_data = populatePlotData(height, false);
+	  weight_plot_data = populatePlotData(weight, false);
+	  bmi_plot_data = populatePlotData(BMI, true);
+	  glucose_plot_data = populatePlotData(gluc, true);
+	  hba1c_plot_data = populatePlotData(hba1c, true);
+	  bp_plot_data = populatePlotData({}, true);
+	  totChol_plot_data = populatePlotData(chol, true);
+	  hdl_plot_data = populatePlotData(hdl, true);
+	  ldl_plot_data = populatePlotData(ldl, true);
 
     }
   )
@@ -470,7 +468,7 @@ function onError() {
 }
 
 /* Helper function to populate the structs we need for the deepdive cards */
-function populatePlotData(data) {
+function populatePlotData(data, needColor) {
 	td = {Value: [], Date: [], Method: [], Location: [], headers: [], colors: []};
 	gd = {values: [], refHi: [], refLo: [], dates: [], units: []};
 
@@ -480,7 +478,13 @@ function populatePlotData(data) {
 		td['Value'].push(getQuantityValueAndUnit(data[i]));
 		var tDate = getDate(data[i]);
 		td['Date'].push(tDate.substring(0,10));
-		td['colors'].push(getColor(data[i])[1]);
+		
+		if(needColor) {
+			td['colors'].push(getColor(data[i])[1]);
+		}
+		else {
+			td['colors'].push('none');
+		}
 
 		// Use our encounter dictionary to find out where the encounter occured
 		var encounter_num = parseInt(data[i]['encounter']['reference'].replace('Encounter/', ''));
@@ -554,17 +558,17 @@ function getQuantityValueAndUnit(ob) {
   } else {
     return '-';
   }
-}
-
-/* Helper function to get value */
-function getValue(ob) {
+}  
+ 
+/* Helper function to get value */   
+function getValue(ob) { 
 	if(typeof ob != 'undefined' &&
 	   typeof ob.valueQuantity != 'undefined' &&
 	   typeof ob.valueQuantity.value != 'undefined') {
-		   return ob.valueQuantity.value;
-   } else {
-	   return undefined;
-   }
+		   return ob.valueQuantity.value;        
+   } else {  
+	   return undefined;  
+   }             
 }
 
 /* Helper function to get dates */
@@ -609,11 +613,11 @@ function getUnits(ob) {
 	   typeof ob.valueQuantity != 'undefined' &&
 	   typeof ob.valueQuantity.code != 'undefined') {
 		   return ob.valueQuantity.code;
-   } else {
+   } else { 
 	   return undefined;
    }
-}
-
+}   
+   
 function getColor(ob) {
   if (typeof ob != 'undefined' &&
       typeof ob.valueQuantity != 'undefined' &&
@@ -636,7 +640,7 @@ function getColor(ob) {
 		  var value_color = color(ob['referenceRange'][0]['low']['value']);
 		}
 		else {
-		  var value_color = color(ob.valueQuantity.value);
+		  var value_color = 'none';//color(ob.valueQuantity.value);
 		}
 		return [true, value_color];
   }

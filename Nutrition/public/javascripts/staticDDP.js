@@ -4,7 +4,7 @@ var ahei;
 var dash; 
 var nutrisavings;
 var x;
-var y;
+var y; 
 var margin;   
  
 // Keep track of whether user has clicked particular metric
@@ -19,13 +19,30 @@ var nutrisavings_i = false;
 var showingSpider = false;
 
 /* Generic create the card */
-function dietCreateCard(id) {
-	/* Create card itself */
-	var drawdownCard = d3.select('#DietChart')
-						 .append('div')
-							.attr('class', 'card')
-							.attr('id', id);
-						 
+function dietCreateCard(id) { 
+	 
+	/* Create the card itself */
+	 
+	/* Figure out where to put the next card 
+	 * (It goes immediately after the parent)
+	 */
+	var parentEl = d3.select("#summary").node();
+	var childEl = parentEl.childNodes;
+	var parentIndex = 0;
+	for(i = 0; i < childEl.length; i++) {
+		if(childEl[i]['id']=='DietCard') {
+			parentIndex = i;
+			break;
+		}
+	} 
+	var newCard = document.createElement('div');
+	newCard.setAttribute('class', 'card');
+	newCard.setAttribute('id', id);
+	parentEl.insertBefore(newCard, parentEl.childNodes[parentIndex+1]);
+	
+	var drawdownCard = d3.select('#'+id);
+	
+				  		 
 	/* Create the card container */
 	var drawdownContainer = drawdownCard.append('div')
 											.attr('id', 'container');
@@ -54,7 +71,7 @@ function dietCreateTitleBurger(cardBody, title) {
 function dietCreateSide(cardBody, perc, side) {
 	var side = cardBody.append('div')
 							.attr('style', 'float:' + side + '; width: ' + perc);
-	return side;
+	return side; 
 }
 
 /* Generic plot data */
@@ -183,13 +200,54 @@ function dietCreatePlot(side, data, cardName) {
 	   
 }
 
+/* Generic create table */
+function dietCreateTable(side, data) {
+	var tableBody = side.append('table')
+							.attr('class', 'deepDiveTable')
+						.append('tbody');
+	
+	dietCreateTableHeader(tableBody, data['tableData']['headers']);
+	dietPopulateTable(tableBody, data['tableData']);
+}
+
+/* Generic create table header */
+function dietCreateTableHeader(tableBody, headers) {
+	var tableRow = tableBody.append('tr');
+	for(i = 0; i < headers.length; i++) {
+		tableRow.append('th')
+					.attr('class', 'deepDiveTableLabel')
+					.text(headers[i]);
+	}
+}
+
+/* Generic populate table */
+function dietPopulateTable(tableBody, data) {
+	for(i = 0; i < data['Date'].length; i++) {
+		var tempTableRow = tableBody.append('tr');
+		
+		for(j = 0; j < data['headers'].length; j++) {
+			if(data['headers'][j] === 'Value') {
+				tempTableRow.append('th')
+							.attr('class', 'deepDiveTableLabel')
+							.attr('nowrap', 'nowrap')
+							.style('color', data['colors'][i])
+							.text(data[data['headers'][j]][i].toFixed(1));
+			} else {
+				tempTableRow.append('th')
+								.attr('class', 'deepDiveTableLabel')
+								.attr('nowrap', 'nowrap')
+								.style('color', '#000000')
+								.text(data[data['headers'][j]][i]);
+			}
+		}
+	}
+}
+
 /* HEI listeners */
 function heiHandler_click() {
-	
+	var cardId = 'heiDrawdown';
+	var cardTitle = 'HEI';
 	if(!hei_i) {
-	
-		var cardId = 'heiDrawdown';
-		var cardTitle = 'HEI';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -202,6 +260,9 @@ function heiHandler_click() {
 		var lhs = dietCreateSide(cardBody, '100%', 'left');
 		var rhs = dietCreateSide(cardBody, '0%', 'right');
 		
+		/* Add LHS Table */
+		dietCreateTable(lhs, hei);		
+		 
 		/* Add RHS Plot */
 		dietCreatePlot(rhs, hei, '#'+cardId);
 		plotScatter(hei, '#'+cardId);
@@ -216,15 +277,17 @@ function heiHandler_click() {
 				showingSpider = false;
 			}
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		hei_i = !hei_i;
 	}
 }
 
 /* AHEI Listeners */
 function aheiHandler_click() {
+	var cardId = 'aheiDrawdown';
+	var cardTitle = 'AHEI';
 	if(!ahei_i) {
-	
-		var cardId = 'aheiDrawdown';
-		var cardTitle = 'AHEI';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -236,6 +299,9 @@ function aheiHandler_click() {
 		/* Add sides */
 		var lhs = dietCreateSide(cardBody, '100%', 'left');
 		var rhs = dietCreateSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		dietCreateTable(lhs, ahei);		
 		
 		/* Add RHS Plot */
 		dietCreatePlot(rhs, ahei, '#'+cardId);
@@ -251,14 +317,16 @@ function aheiHandler_click() {
 				showingSpider = false;
 			}
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		ahei_i = !ahei_i;
 	}
 }
 
 function dashHandler_click() {
+	var cardId = 'dashDrawdown';
+	var cardTitle = 'DASH';
 	if(!dash_i) {
-	
-		var cardId = 'dashDrawdown';
-		var cardTitle = 'DASH';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -270,6 +338,9 @@ function dashHandler_click() {
 		/* Add sides */
 		var lhs = dietCreateSide(cardBody, '100%', 'left');
 		var rhs = dietCreateSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		dietCreateTable(lhs, dash);	
 		
 		/* Add RHS Plot */
 		dietCreatePlot(rhs, dash, '#'+cardId);
@@ -285,14 +356,16 @@ function dashHandler_click() {
 				showingSpider = false;
 			}
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		dash_i = !dash_i;
 	}
 }
 
 function nutrisavingsHandler_click() {
+	var cardId = 'nutrisavingsDrawdown';
+	var cardTitle = 'NutriSavings';
 	if(!nutrisavings_i) {
-	
-		var cardId = 'nutrisavingsDrawdown';
-		var cardTitle = 'NutriSavings';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -305,6 +378,9 @@ function nutrisavingsHandler_click() {
 		var lhs = dietCreateSide(cardBody, '100%', 'left');
 		var rhs = dietCreateSide(cardBody, '0%', 'right');
 		
+		/* Add LHS Table */
+		dietCreateTable(lhs, nutrisavings);	
+		
 		/* Add RHS Plot */
 		dietCreatePlot(rhs, nutrisavings, '#'+cardId);
 		
@@ -313,6 +389,9 @@ function nutrisavingsHandler_click() {
 			document.getElementById(cardId).remove();
 			nutrisavings_i = !nutrisavings_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		nutrisavings_i = !nutrisavings_i;
 	}
 }
 
@@ -407,9 +486,67 @@ function populateDietaryData() {
 	nutrisavings['name'] = 'NutriSavings';
 	nutrisavings['color'] = "#DB2354";
 
+	/* Get table data */
+	hei_table = {}
+	hei_table['Value'] = hei['sum'];
+	hei_table['Ideal'] = Array(hei['sum'].length).fill(100);
+	hei_table['Date'] = genDateStr(hei['date']);
+	hei_table['Source'] = Array(hei['sum'].length).fill('Self-Reported');
+	hei_table['colors'] = createDietColors(hei_table['Value'], hei_table['Ideal']);
+	hei['tableData'] = hei_table;
+	hei['tableData']['headers'] = ['Value', 'Date', 'Source'];
+	
+	ahei_table = {}
+	ahei_table['Value'] = ahei['sum'];
+	ahei_table['Ideal'] = Array(ahei['sum'].length).fill(87.5);
+	ahei_table['Date'] = genDateStr(ahei['date']);
+	ahei_table['Source'] = Array(ahei['sum'].length).fill('Self-Reported');
+	ahei_table['colors'] = createDietColors(ahei_table['Value'], ahei_table['Ideal']);
+	ahei['tableData'] = ahei_table;
+	ahei['tableData']['headers'] = ['Value', 'Date', 'Source'];
+	
+	dash_table = {}
+	dash_table['Value'] = dash['sum'];
+	dash_table['Ideal'] = Array(dash['sum'].length).fill(9);
+	dash_table['Date'] = genDateStr(dash['date']);
+	dash_table['Source'] = Array(dash['sum'].length).fill('Self-Reported');
+	dash_table['colors'] = createDietColors(dash_table['Value'], dash_table['Ideal']);
+	dash['tableData'] = dash_table;
+	dash['tableData']['headers'] = ['Value', 'Date', 'Source'];
+	
+	nutrisavings_table = {}
+	nutrisavings_table['Value'] = nutrisavings['sum'];
+	nutrisavings_table['Ideal'] = Array(nutrisavings['sum'].length).fill(100);
+	nutrisavings_table['Date'] = genDateStr(nutrisavings['date']);
+	nutrisavings_table['Source'] = Array(nutrisavings['sum'].length).fill('Kroger');
+	nutrisavings_table['colors'] = createDietColors(nutrisavings_table['Value'], nutrisavings_table['Ideal']);
+	nutrisavings['tableData'] = nutrisavings_table;
+	nutrisavings['tableData']['headers'] = ['Value', 'Date', 'Source'];
+	
 	/* Plot Percentages */
 	//plotPercentages([hei,ahei,dash]);
 
+}
+
+function createDietColors(values, ideal) {
+	retColors = [];
+	for(i = 0; i < values.length; i++) {
+		if(values[i]/ideal[i] < 0.7) {
+			retColors.push('#C21807');
+		} else {
+			retColors.push('');
+		}
+	}
+	return retColors;
+}
+
+function genDateStr(dates) {
+	retDates = [];
+	for(i = 0; i < dates.length; i++) {
+		var tempDate = dates[i].toLocaleString();
+		retDates.push(tempDate.split(',')[0]);
+	}
+	return retDates;
 }
 
 function clearScatter(cardId) {
@@ -683,15 +820,17 @@ function fillOutScores(actComponentScores, idealComponentScores, date, loc_mrpp,
 	var idealTotal = idealComponentScores.reduce(add, 0.0);
 	var propOfIdeal = actTotal/idealTotal;
 
-	$(loc_mrpp).text("Most Recent Purchase Period (" + date.toDateString() + ")");
-
 	/* We want to have a color scale for the %'s */
-	var color = d3.scale.linear().domain([0.30,0.70])
-								 .interpolate(d3.interpolateHcl)
-								 .range([d3.rgb("#C21807"), d3.rgb('#4CBB17')]);
+	var color = function(value) {
+					if(value < 0.70) {
+						return '#C21807';
+					} else {
+						return '';
+					}
+				}
 
 	var value_color = color(propOfIdeal);
-	$(loc_val).text(String("" + actTotal.toFixed(2) + "/" + idealTotal));
+	$(loc_val).text(String("" + actTotal.toFixed(1) + "/" + idealTotal.toFixed(1)));
 	d3.select(loc_val).style("color",value_color);
 	return value_color;
 }
