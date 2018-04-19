@@ -411,6 +411,23 @@ footer{
 	padding-bottom: 1px;
 }
 
+.gdTableLabel {
+	color: #808080;
+	font-size: 0.75em;
+	text-align: center;
+	padding: 10px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.gdTableValue {
+	font-size:.85em;
+	text-align: center;
+	padding: 10px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
 .deepDiveTable {
 	border-spacing: 1px;
 	padding:2px;
@@ -458,4 +475,12 @@ footer{
 .star {
 	fill: #C8C8C8;
 	fill-opacity: 0.3;
+}
+
+.leftGrocery {
+	
+}
+
+.trBottom {
+	border-bottom: 1.00px solid #808080;
 }

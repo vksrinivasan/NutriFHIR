@@ -19,10 +19,10 @@ var nutrisavings_i = false;
 var showingSpider = false;
 
 /* Generic create the card */
-function dietCreateCard(id) {
-	
+function dietCreateCard(id) { 
+	 
 	/* Create the card itself */
-	
+	 
 	/* Figure out where to put the next card 
 	 * (It goes immediately after the parent)
 	 */
@@ -34,7 +34,7 @@ function dietCreateCard(id) {
 			parentIndex = i;
 			break;
 		}
-	}
+	} 
 	var newCard = document.createElement('div');
 	newCard.setAttribute('class', 'card');
 	newCard.setAttribute('id', id);
@@ -42,7 +42,7 @@ function dietCreateCard(id) {
 	
 	var drawdownCard = d3.select('#'+id);
 	
-						 
+				  		 
 	/* Create the card container */
 	var drawdownContainer = drawdownCard.append('div')
 											.attr('id', 'container');
@@ -71,7 +71,7 @@ function dietCreateTitleBurger(cardBody, title) {
 function dietCreateSide(cardBody, perc, side) {
 	var side = cardBody.append('div')
 							.attr('style', 'float:' + side + '; width: ' + perc);
-	return side;
+	return side; 
 }
 
 /* Generic plot data */
@@ -202,11 +202,9 @@ function dietCreatePlot(side, data, cardName) {
 
 /* HEI listeners */
 function heiHandler_click() {
-	
+	var cardId = 'heiDrawdown';
+	var cardTitle = 'HEI';
 	if(!hei_i) {
-	
-		var cardId = 'heiDrawdown';
-		var cardTitle = 'HEI';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -218,7 +216,7 @@ function heiHandler_click() {
 		/* Add sides */
 		var lhs = dietCreateSide(cardBody, '100%', 'left');
 		var rhs = dietCreateSide(cardBody, '0%', 'right');
-		
+		 
 		/* Add RHS Plot */
 		dietCreatePlot(rhs, hei, '#'+cardId);
 		plotScatter(hei, '#'+cardId);
@@ -233,15 +231,17 @@ function heiHandler_click() {
 				showingSpider = false;
 			}
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		hei_i = !hei_i;
 	}
 }
 
 /* AHEI Listeners */
 function aheiHandler_click() {
+	var cardId = 'aheiDrawdown';
+	var cardTitle = 'AHEI';
 	if(!ahei_i) {
-	
-		var cardId = 'aheiDrawdown';
-		var cardTitle = 'AHEI';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -268,14 +268,16 @@ function aheiHandler_click() {
 				showingSpider = false;
 			}
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		ahei_i = !ahei_i;
 	}
 }
 
 function dashHandler_click() {
+	var cardId = 'dashDrawdown';
+	var cardTitle = 'DASH';
 	if(!dash_i) {
-	
-		var cardId = 'dashDrawdown';
-		var cardTitle = 'DASH';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -302,14 +304,16 @@ function dashHandler_click() {
 				showingSpider = false;
 			}
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		dash_i = !dash_i;
 	}
 }
 
 function nutrisavingsHandler_click() {
+	var cardId = 'nutrisavingsDrawdown';
+	var cardTitle = 'NutriSavings';
 	if(!nutrisavings_i) {
-	
-		var cardId = 'nutrisavingsDrawdown';
-		var cardTitle = 'NutriSavings';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -330,6 +334,9 @@ function nutrisavingsHandler_click() {
 			document.getElementById(cardId).remove();
 			nutrisavings_i = !nutrisavings_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		nutrisavings_i = !nutrisavings_i;
 	}
 }
 
@@ -1021,8 +1028,8 @@ function createTableRows(businessName, streetAddr) {
 	var tableBody = document.getElementById("groceryTableData").getElementsByTagName('tbody')[0];
 	var newRow = tableBody.insertRow(tableBody.rows.length);
 	newRow.className = "groceryTableRow";
-	
-	/* Create space for star */
+	 
+	/* Create space for star */  
 	var starCell = newRow.insertCell(0);
 	var starDiv = document.createElement('div');
 	starDiv.setAttribute('style', 'height:20px;width:20px');
@@ -1047,7 +1054,7 @@ function createTableRows(businessName, streetAddr) {
 	
 	svg.appendChild(star);
 	
-	/* Create space for data */
+	/* Create space for data */ 
 	var newCell = newRow.insertCell(1);
 	var bName = document.createTextNode(businessName);
 	var nLine = document.createElement("br");
