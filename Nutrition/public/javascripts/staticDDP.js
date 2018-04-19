@@ -955,3 +955,4 @@ function getNutriSavingsData_randomized() {
 	var retStruct = {comp: [], ref_lo: reference_lo, ref_hi: reference_hi, date: dates, score: scores};
 	return retStruct;
 }
+
