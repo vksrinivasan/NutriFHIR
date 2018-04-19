@@ -82,17 +82,22 @@
 
 	<div id="GroceryCardMap" class="card-body">
 		<div id=”grocery-container”>
-			<h2 id="groceryTitle" class="card-title">Diet Environment</h2>
+			<h2 id="groceryTitle" class="card-title">Food Environment</h2>
 			<table>
 				<tbody>
-					<tr class="groceryTableLabel">
-						<td id="convenienceStores">Convenience Stores</td>
-						<td></td>
-						<td></td>
-						<td id="supermarkets">Supermarkets</td>
-						<td></td>
-						<td></td>
-						<td id="farmersMarkets">Farmers Markets</td>
+				<tr class="groceryTableLabel">
+						<div class="checkbox-inline">
+                     <label id='CS_label'><input type="checkbox" id='CS' name="optradio" checked>Convenience Stores</label>
+                 </div>
+
+                 <div class="checkbox-inline">
+                     <label id='SM_label'><input type="checkbox" id='SM' name="optradio" checked>Supermarkets</label>
+                 </div>
+
+                 <div class="checkbox-inline">
+                     <label id='FM_label'><input type="checkbox" id='FM' name="optradio" checked>Farmers Markets</label>
+                 </div>
+
 					</tr>
 				</tbody>
 			</table>
@@ -114,7 +119,6 @@
 	</div>
 
 </div>
-
 
   <div class="card" id='medicationTimeline'>
     <div class="card-body">
