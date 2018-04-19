@@ -4,7 +4,7 @@ var ahei;
 var dash; 
 var nutrisavings;
 var x;
-var y;
+var y; 
 var margin;   
  
 // Keep track of whether user has clicked particular metric
@@ -20,11 +20,28 @@ var showingSpider = false;
 
 /* Generic create the card */
 function dietCreateCard(id) {
-	/* Create card itself */
-	var drawdownCard = d3.select('#DietChart')
-						 .append('div')
-							.attr('class', 'card')
-							.attr('id', id);
+	
+	/* Create the card itself */
+	
+	/* Figure out where to put the next card 
+	 * (It goes immediately after the parent)
+	 */
+	var parentEl = d3.select("#summary").node();
+	var childEl = parentEl.childNodes;
+	var parentIndex = 0;
+	for(i = 0; i < childEl.length; i++) {
+		if(childEl[i]['id']=='DietCard') {
+			parentIndex = i;
+			break;
+		}
+	}
+	var newCard = document.createElement('div');
+	newCard.setAttribute('class', 'card');
+	newCard.setAttribute('id', id);
+	parentEl.insertBefore(newCard, parentEl.childNodes[parentIndex+1]);
+	
+	var drawdownCard = d3.select('#'+id);
+	
 						 
 	/* Create the card container */
 	var drawdownContainer = drawdownCard.append('div')
