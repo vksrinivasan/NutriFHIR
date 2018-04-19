@@ -287,6 +287,13 @@
   /* LDL Listener */
   document.getElementById("ldl-score").addEventListener("click", ldlHandler, false);
 
+  /* Toggle Handlers */
+  document.getElementById("CS").addEventListener("click", csHandler, false);
+
+  document.getElementById("SM").addEventListener("click", smHandler, false);
+
+  document.getElementById("FM").addEventListener("click", fmHandler, false);
+
 
   function waitForElement(){
     if(typeof pat_addr !== "undefined"){
