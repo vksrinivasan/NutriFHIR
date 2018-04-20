@@ -4,82 +4,40 @@
 <div class="col-lg12 mx-auto" id="summary">
 
 
-<div class="card">
-	<div id="container">
-		<div id="demographicInformation" class="card-body" style="">
+<div id="DemoCard" class="card">
+	<div id=”container” class="movable">
+		<div class="card-body" style="float:left; width: 30%">
 			<div class="row">
-				<h2 id="Patient_Name" class="card-title col-sm-11">Loading Patient</h2>
+				<h2 id="Patient_Name" class="card-title col-sm-nfv">Loading Patient</h2>
 			</div>
-			<div id="borderDiv" style="float:left; width: 48%; padding-bottom:2em" >
-				<table id="demo1">
-					<tbody>
-						<tr>
-							<td id="dob_age_text" class="width-30">Unknown</td>
-							<th></th>
-							<th></th>
-							<td id="gender_text" class="width-30">Gender Unknown</td>
-						</tr>
-
-						<tr>
-							<td id="race_text" class="width-30">Race Unknown</td>
-							<th></th>
-							<th></th>
-							<td id="hisp_or_lat_text" class="width-30">Hisp/Latino Unknown</td>
-						</tr>
-
-						<tr>
-							<td id="married_text" class="width-30">Unknown</td>
-						</tr>
-
-					</tbody>
-				</table>
-
-				<table id="demo2">
-					<tbody>
-						<tr>
-							<td id="addr_text" class="width-30">Unknown</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-
-			<div id="aborderDiv" style="float:left; width: 1%;" >
-				<svg height="100" width="5">
-					<line x1="0" y1="0" x2="0" y2="100" style="stroke:rgb(55,71,79);stroke-width:2;opacity:0.4" />
-					Sorry, your browser does not support inline SVG.
-				</svg>
-			</div>
-
-			<table id="demo3" style="float:right; width: 50%; ">
+		</div>
+		<div class="card-body" style="float:right; width: 70%">
+			<table id="demoNew" class="vtTable">
 				<tbody>
-
 					<tr>
-						<td class="width-30">Home Phone #:</td>
-						<th class="width-10">
-							<td id="home_phone_text"></td>
+						<th id="dob_text" class="demoTableValue" style="cursor: pointer;">N/A</th>
+						<th id="age_text" class="demoTableValue" style="cursor: pointer;">N/A</th>
+						<th id="gender_text" class="demoTableValue" style="cursor: pointer;">N/A</th>
+						<th id="race_text" class="demoTableValue" style="cursor: pointer;">N/A</th>
+						<th id="married_text" class="demoTableValue" style="cursor: pointer;">N/A</th>
+						<th id="insurance_text" class="demoTableValue" style="cursor: pointer;">N/A</th>
 					</tr>
-
 					<tr>
-						<td class="width-30">Cell Phone #:</td>
-						<th class="width-10">
-							<td id="cell_phone_text"></td>
+						<th id="dob-name" class="demoTableLabel">DOB</th>
+						<th id="age-name" class="demoTableLabel">Age</th>
+						<th id="gender-name" class="demoTableLabel">Gender</th>
+						<th id="race-name" class="demoTableLabel">Race</th>
+						<th id="married-name" class="demoTableLabel">Marital Status</th>
+						<th id="insurance-name" class="demoTableLabel">Insurance</th>
 					</tr>
-
-					<tr>
-						<td class="width-30">Email:</td>
-						<th class="width-10">
-							<td id="email_text"></td>
-					</tr>
-
 				</tbody>
 			</table>
 		</div>
-
 	</div>
 </div>
 
 <div id="VitalCard" class="card">
-	<div id=”container”>
+	<div id=”container” class="movable">
 		<div class="card-body" style="float:left; width: 25%">
 			<div class="row">
 				<h2 id="vitalTitle" class="card-title col-sm-nfv">Vitals/Labs</h2>
@@ -117,7 +75,7 @@
 </div>
 
 <div id="DietCard" class="card">
-	<div id=”container”>
+	<div id=”container” class="movable">
 		<div class="card-body" style="float:left; width: 30%; vertical-align:middle; line-height:45px;">
 			<div class="row">
 				<h2 id="dietTitle" class="card-title col-sm-11">Personal Diet</h2>
@@ -160,7 +118,7 @@
 <div class="card groceryCard">
 
 	<div id="GroceryCardMap" class="card-body">
-		<div id=”grocery-container”>
+		<div id=”grocery-container” class="movable">
 			<h2 id="groceryTitle" class="card-title">Food Environment</h2>
 			<table>
 				<tbody>
@@ -199,32 +157,33 @@
 
 </div>
 
-  <div class="card" id='medicationTimeline'>
+<div class="card" id='medicationTimeline'>
     <div class="card-body">
-      <h2 class="card-title">Medications</h2>
-      <div class="floating-box">
-      <h4 class="card-title">Source</h4>
-
-            <label class="radio-inline">
-                  <input type="radio" name="filter" id="prac">Practitioner
-            </label>
-            <label class="radio-inline">
-                  <input type="radio" name="filter" id="pat">Patient
-            </label>
-            <label class="radio-inline">
-                  <input type="radio" name="filter" id="all" checked="checked">All
-            </label>
-      </div>
-      <div class="floating-box">
-        <h4 class="card-title">Status</h4>
-        <div class="checkbox">
-            <label><input type="checkbox" id="statusCheck" value="">Hide inactive</label>
-        </div>
-      </div>
-      <div id="tooltips">
-      </div>
+		<div id="medicine-container" class="movable">
+			<h2 class="card-title">Medications</h2>
+			<div class="floating-box">
+				<h4 class="card-title">Source</h4>
+				<label class="radio-inline">
+					<input type="radio" name="filter" id="prac">Practitioner
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="filter" id="pat">Patient
+				</label>
+				<label class="radio-inline">
+					  <input type="radio" name="filter" id="all" checked="checked">All
+				</label>
+			</div>
+			<div class="floating-box">
+				<h4 class="card-title">Status</h4>
+				<div class="checkbox">
+					<label><input type="checkbox" id="statusCheck" value="">Hide inactive</label>
+				</div>
+		  </div>
+		  <div id="tooltips">
+		  </div>
+		</div>
     </div>
-  </div>
+</div>
 
 <script src="javascripts/summarySOF.js" type="text/javascript"></script>
 <script src="javascripts/staticDDP.js" type="text/javascript"></script>
@@ -314,6 +273,7 @@
   
     $( "#summary" ).sortable({
 	  overflow: "visible",
+	  handle: ".movable",
 	});
 
     //$( "#summary" ).sortable({

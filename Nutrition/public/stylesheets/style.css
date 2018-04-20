@@ -415,7 +415,7 @@ footer{
 	color: #808080;
 	font-size: 0.75em;
 	text-align: center;
-	padding: 10px;
+	padding: 12px;
 	padding-top: 1px;
 	padding-bottom: 1px;
 }
@@ -423,7 +423,24 @@ footer{
 .gdTableValue {
 	font-size:.85em;
 	text-align: center;
-	padding: 10px;
+	padding: 12px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.demoTableLabel {
+	color: #808080;
+	font-size: 0.75em;
+	text-align: center;
+	padding: 15px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.demoTableValue {
+	font-size:.85em;
+	text-align: center;
+	padding: 15px;
 	padding-top: 1px;
 	padding-bottom: 1px;
 }
@@ -483,4 +500,8 @@ footer{
 
 .trBottom {
 	border-bottom: 1.00px solid #808080;
+}
+
+.movable {
+	
 }

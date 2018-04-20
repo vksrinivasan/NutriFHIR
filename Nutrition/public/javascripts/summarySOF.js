@@ -285,7 +285,7 @@ function update_timeline(selection,action,tItems){
 	}
      });
    });*/
-
+ 
   $.when(pt, obv, cond, meds).fail(onError);
   $.when(pt, obv, cond, meds).done(
     function(patient, obv, conditions, prescriptions) {
@@ -321,11 +321,11 @@ function update_timeline(selection,action,tItems){
       $("#married_text").text(
         titleCase(patient['maritalStatus'].text)
       );
-
+    
 
       /* Get Patient Birth Date and Age*/
       var dob = new Date(patient['birthDate']);
-      var day = dob.getDate();
+      var day = dob.getDate(); 
       var monthIndex = dob.getMonth() + 1;
       var year = dob.getFullYear();
 
@@ -344,8 +344,10 @@ function update_timeline(selection,action,tItems){
 
       var dobStr = monthIndex + "/" + day + '/' + year;
       //console.log(dobStr);
-
-      $("#dob_age_text").text(dobStr + " (" + age + "Y)");
+		
+	  $('#dob_text').text(dobStr);
+	  $('#age_text').text(age);
+      //$("#dob_age_text").text(dobStr + " (" + age + "Y)");
 
 
       /* Get Patient Address */
@@ -733,11 +735,11 @@ test= [
     data: [1,6, 3, 10, 5, 8, 3,2,12],
     pointPlacement: 'on'
 },
-{
+{ 
     name: 'Purchase period 3',
     data: [9,9, 8, 10, 6, 9, 7,8,7],
     pointPlacement: 'on'
-},
+},  
 {
     name: 'Reference',
     data: [10,10, 10, 10, 10, 10, 10,10,20],
