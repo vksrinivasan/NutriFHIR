@@ -7,6 +7,8 @@ var geocoder = null
 //var p_marker = null
 var p_infowindowContent = null
 var p_infowindow = null
+var infowindow = null
+var service = null; 
 
 var csMarkers = [];
 var smMarkers = [];
@@ -51,12 +53,12 @@ d3.select("#SM_label").style('color', '#9999ff');
 d3.select("#FM_label").style('color', '#99c199');
 
 var destMarkers = [];
-var service = null; 
+
 var noAutoComplete = true;
 var noQuery = true;
 var initialService = null;
 geocoder = new google.maps.Geocoder();
-var infowindow = new google.maps.InfoWindow({
+infowindow = new google.maps.InfoWindow({
     size: new google.maps.Size(100, 30),
     maxWidth: 125
   });
@@ -431,7 +433,8 @@ function callbackCS(results, status) {
     var marker = new google.maps.Marker({
       map: map,
       icon: markerIcon,
-      position: place.geometry.location
+      position: place.geometry.location,
+      reference: place.reference
     });
 
     
@@ -483,12 +486,8 @@ autocomplete.addListener('place_changed', function() {
             return;
           }
 
-          goldStar.fillColor = 'black';
-          var placeMarker = new google.maps.Marker({
-                  map: map,
-                  icon: goldStar,
-                  position: place.geometry.location
-             });
+          
+          
 
           // If the place has a geometry, then present it on a map.
           var bName = place.name;
@@ -499,8 +498,59 @@ autocomplete.addListener('place_changed', function() {
           var idToCheck = 'A' + streetAddress.split(' ').join('_');
           if(null == rowMarkerMap[idToCheck])
           {
+            goldStar.fillColor = 'black';
+            var placeMarker = new google.maps.Marker({
+                  map: map,
+                  icon: goldStar,
+                  position: place.geometry.location
+             });
             rowMarkerMap[idToCheck] = placeMarker;
             createTableRows(bName, streetAddress, 'black', 2);
+
+            d3.select('#'+ 'B' + streetAddress.split(' ').join('_')).transition().duration(10)
+                 .style('fill', 'black')
+                 .style('fill-opacity', 1.0);
+
+            var firstElement = document.getElementById("groceryTableData").rows[0];
+            var currRow = document.getElementById(idToCheck);
+
+            firstElement.parentNode.insertBefore(currRow, firstElement);
+          }
+          else
+          {
+
+              var currMarker = rowMarkerMap[idToCheck];
+
+              var currContent = rowContentMap[idToCheck];
+              var currColorType = currContent.Color;
+
+              goldStar.fillColor = currColorType;
+              currMarker.setIcon(goldStar);
+              currContent.Preferred = 1;
+              rowContentMap[idToCheck] = currContent;
+
+              var currRow = document.getElementById(idToCheck);
+              if(null == currRow)
+              {
+                createTableRows(currContent.Name, currContent.Address, currContent.Color);
+                currMarker.setVisible(true);
+
+              }
+
+              var firstElement = document.getElementById("groceryTableData").rows[0];
+                  
+              firstElement.parentNode.insertBefore(currRow, firstElement);
+              
+
+
+              var currAddr = currContent.Address;
+              d3.select('#'+ 'B' + currAddr.split(' ').join('_')).transition().duration(10)
+                 .style('fill', currColorType)
+                 .style('fill-opacity', 1.0);
+
+
+
+
           }
           
           map.panTo(place.geometry.location);
@@ -724,6 +774,8 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
       var currMarker = rowMarkerMap[rowId];
       var currContent = rowContentMap[rowId];
       var currColorType = currContent.Color;
+      var firstElement = document.getElementById("groceryTableData").rows[0];
+      var firstElementId = firstElement.id;
 
       
       if(parseFloat(d3.select(this).style('fill-opacity'))==0.3) {
@@ -737,7 +789,7 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
         currContent.Preferred = 1;
         rowContentMap[rowId] = currContent;
 
-        var firstElement = document.getElementById("groceryTableData").rows[0];
+        
         var currRow = document.getElementById(rowId);
 
         firstElement.parentNode.insertBefore(currRow, firstElement);
@@ -749,23 +801,96 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
                  .style('fill', '#C8C8C8')
                  .style('fill-opacity', 0.3);
 
+
+        if(currContent.Preferred != 2)
+        {
+          var iconToUse = CS;
+          if(currColorType == '#9999ff')
+            iconToUse = SM;
+          else if (currColorType == '#99c199')
+            iconToUse = FM;
+
+          currMarker.setIcon(iconToUse);
+
+          currContent.Preferred = 0;
+          rowContentMap[rowId] = currContent;
+
+          if(rowId == firstElementId)
+          {
+              var table = document.getElementById("groceryTableData");
+              for (var i = 1, row; row = table.rows[i]; i++) {
+
+                  if(rowContentMap[row.id].Preferred == 1) {
+                    firstElement.parentNode.insertBefore(row, firstElement);
+
+                  }
+              }
+          }
+        }
+        else
+        {
+          var row = document.getElementById(rowId)
+          var markerToRemove = rowMarkerMap[rowId]
+          markerToRemove.setMap(null)
+          row.parentNode.removeChild(row);
+
+        }
+
         
-        var iconToUse = CS;
-        if(currColorType == '#9999ff')
-          iconToUse = SM;
-        else if (currColorType == '#99c199')
-          iconToUse = FM;
-
-        currMarker.setIcon(iconToUse);
-
-        currContent.Preferred = 0;
-        rowContentMap[rowId] = currContent;
+        
+        
 
 
       }
     }
   );
+
+function onRowClick(tableId, callback) {
+    var table = document.getElementById(tableId),
+        rows = table.getElementsByTagName("tr"),
+        i;
+    for (i = 0; i < rows.length; i++) {
+        table.rows[i].onclick = function (row) {
+            return function () {
+                callback(row);
+            };
+        }(table.rows[i]);
+    }
+};
+ 
+onRowClick("groceryTableData", function (row){
+    console.log(row.id);
+    markerToShow = rowMarkerMap[row.id];
+    infowindow.marker = markerToShow;
+
+    var request = {
+      reference: markerToShow.reference
+    };   
+    service.getDetails(request, function(place, status) { 
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+          var contentStr = '<h5>' + place.name + '</h5><p>' + place.formatted_address;
+          if (!!place.formatted_phone_number) contentStr += '<br>' + place.formatted_phone_number;
+          //if (!!place.website) contentStr += '<br><a target="_blank" href="' + place.website + '">' + place.website + '</a>';
+          //contentStr += '<br>' + place.types + '</p>';
+
+          contentStr = '<p style="word-wrap:nospace">' + contentStr + '</p>';
+          infowindow.setContent(contentStr);
+          infowindow.open(map, markerToShow);
+        } else { 
+          var contentStr = "<h5>No Result, status=" + status + "</h5>";
+          infowindow.setContent(contentStr);
+          infowindow.open(map, markerToShow); 
+        }
+      }); 
+
+    /* Info windo added */
+
+});
+
+
 }
+
+
   //google.maps.event.addDomListener(window, 'load', initialize);
 
 
