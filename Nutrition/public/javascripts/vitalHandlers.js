@@ -2,8 +2,8 @@
 var height_i = false;
 var weight_i = false;
 var bmi_i = false;
-var glucose_i = false;
-var hba1c_i = false;
+var glucose_i = false;     
+var hba1c_i = false;     
 var bp_i = false;
 var tchol_i = false;
 var hdl_i = false;
@@ -34,7 +34,8 @@ function createCard(id) {
 						 
 	/* Create the card container */
 	var drawdownContainer = drawdownCard.append('div')
-											.attr('id', 'container');
+											.attr('id', 'container')
+											.attr('class', 'movable');
 											
 	/* Create the card body */
 	var cardBody = drawdownContainer.append('div')
@@ -546,8 +547,8 @@ function hdlHandler() {
 		document.getElementById(cardId).remove();
 		hdl_i = !hdl_i;
 	}
-} 
-
+}  
+ 
 function ldlHandler() {
 	var cardId = 'ldlDrawdown';
 	var cardTitle = 'LDL';
