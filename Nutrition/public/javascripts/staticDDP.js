@@ -45,7 +45,8 @@ function dietCreateCard(id) {
 				  		 
 	/* Create the card container */
 	var drawdownContainer = drawdownCard.append('div')
-											.attr('id', 'container');
+											.attr('id', 'container')
+											.attr('class', 'movable');
 											
 	/* Create the card body */
 	var cardBody = drawdownContainer.append('div')
