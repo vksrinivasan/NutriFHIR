@@ -7,6 +7,8 @@ var geocoder = null
 //var p_marker = null
 var p_infowindowContent = null
 var p_infowindow = null
+var infowindow = null
+var service = null; 
 
 var csMarkers = [];
 var smMarkers = [];
@@ -51,12 +53,12 @@ d3.select("#SM_label").style('color', '#9999ff');
 d3.select("#FM_label").style('color', '#99c199');
 
 var destMarkers = [];
-var service = null; 
+
 var noAutoComplete = true;
 var noQuery = true;
 var initialService = null;
 geocoder = new google.maps.Geocoder();
-var infowindow = new google.maps.InfoWindow({
+infowindow = new google.maps.InfoWindow({
     size: new google.maps.Size(100, 30),
     maxWidth: 125
   });
@@ -431,7 +433,8 @@ function callbackCS(results, status) {
     var marker = new google.maps.Marker({
       map: map,
       icon: markerIcon,
-      position: place.geometry.location
+      position: place.geometry.location,
+      reference: place.reference
     });
 
     
@@ -765,7 +768,53 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
       }
     }
   );
+
+function onRowClick(tableId, callback) {
+    var table = document.getElementById(tableId),
+        rows = table.getElementsByTagName("tr"),
+        i;
+    for (i = 0; i < rows.length; i++) {
+        table.rows[i].onclick = function (row) {
+            return function () {
+                callback(row);
+            };
+        }(table.rows[i]);
+    }
+};
+ 
+onRowClick("groceryTableData", function (row){
+    console.log(row.id);
+    markerToShow = rowMarkerMap[row.id];
+    infowindow.marker = markerToShow;
+
+    var request = {
+      reference: markerToShow.reference
+    };   
+    service.getDetails(request, function(place, status) { 
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+          var contentStr = '<h5>' + place.name + '</h5><p>' + place.formatted_address;
+          if (!!place.formatted_phone_number) contentStr += '<br>' + place.formatted_phone_number;
+          //if (!!place.website) contentStr += '<br><a target="_blank" href="' + place.website + '">' + place.website + '</a>';
+          //contentStr += '<br>' + place.types + '</p>';
+
+          contentStr = '<p style="word-wrap:nospace">' + contentStr + '</p>';
+          infowindow.setContent(contentStr);
+          infowindow.open(map, markerToShow);
+        } else { 
+          var contentStr = "<h5>No Result, status=" + status + "</h5>";
+          infowindow.setContent(contentStr);
+          infowindow.open(map, markerToShow); 
+        }
+      }); 
+
+    /* Info windo added */
+
+});
+
+
 }
+
+
   //google.maps.event.addDomListener(window, 'load', initialize);
 
 
