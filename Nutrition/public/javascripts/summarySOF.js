@@ -308,19 +308,35 @@ function update_timeline(selection,action,tItems){
       );
 
       /* Get Patient Gender */
-      $("#gender_text").text(
-        titleCase(patient['gender'])
-      );
+	  var pGender = 'N/A';
+	  if(typeof patient['gender'] !== 'undefined') {
+		  pGender = patient['gender'];
+		  $("#gender_text").text(
+			titleCase(pGender)
+		  );
+	  } else {
+		  $("#gender_text").text(pGender);
+	  }
+
 
       /* Hispanic or Latino? */
 
-      $("#hisp_or_lat_text").text(patient['extension'][1]['extension'][1].valueString);
+      //$("#hisp_or_lat_text").text(patient['extension'][1]['extension'][1].valueString);
 
 
       /* Get Patient Marital Status */
-      $("#married_text").text(
-        titleCase(patient['maritalStatus'].text)
-      );
+	  var pMStatus = 'N/A';
+	  if(typeof patient['maritalStatus'] !== 'undefined') {
+		  pMStatus = patient['maritalStatus'];
+		  $("#married_text").text(
+			titleCase(pMStatus.text)
+		  );
+	  } else {
+		  $("#married_text").text(
+			pMStatus
+		  );
+	  }
+      
     
 
       /* Get Patient Birth Date and Age*/
@@ -359,7 +375,7 @@ function update_timeline(selection,action,tItems){
         (fullAddress)
       );
 
-      function normalize(phone) {
+/*       function normalize(phone) {
         //normalize string and remove all unnecessary characters
         phone = phone.replace(/[^\d]/g, "");
         //check if number length equals to 10
@@ -374,7 +390,7 @@ function update_timeline(selection,action,tItems){
 
       $("#home_phone_text").text(
         (phoneNum)
-      );
+      ); */
 
       /* Print statuses for diabetes and hypertension */
       console.log("Diabetes: " + isDiabetic);
@@ -395,55 +411,110 @@ function update_timeline(selection,action,tItems){
       /* Get Weight */
       var byCodes = smart.byCodes(obv, 'code');
       var weight = byCodes('3141-9');
-      $("#weight-text").text(getQuantityValueAndUnit(weight[0]));
+	  var weightFinal = getQuantityValueAndUnit(weight[0]);
+	  if(weightFinal == '-') {
+			$("#weight-text").text('N/A');
+	  } else {
+		  $("#weight-text").text(weightFinal);
+	  }
+      
 
       /* Get Height */
       var height = byCodes('8302-2');
-      $("#height-text").text(getQuantityValueAndUnit(height[0]));
+	  var heightFinal = getQuantityValueAndUnit(height[0]);
+	  if(heightFinal == '-') {
+		  $("#height-text").text('N/A');
+	  } else {
+		  $("#height-text").text(heightFinal);
+	  }
+      
 
       /* Get BMI */
       var BMI = byCodes('39156-5');
-      $("#bmi-score").text(getQuantityValueAndUnit(BMI[0]));
-      colorField("#bmi-score", BMI[0]);
+	  var BMIFinal = getQuantityValueAndUnit(BMI[0]);
+	  if(BMIFinal == '-') {
+		  $("#bmi-score").text('N/A');
+	  } else {
+		  $("#bmi-score").text(BMIFinal);
+		  colorField("#bmi-score", BMI[0]);
+	  }
+      
 
       /*Get Cholesterol(moles/volume) in Serum*/
       var cholesterol = byCodes('14647-2')
 
       /*Get total HBA1C*/
       var hba1c = byCodes('4548-4')
-      $("#hba1c-score").text(getQuantityValueAndUnit(hba1c[0]));
-      colorField("#hba1c-score", hba1c[0]);
+	  var hba1cFinal = getQuantityValueAndUnit(hba1c[0]);
+	  if(hba1cFinal == '-') {
+		  $("#hba1c-score").text('N/A');
+	  } else {
+		  $("#hba1c-score").text(hba1cFinal);
+		  colorField("#hba1c-score", hba1c[0]);		  
+	  }
+
 
       /*Get total cholesterol*/
       var chol = byCodes('2093-3')
-      $("#chol").text(getQuantityValueAndUnit(chol[0]))
-      console.log(obv)
-      colorField("#chol", chol[0]);
-
+	  var cholFinal = getQuantityValueAndUnit(chol[0]);
+	  if(cholFinal == '-') {
+		  $("#chol").text('N/A');
+	  } else {
+		  $("#chol").text(cholFinal);
+		  colorField("#chol", chol[0]);
+	  }
+      
       /*Get HDL*/
       var hdl = byCodes('2085-9')
-      $("#hdl-score").text(getQuantityValueAndUnit(hdl[0]))
-      colorField("#hdl-score", hdl[0]);
+	  var hdlFinal = getQuantityValueAndUnit(hdl[0]);
+	  if(hdlFinal == '-') {
+		  $("#hdl-score").text('N/A');
+	  } else {
+		  $("#hdl-score").text(hdlFinal);
+		  colorField("#hdl-score", hdl[0]);		  
+	  }
 
-      /*Get HDL*/
-      var ldl = byCodes('13457-7')
-      $("#ldl-score").text(getQuantityValueAndUnit(ldl[0]))
-      colorField("#ldl-score", ldl[0]);
+      /*Get LDL*/
+      var ldl = byCodes('13457-7');
+	  var ldlFinal = getQuantityValueAndUnit(ldl[0]);
+	  if(ldlFinal != '-') {
+		  $("#ldl-score").text(ldlFinal);
+		  colorField("#ldl-score", ldl[0]);
+	  } else {
+		  $("#ldl-score").text('N/A');
+	  }
+      
 
       /*Get Glucose [Mass/volume] in serum or plasma*/
-      var gluc = byCodes('2345-7')
-      $("#gluc-score").text(getQuantityValueAndUnit(gluc[0]))
-      colorField("#gluc-score", gluc[0]);
+      var gluc = byCodes('2345-7');
+	  var glucFinal = getQuantityValueAndUnit(gluc[0]);
+	  if(glucFinal == '-') {
+		  $("#gluc-score").text('N/A');
+	  } else {
+		  $("#gluc-score").text(glucFinal);
+		  colorField("#gluc-score", gluc[0]);	  
+	  }
+
 
       /*Get Systolic Blood Pressure*/
-      var sbp = byCodes('8480-6')
-      $("#sbp-text").text(getQuantityValueAndUnit(sbp[0]))
-      colorField("#sbp-text", sbp[0]);
+      var sbp = byCodes('8480-6');
+	  var sbpFinal = getQuantityValueAndUnit(sbp[0]);
+	  if(sbpFinal == '-') {
+	     $("#sbp-text").text('N/A');
+	  } else {
+		 $("#sbp-text").text(sbpFinal);
+		 colorField("#sbp-text", sbp[0]);
+	  }
 
       /*Get Diastolic Blood Pressure*/
       var dbp = byCodes('8462-4')
-      $("#dbp-text").text(getQuantityValueAndUnit(dbp[0]))
-      colorField("#dbp-text", dbp[0]);
+	  var dbpFinal = getQuantityValueAndUnit(dbp[0]);
+	  if(dbpFinal == '-') {
+	      $("#dbp-text").text('N/A');
+	  } else {
+		  $("#dbp-text").text(dbpFinal);
+		  colorField("#dbp-text", dbp[0]);		  
+	  }
 
 	  var address = fullAddress;
       var queryType = "Groceries";
@@ -636,10 +707,10 @@ function getColor(ob) {
 			.range([d3.rgb('#4CBB17'), d3.rgb("#C21807")]);
 
 		if (ob.valueQuantity.value > ob['referenceRange'][0]['high']['value']) {
-		  var value_color = color(ob['referenceRange'][0]['high']['value']);
+		  var value_color = "#C21807";
 		}
 		else if (ob.valueQuantity.value < ob['referenceRange'][0]['low']['value']) {
-		  var value_color = color(ob['referenceRange'][0]['low']['value']);
+		  var value_color = "#C21807";
 		}
 		else {
 		  var value_color = 'none';//color(ob.valueQuantity.value);
