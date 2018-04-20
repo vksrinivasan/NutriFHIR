@@ -17,6 +17,7 @@ var dash_i = false;
 var nutrisavings_i = false; 
 
 var showingSpider = false;
+var monitorSpider = false;
 
 /* Generic create the card */
 function dietCreateCard(id) { 
@@ -70,7 +71,9 @@ function dietCreateTitleBurger(cardBody, title) {
 /* Generic create card sides/divisions */
 function dietCreateSide(cardBody, perc, side) {
 	var side = cardBody.append('div')
-							.attr('style', 'float:' + side + '; width: ' + perc);
+			.attr('style', 'float:' + side + '; width: ' + perc)
+			.style("overflow", "auto")
+			.style("height", "100px");
 	return side; 
 }
 
@@ -89,7 +92,7 @@ function dietCreatePlot(side, data, cardName) {
 	var height = height - margin.top - margin.bottom;
 
 	y_min = 0; //math.min(math.min(arr_metrics[i]['percentage']), y_min);
-	y_max = 100; //math.max(math.max(arr_metrics[i]['percentage']), y_max);
+	y_max = math.max(data['ideal']);
 
 	var x_min = new Date(Math.min.apply(null, data['date']));
 
@@ -148,15 +151,28 @@ function dietCreatePlot(side, data, cardName) {
 	
 	// Plot Actual Data
  	var plotVals = [];
+	var idealVals = [];
 	for(j = 0; j < data['date'].length; j++) {
-		plotVals.push([data['date'][j], data['percentage'][j]]);
+		plotVals.push([data['date'][j], data['sum'][j]]);
+		idealVals.push([data['date'][j], data['ideal'][j]]);
 	}
 	svg.append("path")
 		.attr('d', lineFunc(plotVals))
-		.attr('stroke', data['color'])
+		.attr('stroke', 'steelblue')
 		.attr('stroke-width', 2)
 		.attr('fill', 'none')
 		.attr('id', data['name']);
+	
+	svg.append("path")
+	   .attr('d', lineFunc(plotVals))
+	   .attr('class', 'pathActual');
+
+	svg.append("path")
+		.attr('d', lineFunc(idealVals))
+		.attr('stroke', 'red')
+		.attr('stroke-width', 2)
+		.attr('fill', 'none')
+		.attr('id', data['name'] + " ideal");
 	
 	svg.append("path")
 	   .attr('d', lineFunc(plotVals))
@@ -169,7 +185,7 @@ function dietCreatePlot(side, data, cardName) {
         .attr("text-anchor", "middle")
 		.attr("font-family", "sans-serif")
         .style("font-size", "15px")
-        .text("Eating Index (percentage of ideal) v. Time");
+        .text(data['name'] + " score v. Time");
 
 	// Add y-axis
     	svg.append("text")
@@ -180,7 +196,7 @@ function dietCreatePlot(side, data, cardName) {
 		.style("text-anchor", "middle")
 		.style("font-family", "sans-serif")
 		.style("font-size", 12)
-		.text("Eating Index (percentage of ideal)");
+		.text(data['name'] + " score");
 	   
 	
 	// Plot scatter plot circles
@@ -203,8 +219,8 @@ function dietCreatePlot(side, data, cardName) {
 /* Generic create table */
 function dietCreateTable(side, data) {
 	var tableBody = side.append('table')
-							.attr('class', 'deepDiveTable')
-						.append('tbody');
+			.attr('class', 'deepDiveTable')
+			.append('tbody');
 	
 	dietCreateTableHeader(tableBody, data['tableData']['headers']);
 	dietPopulateTable(tableBody, data['tableData']);
@@ -561,13 +577,13 @@ function plotScatter(scoreObj, cardId) {
 	// Put the data for this sore in an easy to use object
 	var plotVals = []
 	for(i = 0; i < scoreObj['date'].length; i++) {
-		plotVals.push([i, scoreObj['date'][i], scoreObj['percentage'][i], scoreObj]);
+		plotVals.push([i, scoreObj['date'][i], scoreObj['sum'][i], scoreObj]);
 	}
 
 	var tool_tip = d3.tip()
 	  .attr("class", "d3-tip")
-	  .offset([-400, -150])
-	  .html("<div id='tipDiv'></div>");
+	  .offset([-380, -250])
+	  .html("<div id='tipDiv' class='card'></div>");
 
 	var tool_tip_percent = d3.tip()
 	  .attr("class", "d3-tip")
@@ -594,7 +610,7 @@ function plotScatter(scoreObj, cardId) {
 	   })
 	   .attr("transform",
 				  "translate(" + margin.left + "," + margin.top + ")")
-	   .style("fill", scoreObj['color'])
+	   .style("fill", 'steelblue')
 	   .style("cursor", 'pointer')
 	   .on('click', function(d) {
 		if (!showingSpider) {
@@ -610,10 +626,12 @@ function plotScatter(scoreObj, cardId) {
 
 			createSpider(tipSVG, d[0], d[3]);
 			showingSpider = true;
+			monitorSpider = false;
 		}
 		else {
 			d3.select("#tipDiv").remove();
 			showingSpider = false;
+			monitorSpider = false;
 		}
 
 	    })
@@ -627,11 +645,28 @@ function plotScatter(scoreObj, cardId) {
 					.text(function() {
 						return (d[3]['sum'][i]/d[3]['ideal'][i] * 100).toFixed(2) + "%";  // Value of the text
 					});
+			svg.selectAll("circle").attr("r", 6);
 		})
 
 		.on('mouseout', function(d, i){
 			d3.select("#tipPercentDiv").remove();  // Remove text location
+			svg.selectAll("circle").attr("r", 3);
 		});
+
+	/* monitor for click when spider chart is shown */
+	d3.select("body").on("click",function(){
+		if (showingSpider && monitorSpider) {
+			//console.log("removing spider chart");
+			d3.select("#tipDiv").remove();
+			showingSpider = false;
+			monitoringSpider = false;
+		}
+		else if (showingSpider && !monitorSpider) {
+			//console.log("watching to remove spider chart");
+			monitorSpider = true;
+		}
+	});
+	//monitorSpider = true;
 	/*
 	var borderPath = svg.append("rect")
        			.attr("x", 0)
@@ -646,7 +681,7 @@ function plotScatter(scoreObj, cardId) {
 
 /* Create the spider chart on mouseover */
 function createSpider(toolTip, index, data) {
-	var w = 300,
+	var w = 480,
 		h = 250;
 
 	console.log(data);
