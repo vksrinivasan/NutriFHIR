@@ -690,10 +690,30 @@ function populatePlotData(data, needColor) {
 		gd['dates'].push(new Date(tDate));
 		gd['units'].push(getUnits(data[i]));
 	}
+	
+	gd['refHi'] = cleanReferenceLoHi(gd['refHi']);
+	gd['refLo'] = cleanReferenceLoHi(gd['refLo']);
 
 	td['headers'] = ['Value', 'Date', 'Method', 'Location'];
 	console.log(td);
 	return {tableData: td, graphData: gd};
+}
+
+/* Helper function to clean reference hi/lo data */
+function cleanReferenceLoHi(data) {
+	var retArray = new Array(data.length);
+	
+	var avgVal = undefined;
+	for(i = 0; i < data.length; i++) {
+		if(data[i] != undefined) {
+			avgVal = data[i];
+		}
+	}
+	
+	for(i = 0; i < retArray.length; i++) {
+		retArray[i] = avgVal;
+	}
+	return retArray;
 }
 
 /* Helper Function To Convert Lower-case words to Upper Case First letter */
