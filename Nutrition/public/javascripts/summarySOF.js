@@ -62,11 +62,16 @@ function onReady(smart) {
      try{
      item.id =  id
      if(statement.effectivePeriod){
-     item.start =  new Date(statement.effectivePeriod.start).toLocaleDateString()
-     if(statement.effectivePeriod.end)
-        {
-        item.end = new Date(statement.effectivePeriod.end).toLocaleDateString()
-        item.type = 'range'
+     item.start =  new Date(statement.effectivePeriod.start)
+     if(statement.effectivePeriod.end){
+          item.end = new Date(statement.effectivePeriod.end)
+          diff = Math.abs(item.start.getTime() - item.end.getTime()) / 3600000;
+          if(diff > 48){
+          item.type = 'range'
+          }
+          else{
+            item.type = 'point'
+          }
         }
         }
      else{
@@ -95,11 +100,11 @@ function onReady(smart) {
     item.status = statement.status
     if(item.status == 'active'){
       item.sflag = 'active'
-      item.className = 'active'
+      item.className = 'active prac'
     }
     else{
       item.sflag = 'inactive'
-      item.className = 'inactive'
+      item.className = 'inactive pat'
     }
     if(statement.informationSource){
       item.source = statement.informationSource.display
@@ -123,14 +128,11 @@ function onReady(smart) {
 
 
     //format tooltip dispalay
-    item.title = '<b>Medication</b> : '+item.content+'<br>'+
-                 '<b>Reference</b> : '+item.reference+'<br>'+
-                 '<b>Source</b> : '+item.source+'<br>'+
-                 '<b>Status</b> : '+item.status+'<br>'+
-                 '<b>Route</b> : '+item.route+'<br>'+
-                 '<b>Dose</b> : '+item.dosageQuantity+'<br>'+
-                 '<b>Start</b> : '+item.start+'<br>'+
-                 '<b>End</b> : '+item.end+'<br>'
+    item.title = '<p class = "tooltip-header tiptitle">'+item.content+'<p><br>'+
+                 '<b class = "tipcontent">Source : '+item.source+'</b><br>'+
+                 '<b class = "tipcontent">Status : '+item.status+'</b><br>'+
+                 '<b class = "tipcontent">Route : '+item.route+'</b><br>'+
+                 '<b class = "tipcontent">Dose : '+item.dosageQuantity+'</b><br>'
     }
 
 
@@ -149,107 +151,222 @@ function onReady(smart) {
      //Build timeline
      var cap_options = {
          tooltip: {
-         followMouse: true,
+         followMouse: false,
          overflowMethod: 'cap'
        },
        maxHeight : '400px',
-       minHeight : '400px'
+       minHeight : '400px',
+       showTooltips : false
      }
 
 
      var container = document.getElementById('tooltips')
      var items = new vis.DataSet(meds)
-     var options = {
-       maxHeight : '400px'
-     }
 
 
-     var toolT = new vis.Timeline(document.getElementById('tooltips'),items, cap_options);
+     var toolT = new vis.Timeline(container,items, cap_options);
      //var Timeline = new vis.Timeline(container,items,options)
+
+
 
      //Event handler for radio buttons
      $(function(){
        $("[name=filter]").change(function(){
 
-          $('#statusCheck').prop('checked',false)
 
-          if($(this).attr("id") == 'prac'){
-            update_timeline('prac',"visible",items)
-            update_timeline('pat',"hide",items)
-            console.log(items)
-          }
+         if($('#statusCheck').prop('checked')){
 
-          else if($(this).attr("id") == 'pat'){
-            update_timeline('pat',"visible",items)
-            update_timeline('prac',"hide",items)
-            //console.log(items)
-          }
-
-          else{
-            update_timeline('all',"visible",items)
-          }
-
-
-          });
-
-          /*Checkbox*/
-
-          $('#statusCheck').change(function() {
-
-          chosenRadio = $('input[name=filter]:checked').attr('id');
-
-          if(this.checked){
+            if($(this).attr("id") == 'prac'){
+            console.log($('#statusCheck').prop('checked'))
             items.forEach(function(each){
-                if(each.sflag == 'inactive' && each.flag == chosenRadio){
-                  console.log(each.flag,each.sflag,each.className)
-                  items.update({id : each.id , className : "hide "+each.status})
-                }
-                else if(each.sflag == 'inactive' && chosenRadio == 'all'){
-                  console.log(each.flag,each.sflag,each.className)
-                  items.update({id : each.id , className : "hide "+each.status})
-                }
+                  if(each.flag == 'pat'){
+                    items.update({id : each.id, className : "hide"+" "+each.status})
+                    console.log('hide pat')
+                    }
+                  if(each.flag == 'prac' && each.sflag == "inactive") {
+                    items.update({id : each.id, className : "hide"+" "+each.status})
+                    console.log('hide prac and inactive')
+                  }
+                  if(each.flag == 'prac' && each.sflag == "active"){
+                    items.update({id : each.id, className : "visible"+" "+each.status})
+                    console.log(each)
+                    console.log('show prac and active')
+                  }
+                 })
+
+               }
+
+           if($(this).attr("id") == 'pat'){
+            items.forEach(function(each){
+                  if(each.flag == 'prac'){
+                    items.update({id : each.id, className : "hide" +" "+ each.status})
+                    console.log('hide prac')
+                    }
+                  if(each.flag == 'pat' && each.sflag == "inactive") {
+                    items.update({id : each.id, className : "hide"+" "+each.status})
+                    console.log('hide pat and inactive')
+                  }
+                  if(each.flag == 'pat' && each.sflag == "active"){
+                    items.update({id : each.id, className : "visible"+" "+each.status})
+                    console.log(each)
+                    console.log('show pat and active')
+                  }
+                 })
+          }
+
+          if($(this).attr("id") == 'all'){
+            items.forEach(function(each){
+              if(each.sflag == "inactive"){
+              console.log("hide inactive "+each.status,each.flag)
+              items.update({id : each.id, className : "hide" +" "+ each.status})
+              }
+              else{
+                items.update({id : each.id, className : "visible" +" "+ each.status})
+              }
             })
           }
 
-          if(!this.checked){
-            items.forEach(function(each){
-                if(each.sflag == 'inactive' && each.flag == chosenRadio){
-                  console.log(each.flag,each.sflag,each.className)
-                  items.update({id : each.id , className : "visible "+each.status})
-                }
-                else if(each.sflag == 'inactive' && chosenRadio == 'all'){
-                  console.log(each.flag,each.sflag,each.className)
-                  items.update({id : each.id , className : "visible "+each.status})
-                }
-            })
           }
+
+          if(!$('#statusCheck').prop('checked')){
+
+             if($(this).attr("id") == 'prac'){
+             console.log($('#statusCheck').prop('checked'))
+             items.forEach(function(each){
+                   if(each.flag == 'pat'){
+                     items.update({id : each.id, className : "hide"+" "+each.status})
+                     console.log('hide pat')
+                     }
+                   if(each.flag == 'prac') {
+                     items.update({id : each.id, className : "visible"+" "+each.status})
+                     console.log('show')
+                   }
+                  })
+
+                }
+
+            if($(this).attr("id") == 'pat'){
+             items.forEach(function(each){
+                   if(each.flag == 'prac'){
+                     items.update({id : each.id, className : "hide" +" "+ each.status})
+                     console.log('hide prac')
+                     }
+                   if(each.flag == 'pat') {
+                     items.update({id : each.id, className : "visible"+" "+each.status})
+                     console.log('show pat')
+                   }
+                  })
+                }
+
+           if($(this).attr("id") == 'all'){
+             items.forEach(function(each){
+               console.log("hide inactive "+each.status,each.flag)
+               items.update({id : each.id, className : "visible" +" "+ each.status})
+             })
+           }
+
+           }
+
+
+
 
           });
 
      })
 
+     //Event handling for checkbox
+     $('#statusCheck').change(function(){
+       var selectedRadio = $('input[type=radio][name=filter]:checked').attr('id')
+       if(this.checked){
+         if(selectedRadio == 'pat'){
+           items.forEach(function(each){
+             if(each.sflag == "inactive" && each.flag == "pat"){
+             items.update({id : each.id, className : "hide" +" "+ each.status})
+           }
+           })
+         }
+         if(selectedRadio == 'prac'){
+           items.forEach(function(each){
+             if(each.sflag == "inactive" && each.flag == "prac"){
+             items.update({id : each.id, className : "hide" +" "+ each.status})
+           }
+           })
+         }
+         else{
+           items.forEach(function(each){
+             if(each.sflag == "inactive"){
+             items.update({id : each.id, className : "hide" +" "+ each.status})
+              }
+           })
+         }
+       }
+       else{
+         if(selectedRadio == 'pat'){
+           items.forEach(function(each){
+             if(each.sflag == "inactive" && each.flag == "pat"){
+             items.update({id : each.id, className : "visible" +" "+ each.status})
+           }
+           })
+         }
+         else if(selectedRadio == 'prac'){
+           items.forEach(function(each){
+             if(each.sflag == "inactive" && each.flag == "prac"){
+             items.update({id : each.id, className : "visible" +" "+ each.status})
+           }
+           })
+         }
+         else{
+           items.forEach(function(each){
+             if(each.sflag == "inactive"){
+             items.update({id : each.id, className : "visible" +" "+ each.status})
+              }
+           })
+         }
+       }
+      });
+
+      //tooltips
+
+      $(document).on("mouseover",".vis-item", function (){
+        var test = $(this).text()
+        items.forEach(function(each){
+          if(each.content == test){
+          console.log(each)
+          $("#medTitle").text(each.content)
+          $("#source").text("Source : "+each.source)
+          $("#dose").text("Dose : "+each.dosageQuantity)
+          $("#status").text("Status : "+each.sflag)
+        }
+        })
+        //console.log($(this).next('div').text())
+        console.log($('.custom-tip').children())
+        var content = $('.custom-tip').children()[1].innerHTML+"<br>"+$('.custom-tip').children()[3].innerHTML
+        +"<br>"+$('.custom-tip').children()[5].innerHTML
+        var title = $('.custom-tip').children()[0].innerHTML
+
+        $(this).qtip({
+            content: {
+              title: title,
+              text: content
+            },
+            show: 'click',
+            style: {
+              classes: 'myCustomClass'
+            },
+            position: {
+                target: 'mouse'
+              }
+        });
+      })
 
 
    });
 
 
-   /*Update function*/
-function update_timeline(selection,action,tItems){
-  if(selection == 'prac' || selection == 'pat'){
-   tItems.forEach(function(each){
-         if(each.flag == selection){
-           tItems.update({id : each.id, className : action+" "+each.status})
-                        }
-          selected = selection
-        })
-  }
-  else{
-    tItems.forEach(function(each){
-            tItems.update({id : each.id, className : action+" "+each.status})
-           selected = selection
-         })
-  }
-}
+
+
+
+
 
   /* Go through encounters */
   console.log('on encounters');
