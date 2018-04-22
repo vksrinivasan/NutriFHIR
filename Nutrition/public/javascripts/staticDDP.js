@@ -981,32 +981,12 @@ function getNutriSavingsData_randomized() {
 
 	var reference_lo = [0];
 	var reference_hi = [100];
-	
-	//get nutrisavings data
-	//currently getting random user
-	//the function takes in firstname and lastname. if no match then sends random user info
-	var nutriSavingsInfo = getPatientNutritionInfo('','');
-	var nutriSavingsScore = parseInt(nutriSavingsInfo.activities.find(
-		function (obj) { 
-			return obj.activityID === "NS012"; 
-		}
-	).activityValue);
-	var nutriSavingsScoreDate = new Date(nutriSavingsInfo.activities.find(
-		function (obj) { 
-			return obj.activityID === "NS012"; 
-		}
-	).activityValue);
-	
-	
-	var dates = [new Date(2018,0,1), new Date(2018,1,1),new Date(2018,2,1),nutriSavingsScoreDate];
+	var dates = [new Date(2018,0,1), new Date(2018,1,1),new Date(2018,2,1),new Date(2018,3,1)];
 	var scores = [[], [], [], []];
 
 	for(i = 0; i < dates.length; i++) {
 		scores[i][0] = getRandomInt(reference_lo[0], reference_hi[0]);
 	}
-	
-	//replace the randomized nutriSavings score
-	scores[3][0] = nutriSavingsScore;
 
 	var retStruct = {comp: [], ref_lo: reference_lo, ref_hi: reference_hi, date: dates, score: scores};
 	return retStruct;
