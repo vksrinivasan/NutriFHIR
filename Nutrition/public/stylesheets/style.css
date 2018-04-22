@@ -17,9 +17,9 @@
 
 .floating-box {
     display: inline-block;
-    width: 40%;
+    width: 49%;
     height: auto;
-    margin: 10px;
+    margin: 2px;
 }
 
 
@@ -35,8 +35,24 @@
   visibility: hidden;
 }
 
+.vis-item.active{
+  color : green;
+  border-color: green;
+}
+
+.vis-item.inactive{
+  color : grey;
+  border-color: grey;
+}
+
 #title {
   font-family: 'Lobster', cursive;
+}
+
+h2 {
+	font-family: 'Lobster', cursive;
+	font-weight: 500;
+	color: #ffffff;
 }
 
 h3 {
@@ -44,7 +60,7 @@ h3 {
 }
 
 h4{
-  color: var(--grey-color);
+  color: #2196f3;
 }
 
 body {
@@ -211,7 +227,6 @@ body {
 .footer {
   padding-top: 20px;
   color: #777;
-  border-top: 1px solid #e5e5e5;
 }
 
 /* List for scores*/
@@ -303,6 +318,17 @@ footer{
   margin-top:20px;
 }
 
+/*custom tip*/
+.custom-tip{
+  color: #2196f3;
+}
+
+.myCustomClass{
+    border-color: rgb(0,190,0);
+    background-color: white;
+}
+
+
 .axis path,
 .axis line {
 	fill: none;
@@ -332,8 +358,8 @@ footer{
 
 
 .card-hamburger {
-  margin: 10px 20px; 
-  color:#2196f3; 
+  margin: 10px 20px;
+  color:#2196f3;
   cursor: move
 }
 
@@ -347,6 +373,31 @@ footer{
 
 .sortable-drag {
   opacity: 1;
+}
+
+.groceryTable {
+	border-spacing: 1px;
+	padding: 0px;
+}
+
+.groceryTableBody {
+	overflow: auto;
+	width: 100%;
+	height: 250px;
+	display: block;
+}
+
+.groceryTableRow {
+	background: #ffffff;
+}
+
+.groceryTableRow:hover {
+	background-color: #EBEBEB;
+}
+
+.groceryTypeTable {
+	border-spacing: 1px;
+	padding: 0px;
 }
 
 .vtTable {
@@ -367,6 +418,40 @@ footer{
 	font-size:.85em;
 	text-align: center;
 	padding: 4.5px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.gdTableLabel {
+	color: #808080;
+	font-size: 0.75em;
+	text-align: center;
+	padding: 12px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.gdTableValue {
+	font-size:.85em;
+	text-align: center;
+	padding: 12px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.demoTableLabel {
+	color: #808080;
+	font-size: 0.75em;
+	text-align: center;
+	padding: 15px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+.demoTableValue {
+	font-size:.85em;
+	text-align: center;
+	padding: 15px;
 	padding-top: 1px;
 	padding-bottom: 1px;
 }
@@ -394,13 +479,13 @@ footer{
 }
 
 .pathActual {
-	stroke: #2196f3; 
+	stroke: #2196f3;
 	stroke-width: 1;
 	fill: none;
 }
 
 .pathRef {
-	stroke: #cc0000; 
+	stroke: #cc0000;
 	stroke-width: 2;
 	fill: none;
 }
@@ -413,4 +498,21 @@ footer{
 .pointRef {
 	stroke: #cc0000;
 	fill: #cc0000;
+}
+
+.star {
+	fill: #C8C8C8;
+	fill-opacity: 0.3;
+}
+
+.leftGrocery {
+	
+}
+
+.trBottom {
+	border-bottom: 1.00px solid #808080;
+}
+
+.movable {
+	
 }

@@ -2,7 +2,7 @@
 var meds=[]
 var pat_addr;
 var height_plot_data;
-var weight_plot_data; 
+var weight_plot_data;
 var bmi_plot_data;
 var glucose_plot_data;
 var hba1c_plot_data;
@@ -10,9 +10,10 @@ var bp_plot_data;
 var totChol_plot_data;
 var hdl_plot_data;
 var ldl_plot_data;
+var encounterId_Locations = {};
 
 /* Required Smart on Fhir On Ready Function */
-function onReady(smart) {       
+function onReady(smart) {
   var patient = smart.patient;
   var pt = patient.read();
   var obv = smart.patient.api.fetchAll({
@@ -20,7 +21,7 @@ function onReady(smart) {
     // Note - I don't know how to sort results by time or anything. Someone
     // should figure that out
     type: 'Observation',
-    query: { 
+    query: {
       code: {
         $or: ['http://loinc.org|3141-9', // Body weight measured
               'http://loinc.org|8302-2', // Body height
@@ -53,7 +54,7 @@ function onReady(smart) {
   smart.patient.api.fetchAllWithReferences({type: "MedicationStatement"}).then(function(results) {
     id = 0;
 
-    //Trying timeline concept
+   //Trying timeline concept
    results.forEach(function(statement){
      console.log(statement)
      item = {}
@@ -61,15 +62,20 @@ function onReady(smart) {
      try{
      item.id =  id
      if(statement.effectivePeriod){
-     item.start = new Date(statement.effectivePeriod.start)
-     if(statement.effectivePeriod.end)
-        {
-        item.end = new Date(statement.effectivePeriod.end)
-        item.type = 'range'
+     item.start =  new Date(statement.effectivePeriod.start)
+     if(statement.effectivePeriod.end){
+          item.end = new Date(statement.effectivePeriod.end)
+          diff = Math.abs(item.start.getTime() - item.end.getTime()) / 3600000;
+          if(diff > 48){
+          item.type = 'range'
+          }
+          else{
+            item.type = 'point'
+          }
         }
         }
      else{
-      item.start = new Date(statement.effectiveDateTime)
+      item.start = new Date(statement.effectiveDateTime).toLocaleDateString()
       }
 
       if(!item.type){
@@ -94,9 +100,11 @@ function onReady(smart) {
     item.status = statement.status
     if(item.status == 'active'){
       item.sflag = 'active'
+      item.className = 'active prac'
     }
     else{
       item.sflag = 'inactive'
+      item.className = 'inactive pat'
     }
     if(statement.informationSource){
       item.source = statement.informationSource.display
@@ -117,17 +125,14 @@ function onReady(smart) {
       item.reference = 'Patient'
       item.flag = 'pat'
     }
-    //show-hide thing
-    item.className = 'visible'
+
+
     //format tooltip dispalay
-    item.title = '<b>Medication</b> : '+item.content+'<br>'+
-                 '<b>Reference</b> : '+item.reference+'<br>'+
-                 '<b>Source</b> : '+item.source+'<br>'+
-                 '<b>Status</b> : '+item.status+'<br>'+
-                 '<b>Route</b> : '+item.route+'<br>'+
-                 '<b>Dose</b> : '+item.dosageQuantity+'<br>'+
-                 '<b>Start</b> : '+item.start+'<br>'+
-                 '<b>End</b> : '+item.end+'<br>'
+    item.title = '<p class = "tooltip-header tiptitle">'+item.content+'<p><br>'+
+                 '<b class = "tipcontent">Source : '+item.source+'</b><br>'+
+                 '<b class = "tipcontent">Status : '+item.status+'</b><br>'+
+                 '<b class = "tipcontent">Route : '+item.route+'</b><br>'+
+                 '<b class = "tipcontent">Dose : '+item.dosageQuantity+'</b><br>'
     }
 
 
@@ -146,107 +151,232 @@ function onReady(smart) {
      //Build timeline
      var cap_options = {
          tooltip: {
-         followMouse: true,
+         followMouse: false,
          overflowMethod: 'cap'
        },
-       maxHeight : '400px'
+       maxHeight : '400px',
+       minHeight : '400px',
+       showTooltips : false
      }
 
 
      var container = document.getElementById('tooltips')
      var items = new vis.DataSet(meds)
-     var options = {
-       maxHeight : '400px'
-     }
 
 
-     var toolT = new vis.Timeline(document.getElementById('tooltips'),items, cap_options);
+     var toolT = new vis.Timeline(container,items, cap_options);
      //var Timeline = new vis.Timeline(container,items,options)
+
 
 
      //Event handler for radio buttons
      $(function(){
        $("[name=filter]").change(function(){
 
-          $('#statusCheck').prop('checked',false)
 
-          if($(this).attr("id") == 'prac'){
-            update_timeline('prac',"visible",items)
-            update_timeline('pat',"hide",items)
-            console.log(items)
-          }
+         if($('#statusCheck').prop('checked')){
 
-          else if($(this).attr("id") == 'pat'){
-            update_timeline('pat',"visible",items)
-            update_timeline('prac',"hide",items)
-            //console.log(items)
-          }
-
-          else{
-            update_timeline('all',"visible",items)
-          }
-
-
-          });
-
-          /*Checkbox*/
-
-          $('#statusCheck').change(function() {
-
-          chosenRadio = $('input[name=filter]:checked').attr('id');
-
-          if(this.checked){
+            if($(this).attr("id") == 'prac'){
+            console.log($('#statusCheck').prop('checked'))
             items.forEach(function(each){
-                if(each.sflag == 'inactive' && each.flag == chosenRadio){
-                  console.log(each.flag,each.sflag)
-                  items.update({id : each.id , className : "hide"})
-                }
-                else if(each.sflag == 'inactive' && chosenRadio == 'all'){
-                  console.log(each.flag,each.sflag)
-                  items.update({id : each.id , className : "hide"})
-                }
+                  if(each.flag == 'pat'){
+                    items.update({id : each.id, className : "hide"+" "+each.status})
+                    console.log('hide pat')
+                    }
+                  if(each.flag == 'prac' && each.sflag == "inactive") {
+                    items.update({id : each.id, className : "hide"+" "+each.status})
+                    console.log('hide prac and inactive')
+                  }
+                  if(each.flag == 'prac' && each.sflag == "active"){
+                    items.update({id : each.id, className : "visible"+" "+each.status})
+                    console.log(each)
+                    console.log('show prac and active')
+                  }
+                 })
+
+               }
+
+           if($(this).attr("id") == 'pat'){
+            items.forEach(function(each){
+                  if(each.flag == 'prac'){
+                    items.update({id : each.id, className : "hide" +" "+ each.status})
+                    console.log('hide prac')
+                    }
+                  if(each.flag == 'pat' && each.sflag == "inactive") {
+                    items.update({id : each.id, className : "hide"+" "+each.status})
+                    console.log('hide pat and inactive')
+                  }
+                  if(each.flag == 'pat' && each.sflag == "active"){
+                    items.update({id : each.id, className : "visible"+" "+each.status})
+                    console.log(each)
+                    console.log('show pat and active')
+                  }
+                 })
+          }
+
+          if($(this).attr("id") == 'all'){
+            items.forEach(function(each){
+              if(each.sflag == "inactive"){
+              console.log("hide inactive "+each.status,each.flag)
+              items.update({id : each.id, className : "hide" +" "+ each.status})
+              }
+              else{
+                items.update({id : each.id, className : "visible" +" "+ each.status})
+              }
             })
           }
 
-          if(!this.checked){
-            items.forEach(function(each){
-                if(each.sflag == 'inactive' && each.flag == chosenRadio){
-                  console.log(each.flag,each.sflag)
-                  items.update({id : each.id , className : "visible"})
-                }
-                else if(each.sflag == 'inactive' && chosenRadio == 'all'){
-                  console.log(each.flag,each.sflag)
-                  items.update({id : each.id , className : "visible"})
-                }
-            })
           }
+
+          if(!$('#statusCheck').prop('checked')){
+
+             if($(this).attr("id") == 'prac'){
+             console.log($('#statusCheck').prop('checked'))
+             items.forEach(function(each){
+                   if(each.flag == 'pat'){
+                     items.update({id : each.id, className : "hide"+" "+each.status})
+                     console.log('hide pat')
+                     }
+                   if(each.flag == 'prac') {
+                     items.update({id : each.id, className : "visible"+" "+each.status})
+                     console.log('show')
+                   }
+                  })
+
+                }
+
+            if($(this).attr("id") == 'pat'){
+             items.forEach(function(each){
+                   if(each.flag == 'prac'){
+                     items.update({id : each.id, className : "hide" +" "+ each.status})
+                     console.log('hide prac')
+                     }
+                   if(each.flag == 'pat') {
+                     items.update({id : each.id, className : "visible"+" "+each.status})
+                     console.log('show pat')
+                   }
+                  })
+                }
+
+           if($(this).attr("id") == 'all'){
+             items.forEach(function(each){
+               console.log("hide inactive "+each.status,each.flag)
+               items.update({id : each.id, className : "visible" +" "+ each.status})
+             })
+           }
+
+           }
+
+
+
 
           });
 
      })
 
+     //Event handling for checkbox
+     $('#statusCheck').change(function(){
+       var selectedRadio = $('input[type=radio][name=filter]:checked').attr('id')
+       if(this.checked){
+         if(selectedRadio == 'pat'){
+           items.forEach(function(each){
+             if(each.sflag == "inactive" && each.flag == "pat"){
+             items.update({id : each.id, className : "hide" +" "+ each.status})
+           }
+           })
+         }
+         if(selectedRadio == 'prac'){
+           items.forEach(function(each){
+             if(each.sflag == "inactive" && each.flag == "prac"){
+             items.update({id : each.id, className : "hide" +" "+ each.status})
+           }
+           })
+         }
+         else{
+           items.forEach(function(each){
+             if(each.sflag == "inactive"){
+             items.update({id : each.id, className : "hide" +" "+ each.status})
+              }
+           })
+         }
+       }
+       else{
+         if(selectedRadio == 'pat'){
+           items.forEach(function(each){
+             if(each.sflag == "inactive" && each.flag == "pat"){
+             items.update({id : each.id, className : "visible" +" "+ each.status})
+           }
+           })
+         }
+         else if(selectedRadio == 'prac'){
+           items.forEach(function(each){
+             if(each.sflag == "inactive" && each.flag == "prac"){
+             items.update({id : each.id, className : "visible" +" "+ each.status})
+           }
+           })
+         }
+         else{
+           items.forEach(function(each){
+             if(each.sflag == "inactive"){
+             items.update({id : each.id, className : "visible" +" "+ each.status})
+              }
+           })
+         }
+       }
+      });
+
+      //tooltips
+
+      $(document).on("mouseover",".vis-item", function (){
+        var test = $(this).text()
+        items.forEach(function(each){
+          if(each.content == test){
+          console.log(each)
+          $("#medTitle").text(each.content)
+          $("#source").text("Source : "+each.source)
+          $("#dose").text("Dose : "+each.dosageQuantity)
+          $("#status").text("Status : "+each.sflag)
+        }
+        })
+        //console.log($(this).next('div').text())
+        console.log($('.custom-tip').children())
+        var content = $('.custom-tip').children()[1].innerHTML+"<br>"+$('.custom-tip').children()[3].innerHTML
+        +"<br>"+$('.custom-tip').children()[5].innerHTML
+        var title = $('.custom-tip').children()[0].innerHTML
+
+        $(this).qtip({
+            content: {
+              title: title,
+              text: content
+            },
+            show: 'click',
+            style: {
+              classes: 'myCustomClass'
+            },
+            position: {
+                target: 'mouse'
+              }
+        });
+      })
 
 
    });
 
 
-   /*Update function*/
-function update_timeline(selection,action,tItems){
-  if(selection == 'prac' || selection == 'pat'){
-   tItems.forEach(function(each){
-         if(each.flag == selection){
-           tItems.update({id : each.id, className : action})
-                        }
-          selected = selection
-        })
-  }
-  else{
-    tItems.forEach(function(each){
-            tItems.update({id : each.id, className : action})
-           selected = selection
-         })
-  }
-}
+
+
+
+
+
+  /* Go through encounters */
+  console.log('on encounters');
+  smart.patient.api.fetchAllWithReferences({type: "Encounter"}).then(function(results) {
+    results.forEach(function(statement){
+      encounterId_Locations[statement.id] = statement['location'][0]['location']['display'];
+    });
+  });
+
+  console.log(encounterId_Locations);
 
 
 
@@ -272,7 +402,7 @@ function update_timeline(selection,action,tItems){
 	}
      });
    });*/
-
+ 
   $.when(pt, obv, cond, meds).fail(onError);
   $.when(pt, obv, cond, meds).done(
     function(patient, obv, conditions, prescriptions) {
@@ -292,27 +422,43 @@ function update_timeline(selection,action,tItems){
 
       $("#Patient_Name").text(
         titleCase(fname) + ' ' + titleCase(lname)
-      );        
- 
-      /* Get Patient Gender */
-      $("#gender_text").text(
-        titleCase(patient['gender'])          
       );
+
+      /* Get Patient Gender */
+	  var pGender = 'N/A';
+	  if(typeof patient['gender'] !== 'undefined') {
+		  pGender = patient['gender'];
+		  $("#gender_text").text(
+			titleCase(pGender)
+		  );
+	  } else {
+		  $("#gender_text").text(pGender);
+	  }
+
 
       /* Hispanic or Latino? */
 
-      $("#hisp_or_lat_text").text(patient['extension'][1]['extension'][1].valueString);
+      //$("#hisp_or_lat_text").text(patient['extension'][1]['extension'][1].valueString);
 
 
       /* Get Patient Marital Status */
-      $("#married_text").text(
-        titleCase(patient['maritalStatus'].text)
-      );
-
+	  var pMStatus = 'N/A';
+	  if(typeof patient['maritalStatus'] !== 'undefined') {
+		  pMStatus = patient['maritalStatus'];
+		  $("#married_text").text(
+			titleCase(pMStatus.text)
+		  );
+	  } else {
+		  $("#married_text").text(
+			pMStatus
+		  );
+	  }
+      
+    
 
       /* Get Patient Birth Date and Age*/
       var dob = new Date(patient['birthDate']);
-      var day = dob.getDate();
+      var day = dob.getDate(); 
       var monthIndex = dob.getMonth() + 1;
       var year = dob.getFullYear();
 
@@ -331,8 +477,10 @@ function update_timeline(selection,action,tItems){
 
       var dobStr = monthIndex + "/" + day + '/' + year;
       //console.log(dobStr);
-
-      $("#dob_age_text").text(dobStr + " (" + age + "Y)");
+		
+	  $('#dob_text').text(dobStr);
+	  $('#age_text').text(age);
+      //$("#dob_age_text").text(dobStr + " (" + age + "Y)");
 
 
       /* Get Patient Address */
@@ -344,7 +492,7 @@ function update_timeline(selection,action,tItems){
         (fullAddress)
       );
 
-      function normalize(phone) {
+/*       function normalize(phone) {
         //normalize string and remove all unnecessary characters
         phone = phone.replace(/[^\d]/g, "");
         //check if number length equals to 10
@@ -359,7 +507,7 @@ function update_timeline(selection,action,tItems){
 
       $("#home_phone_text").text(
         (phoneNum)
-      );
+      ); */
 
       /* Print statuses for diabetes and hypertension */
       console.log("Diabetes: " + isDiabetic);
@@ -378,75 +526,128 @@ function update_timeline(selection,action,tItems){
       }
 
       /* Get Weight */
-      var byCodes = smart.byCodes(obv, 'code');   
+      var byCodes = smart.byCodes(obv, 'code');
       var weight = byCodes('3141-9');
-      $("#weight-text").text(getQuantityValueAndUnit(weight[0]));
-      colorField("#weight-text", weight[0]);
+	  var weightFinal = getQuantityValueAndUnit(weight[0]);
+	  if(weightFinal == '-') {
+			$("#weight-text").text('N/A');
+	  } else {
+		  $("#weight-text").text(weightFinal);
+	  }
+      
 
       /* Get Height */
       var height = byCodes('8302-2');
-      $("#height-text").text(getQuantityValueAndUnit(height[0]));
-	  colorField('#height-text', height[0]);
+	  var heightFinal = getQuantityValueAndUnit(height[0]);
+	  if(heightFinal == '-') {
+		  $("#height-text").text('N/A');
+	  } else {
+		  $("#height-text").text(heightFinal);
+	  }
+      
 
       /* Get BMI */
       var BMI = byCodes('39156-5');
-      $("#bmi-score").text(getQuantityValueAndUnit(BMI[0]));
-      colorField("#bmi-score", BMI[0]);
+	  var BMIFinal = getQuantityValueAndUnit(BMI[0]);
+	  if(BMIFinal == '-') {
+		  $("#bmi-score").text('N/A');
+	  } else {
+		  $("#bmi-score").text(BMIFinal);
+		  colorField("#bmi-score", BMI[0]);
+	  }
+      
 
       /*Get Cholesterol(moles/volume) in Serum*/
       var cholesterol = byCodes('14647-2')
 
       /*Get total HBA1C*/
       var hba1c = byCodes('4548-4')
-      $("#hba1c-score").text(getQuantityValueAndUnit(hba1c[0]));
-      colorField("#hba1c-score", hba1c[0]);
+	  var hba1cFinal = getQuantityValueAndUnit(hba1c[0]);
+	  if(hba1cFinal == '-') {
+		  $("#hba1c-score").text('N/A');
+	  } else {
+		  $("#hba1c-score").text(hba1cFinal);
+		  colorField("#hba1c-score", hba1c[0]);		  
+	  }
+
 
       /*Get total cholesterol*/
       var chol = byCodes('2093-3')
-      $("#chol").text(getQuantityValueAndUnit(chol[0]))
-      console.log(obv)
-      colorField("#chol", chol[0]);
-
+	  var cholFinal = getQuantityValueAndUnit(chol[0]);
+	  if(cholFinal == '-') {
+		  $("#chol").text('N/A');
+	  } else {
+		  $("#chol").text(cholFinal);
+		  colorField("#chol", chol[0]);
+	  }
+      
       /*Get HDL*/
       var hdl = byCodes('2085-9')
-      $("#hdl-score").text(getQuantityValueAndUnit(hdl[0]))
-      colorField("#hdl-score", hdl[0]);
+	  var hdlFinal = getQuantityValueAndUnit(hdl[0]);
+	  if(hdlFinal == '-') {
+		  $("#hdl-score").text('N/A');
+	  } else {
+		  $("#hdl-score").text(hdlFinal);
+		  colorField("#hdl-score", hdl[0]);		  
+	  }
 
-      /*Get HDL*/
-      var ldl = byCodes('13457-7')
-      $("#ldl-score").text(getQuantityValueAndUnit(ldl[0]))
-      colorField("#ldl-score", ldl[0]);
+      /*Get LDL*/
+      var ldl = byCodes('13457-7');
+	  var ldlFinal = getQuantityValueAndUnit(ldl[0]);
+	  if(ldlFinal != '-') {
+		  $("#ldl-score").text(ldlFinal);
+		  colorField("#ldl-score", ldl[0]);
+	  } else {
+		  $("#ldl-score").text('N/A');
+	  }
+      
 
       /*Get Glucose [Mass/volume] in serum or plasma*/
-      var gluc = byCodes('2345-7')
-      $("#gluc-score").text(getQuantityValueAndUnit(gluc[0]))
-      colorField("#gluc-score", gluc[0]);
+      var gluc = byCodes('2345-7');
+	  var glucFinal = getQuantityValueAndUnit(gluc[0]);
+	  if(glucFinal == '-') {
+		  $("#gluc-score").text('N/A');
+	  } else {
+		  $("#gluc-score").text(glucFinal);
+		  colorField("#gluc-score", gluc[0]);	  
+	  }
+
 
       /*Get Systolic Blood Pressure*/
-      var sbp = byCodes('8480-6')
-      $("#sbp-text").text(getQuantityValueAndUnit(sbp[0]))
-      colorField("#sbp-text", sbp[0]);
+      var sbp = byCodes('8480-6');
+	  var sbpFinal = getQuantityValueAndUnit(sbp[0]);
+	  if(sbpFinal == '-') {
+	     $("#sbp-text").text('N/A');
+	  } else {
+		 $("#sbp-text").text(sbpFinal);
+		 colorField("#sbp-text", sbp[0]);
+	  }
 
       /*Get Diastolic Blood Pressure*/
       var dbp = byCodes('8462-4')
-      $("#dbp-text").text(getQuantityValueAndUnit(dbp[0]))
-      colorField("#dbp-text", dbp[0]);
-	    
-	  var address = fullAddress; 
+	  var dbpFinal = getQuantityValueAndUnit(dbp[0]);
+	  if(dbpFinal == '-') {
+	      $("#dbp-text").text('N/A');
+	  } else {
+		  $("#dbp-text").text(dbpFinal);
+		  colorField("#dbp-text", dbp[0]);		  
+	  }
+
+	  var address = fullAddress;
       var queryType = "Groceries";
       pat_addr = fullAddress;
-	  
+
 	  /* Fill out all plot data global variables we will use */
-	  height_plot_data = populatePlotData(height);
-	  weight_plot_data = populatePlotData(weight);
-	  bmi_plot_data = populatePlotData(BMI);
-	  glucose_plot_data = populatePlotData(gluc);
-	  hba1c_plot_data = populatePlotData(hba1c);
-	  bp_plot_data = populatePlotData({});
-	  totChol_plot_data = populatePlotData(chol);
-	  hdl_plot_data = populatePlotData(hdl);
-	  ldl_plot_data = populatePlotData(ldl);
-	  
+	  height_plot_data = populatePlotData(height, false);
+	  weight_plot_data = populatePlotData(weight, false);
+	  bmi_plot_data = populatePlotData(BMI, true);
+	  glucose_plot_data = populatePlotData(gluc, true);
+	  hba1c_plot_data = populatePlotData(hba1c, true);
+	  bp_plot_data = populatePlotData({}, true);
+	  totChol_plot_data = populatePlotData(chol, true);
+	  hdl_plot_data = populatePlotData(hdl, true);
+	  ldl_plot_data = populatePlotData(ldl, true);
+
     }
   )
 }
@@ -457,19 +658,31 @@ function onError() {
 }
 
 /* Helper function to populate the structs we need for the deepdive cards */
-function populatePlotData(data) {
-	td = {Value: [], Date: [], EncounterID: [], headers: [], colors: []};
+function populatePlotData(data, needColor) {
+	td = {Value: [], Date: [], Method: [], Location: [], headers: [], colors: []};
 	gd = {values: [], refHi: [], refLo: [], dates: [], units: []};
-	
+
 	for(i = 0; i < data.length; i++) {
-		
+
 		/* Push Table Data */
 		td['Value'].push(getQuantityValueAndUnit(data[i]));
 		var tDate = getDate(data[i]);
 		td['Date'].push(tDate.substring(0,10));
-		td['EncounterID'].push(data[i]['encounter']['reference'].replace('Encounter/', ''));
-		td['colors'].push(getColor(data[i])[1]);
 		
+		if(needColor) {
+			td['colors'].push(getColor(data[i])[1]);
+		}
+		else {
+			td['colors'].push('none');
+		}
+
+		// Use our encounter dictionary to find out where the encounter occured
+		var encounter_num = parseInt(data[i]['encounter']['reference'].replace('Encounter/', ''));
+		td['Location'].push(encounterId_Locations[encounter_num]);
+
+		// Try to get method
+		td['Method'].push(getMethod(data[i]));
+
 		/* Push Graph Data */
 		gd['values'].push(getValue(data[i]));
 		gd['refHi'].push(getRefHi(data[i]));
@@ -477,9 +690,9 @@ function populatePlotData(data) {
 		gd['dates'].push(new Date(tDate));
 		gd['units'].push(getUnits(data[i]));
 	}
-	
-	td['headers'] = ['Value', 'Date', 'EncounterID']
-	
+
+	td['headers'] = ['Value', 'Date', 'Method', 'Location'];
+	console.log(td);
 	return {tableData: td, graphData: gd};
 }
 
@@ -515,6 +728,16 @@ function calculateAge(date) {
   }
 }
 
+/* Helper Function to Get Method of Observation */
+function getMethod(ob) {
+	if (typeof ob != 'undefined' &&
+		typeof ob.method != 'undefined') {
+			return ob.method;
+	} else {
+		return '-'
+	}
+}
+
 /* Helper Function to Get Quantity Value/Units for a Given Observation */
 function getQuantityValueAndUnit(ob) {
   if (typeof ob != 'undefined' &&
@@ -525,17 +748,17 @@ function getQuantityValueAndUnit(ob) {
   } else {
     return '-';
   }
-}
-
-/* Helper function to get value */
-function getValue(ob) {
+}  
+ 
+/* Helper function to get value */   
+function getValue(ob) { 
 	if(typeof ob != 'undefined' &&
 	   typeof ob.valueQuantity != 'undefined' &&
 	   typeof ob.valueQuantity.value != 'undefined') {
-		   return ob.valueQuantity.value;
-   } else {
-	   return undefined;
-   }
+		   return ob.valueQuantity.value;        
+   } else {  
+	   return undefined;  
+   }             
 }
 
 /* Helper function to get dates */
@@ -558,7 +781,7 @@ function getRefHi(ob) {
 		   return ob.referenceRange[0].high.value;
    } else {
 	   return undefined;
-   } 
+   }
 }
 
 /* Helper function to get reflo */
@@ -571,7 +794,7 @@ function getRefLo(ob) {
 		   return ob.referenceRange[0].low.value;
    } else {
 	   return undefined;
-   } 
+   }
 }
 
 /* Helper function to get units */
@@ -580,11 +803,11 @@ function getUnits(ob) {
 	   typeof ob.valueQuantity != 'undefined' &&
 	   typeof ob.valueQuantity.code != 'undefined') {
 		   return ob.valueQuantity.code;
-   } else {
+   } else { 
 	   return undefined;
    }
-}
-
+}   
+   
 function getColor(ob) {
   if (typeof ob != 'undefined' &&
       typeof ob.valueQuantity != 'undefined' &&
@@ -593,22 +816,22 @@ function getColor(ob) {
       typeof ob['referenceRange'][0]['high'] != 'undefined' &&
       typeof ob['referenceRange'][0]['high']['value'] != 'undefined' &&
       typeof ob['referenceRange'][0]['low'] != 'undefined' &&
-      typeof ob['referenceRange'][0]['low']['value'] != 'undefined') 
-	  
+      typeof ob['referenceRange'][0]['low']['value'] != 'undefined')
+
   {
         var color = d3.scale.linear().domain([ob['referenceRange'][0]['low']['value'], ob['referenceRange'][0]['high']['value']])
 			.interpolate(d3.interpolateHcl)
 			.range([d3.rgb('#4CBB17'), d3.rgb("#C21807")]);
-	
+
 		if (ob.valueQuantity.value > ob['referenceRange'][0]['high']['value']) {
-		  var value_color = color(ob['referenceRange'][0]['high']['value']);
-		} 
-		else if (ob.valueQuantity.value < ob['referenceRange'][0]['low']['value']) {
-		  var value_color = color(ob['referenceRange'][0]['low']['value']);
+		  var value_color = "#C21807";
 		}
-		else {    
-		  var value_color = color(ob.valueQuantity.value);
-		}     
+		else if (ob.valueQuantity.value < ob['referenceRange'][0]['low']['value']) {
+		  var value_color = "#C21807";
+		}
+		else {
+		  var value_color = 'none';//color(ob.valueQuantity.value);
+		}
 		return [true, value_color];
   }
   else {
@@ -700,11 +923,11 @@ test= [
     data: [1,6, 3, 10, 5, 8, 3,2,12],
     pointPlacement: 'on'
 },
-{
+{ 
     name: 'Purchase period 3',
     data: [9,9, 8, 10, 6, 9, 7,8,7],
     pointPlacement: 'on'
-},
+},  
 {
     name: 'Reference',
     data: [10,10, 10, 10, 10, 10, 10,10,20],

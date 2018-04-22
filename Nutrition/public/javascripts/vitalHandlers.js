@@ -2,8 +2,8 @@
 var height_i = false;
 var weight_i = false;
 var bmi_i = false;
-var glucose_i = false;
-var hba1c_i = false;
+var glucose_i = false;     
+var hba1c_i = false;     
 var bp_i = false;
 var tchol_i = false;
 var hdl_i = false;
@@ -11,15 +11,31 @@ var ldl_i = false;
 
 /* Generic create the card */
 function createCard(id) {
-	/* Create card itself */
-	var drawdownCard = d3.select('#summary')
-						 .append('div')
-							.attr('class', 'card')
-							.attr('id', id);
+	/* Create the card itself */ 
+	
+	/* Figure out where to put the next card 
+	 * (It goes immediately after the parent)
+	 */
+	var parentEl = d3.select("#summary").node();
+	var childEl = parentEl.childNodes;
+	var parentIndex = 0;
+	for(i = 0; i < childEl.length; i++) {
+		if(childEl[i]['id']=='VitalCard') {
+			parentIndex = i;
+			break;
+		}
+	}
+	var newCard = document.createElement('div');
+	newCard.setAttribute('class', 'card');
+	newCard.setAttribute('id', id);
+	parentEl.insertBefore(newCard, parentEl.childNodes[parentIndex+1]);
+	
+	var drawdownCard = d3.select('#'+id);
 						 
 	/* Create the card container */
 	var drawdownContainer = drawdownCard.append('div')
-											.attr('id', 'container');
+											.attr('id', 'container')
+											.attr('class', 'movable');
 											
 	/* Create the card body */
 	var cardBody = drawdownContainer.append('div')
@@ -39,10 +55,6 @@ function createTitleBurger(cardBody, title) {
 	       .attr('id', title)
 		   .attr('style', 'cursor: pointer')
 	       .text(title);
-
-	row.append('div') 
-	       .attr('class', 'glyphicon glyphicon-menu-hamburger pull-right card-hamburger')
-	       .attr('aria-hidden', 'true');
 }
  
 /* Generic create card sides/divisions */
@@ -110,11 +122,71 @@ function createPlot(side, data, cardName) {
 	height = height - margin.top - margin.bottom;
 	
 	// Set y axis scales
-	var y_minmax_act = math.min(pData['values']);
-	var y_min_ref = math.min(pData['refLo']);
-	var y_max_ref = math.max(pData['refHi']);
-	var y_min = math.min(y_minmax_act, y_min_ref);
-	var y_max = math.max(y_minmax_act, y_max_ref);
+	var y_min_act;
+	var y_max_act;
+	var y_min_ref;
+	var y_max_ref;
+	var y_min;
+	var y_max;
+	
+	try { 
+		y_min_act = math.min(pData['values']);
+	} 
+	catch (err) {
+		y_min_act = undefined;
+	}
+	
+	try {
+		var y_max_act = math.max(pData['values']);
+	}
+	catch (err) {
+		y_max_act = undefined;
+	}
+	
+	try {
+		var y_min_ref = math.min(pData['refLo']);
+	}
+	catch (err) {
+		y_min_ref = undefined;
+	}
+	
+	try {
+		var y_max_ref = math.max(pData['refHi']);
+	} catch (err) {
+		y_max_ref = undefined;
+	}
+	
+	if(y_min_act != undefined && y_min_ref != undefined) {
+		y_min = math.min(y_min_act, y_min_ref);
+	} 
+	else if (y_min_act != undefined) {
+		y_min = y_min_act;
+	} 
+	else if (y_min_ref != undefined) {
+		y_min = y_min_ref;
+	} 
+	else {
+		y_min = 0;
+	}
+		
+	if(y_max_act != undefined && y_max_ref != undefined) {
+		y_max = math.max(y_max_act, y_max_ref);
+	} 
+	else if (y_max_act != undefined) {
+		y_max = y_max_act;
+	} 
+	else if (y_max_ref != undefined) {
+		y_max = y_max_ref;
+	} 
+	else {
+		y_max = 0;
+	}
+	
+	if(y_min === y_max) {
+		var t_minmax = y_min;
+		y_min = t_minmax - t_minmax;
+		y_max = t_minmax + t_minmax;
+	}
 	
 	y = d3.scale.linear()
 				.domain([y_min, y_max])
@@ -214,11 +286,9 @@ function createPlot(side, data, cardName) {
 }
 
 function heightHandler() {
-	
+	var cardId = 'heightDrawdown';
+	var cardTitle = 'Height';
 	if(!height_i) {
-	
-		var cardId = 'heightDrawdown';
-		var cardTitle = 'Height';
 		
 		/* Create the card */
 		cardBody = createCard(cardId);
@@ -242,15 +312,16 @@ function heightHandler() {
 			document.getElementById(cardId).remove();
 			height_i = !height_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		height_i = !height_i;
 	}
 }
 
 function weightHandler() {
-	
+	var cardId = 'weightDrawdown';
+	var cardTitle = 'Weight';
 	if(!weight_i) {
-		
-		var cardId = 'weightDrawdown';
-		var cardTitle = 'Weight';
 		
 		/* Create the card */
 		cardBody = createCard(cardId);
@@ -274,15 +345,16 @@ function weightHandler() {
 			document.getElementById(cardId).remove();
 			weight_i = !weight_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		weight_i = !weight_i;
 	}
 }
 
 function bmiHandler() {
-	
+	var cardId = 'bmiDrawdown';
+	var cardTitle = 'BMI';
 	if(!bmi_i) {
-	
-		var cardId = 'bmiDrawdown';
-		var cardTitle = 'BMI';
 		
 		/* Create the card */
 		cardBody = createCard(cardId);
@@ -306,15 +378,16 @@ function bmiHandler() {
 			document.getElementById(cardId).remove();
 			bmi_i = !bmi_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		bmi_i = !bmi_i;
 	}
 }
 
 function glucoseHandler() {
-	
+	var cardId = 'glucoseDrawdown';
+	var cardTitle = 'Glucose';
 	if(!glucose_i) {
-	
-		var cardId = 'glucoseDrawdown';
-		var cardTitle = 'Glucose';
 		
 		/* Create the card */
 		cardBody = createCard(cardId);
@@ -338,15 +411,16 @@ function glucoseHandler() {
 			document.getElementById(cardId).remove();
 			glucose_i = !glucose_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		glucose_i = !glucose_i;
 	}
 }
 
 function hba1cHandler() {
-	
+	var cardId = 'hba1cDrawdown';
+	var cardTitle = 'HbA1c';
 	if(!hba1c_i) {
-	
-		var cardId = 'hba1cDrawdown';
-		var cardTitle = 'HbA1c';
 		
 		/* Create the card */
 		cardBody = createCard(cardId);
@@ -370,16 +444,17 @@ function hba1cHandler() {
 			document.getElementById(cardId).remove();
 			hba1c_i = !hba1c_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		hba1c_i = !hba1c_i;
 	}
 }
 
 function bpHandler() {
-	
+	var cardId = 'bpDrawdown';
+	var cardTitle = 'Blood Pressure';
 	if(!bp_i) {
-	
-		var cardId = 'bpDrawdown';
-		var cardTitle = 'Blood Pressure';
-		
+			
 		/* Create the card */
 		cardBody = createCard(cardId);
 		bp_i = !bp_i;
@@ -402,15 +477,16 @@ function bpHandler() {
 			document.getElementById(cardId).remove();
 			bp_i = !bp_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		bp_i = !bp_i;
 	}
 }
 
 function cholHandler() {
-	
+	var cardId = 'cholDrawdown';
+	var cardTitle = 'Total Cholesterol';
 	if(!tchol_i) {
-	
-		var cardId = 'cholDrawdown';
-		var cardTitle = 'Total Cholesterol';
 		
 		/* Create the card */
 		cardBody = createCard(cardId);
@@ -434,15 +510,16 @@ function cholHandler() {
 			document.getElementById(cardId).remove();
 			tchol_i = !tchol_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		tchol_i = !tchol_i;
 	}
 }
 
 function hdlHandler() {
-	
+	var cardId = 'hdlDrawdown';
+	var cardTitle = 'HDL';
 	if(!hdl_i) {
-	
-		var cardId = 'hdlDrawdown';
-		var cardTitle = 'HDL';
 		
 		/* Create the card */
 		cardBody = createCard(cardId);
@@ -466,15 +543,16 @@ function hdlHandler() {
 			document.getElementById(cardId).remove();
 			hdl_i = !hdl_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		hdl_i = !hdl_i;
 	}
-} 
-
+}  
+ 
 function ldlHandler() {
-	
+	var cardId = 'ldlDrawdown';
+	var cardTitle = 'LDL';
 	if(!ldl_i) {
-	
-		var cardId = 'ldlDrawdown';
-		var cardTitle = 'LDL';
 		
 		/* Create the card */
 		cardBody = createCard(cardId);
@@ -498,5 +576,8 @@ function ldlHandler() {
 			document.getElementById(cardId).remove();
 			ldl_i = !ldl_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		ldl_i = !ldl_i;
 	}
 } 
