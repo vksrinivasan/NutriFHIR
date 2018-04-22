@@ -4,7 +4,7 @@ var ahei;
 var dash; 
 var nutrisavings;
 var x;
-var y;
+var y; 
 var margin;   
  
 // Keep track of whether user has clicked particular metric
@@ -17,18 +17,37 @@ var dash_i = false;
 var nutrisavings_i = false; 
 
 var showingSpider = false;
+var monitorSpider = false;
 
 /* Generic create the card */
-function dietCreateCard(id) {
-	/* Create card itself */
-	var drawdownCard = d3.select('#DietChart')
-						 .append('div')
-							.attr('class', 'card')
-							.attr('id', id);
-						 
+function dietCreateCard(id) { 
+	 
+	/* Create the card itself */
+	 
+	/* Figure out where to put the next card 
+	 * (It goes immediately after the parent)
+	 */
+	var parentEl = d3.select("#summary").node();
+	var childEl = parentEl.childNodes;
+	var parentIndex = 0;
+	for(i = 0; i < childEl.length; i++) {
+		if(childEl[i]['id']=='DietCard') {
+			parentIndex = i;
+			break;
+		}
+	} 
+	var newCard = document.createElement('div');
+	newCard.setAttribute('class', 'card');
+	newCard.setAttribute('id', id);
+	parentEl.insertBefore(newCard, parentEl.childNodes[parentIndex+1]);
+	
+	var drawdownCard = d3.select('#'+id);
+	
+				  		 
 	/* Create the card container */
 	var drawdownContainer = drawdownCard.append('div')
-											.attr('id', 'container');
+											.attr('id', 'container')
+											.attr('class', 'movable');
 											
 	/* Create the card body */
 	var cardBody = drawdownContainer.append('div')
@@ -53,8 +72,10 @@ function dietCreateTitleBurger(cardBody, title) {
 /* Generic create card sides/divisions */
 function dietCreateSide(cardBody, perc, side) {
 	var side = cardBody.append('div')
-							.attr('style', 'float:' + side + '; width: ' + perc);
-	return side;
+			.attr('style', 'float:' + side + '; width: ' + perc)
+			.style("overflow", "auto")
+			.style("height", "100px");
+	return side; 
 }
 
 /* Generic plot data */
@@ -72,7 +93,7 @@ function dietCreatePlot(side, data, cardName) {
 	var height = height - margin.top - margin.bottom;
 
 	y_min = 0; //math.min(math.min(arr_metrics[i]['percentage']), y_min);
-	y_max = 100; //math.max(math.max(arr_metrics[i]['percentage']), y_max);
+	y_max = math.max(data['ideal']);
 
 	var x_min = new Date(Math.min.apply(null, data['date']));
 
@@ -131,15 +152,28 @@ function dietCreatePlot(side, data, cardName) {
 	
 	// Plot Actual Data
  	var plotVals = [];
+	var idealVals = [];
 	for(j = 0; j < data['date'].length; j++) {
-		plotVals.push([data['date'][j], data['percentage'][j]]);
+		plotVals.push([data['date'][j], data['sum'][j]]);
+		idealVals.push([data['date'][j], data['ideal'][j]]);
 	}
 	svg.append("path")
 		.attr('d', lineFunc(plotVals))
-		.attr('stroke', data['color'])
+		.attr('stroke', 'steelblue')
 		.attr('stroke-width', 2)
 		.attr('fill', 'none')
 		.attr('id', data['name']);
+	
+	svg.append("path")
+	   .attr('d', lineFunc(plotVals))
+	   .attr('class', 'pathActual');
+
+	svg.append("path")
+		.attr('d', lineFunc(idealVals))
+		.attr('stroke', 'red')
+		.attr('stroke-width', 2)
+		.attr('fill', 'none')
+		.attr('id', data['name'] + " ideal");
 	
 	svg.append("path")
 	   .attr('d', lineFunc(plotVals))
@@ -152,7 +186,7 @@ function dietCreatePlot(side, data, cardName) {
         .attr("text-anchor", "middle")
 		.attr("font-family", "sans-serif")
         .style("font-size", "15px")
-        .text("Eating Index (percentage of ideal) v. Time");
+        .text(data['name'] + " score v. Time");
 
 	// Add y-axis
     	svg.append("text")
@@ -163,7 +197,7 @@ function dietCreatePlot(side, data, cardName) {
 		.style("text-anchor", "middle")
 		.style("font-family", "sans-serif")
 		.style("font-size", 12)
-		.text("Eating Index (percentage of ideal)");
+		.text(data['name'] + " score");
 	   
 	
 	// Plot scatter plot circles
@@ -183,13 +217,54 @@ function dietCreatePlot(side, data, cardName) {
 	   
 }
 
+/* Generic create table */
+function dietCreateTable(side, data) {
+	var tableBody = side.append('table')
+			.attr('class', 'deepDiveTable')
+			.append('tbody');
+	
+	dietCreateTableHeader(tableBody, data['tableData']['headers']);
+	dietPopulateTable(tableBody, data['tableData']);
+}
+
+/* Generic create table header */
+function dietCreateTableHeader(tableBody, headers) {
+	var tableRow = tableBody.append('tr');
+	for(i = 0; i < headers.length; i++) {
+		tableRow.append('th')
+					.attr('class', 'deepDiveTableLabel')
+					.text(headers[i]);
+	}
+}
+
+/* Generic populate table */
+function dietPopulateTable(tableBody, data) {
+	for(i = 0; i < data['Date'].length; i++) {
+		var tempTableRow = tableBody.append('tr');
+		
+		for(j = 0; j < data['headers'].length; j++) {
+			if(data['headers'][j] === 'Value') {
+				tempTableRow.append('th')
+							.attr('class', 'deepDiveTableLabel')
+							.attr('nowrap', 'nowrap')
+							.style('color', data['colors'][i])
+							.text(data[data['headers'][j]][i].toFixed(1));
+			} else {
+				tempTableRow.append('th')
+								.attr('class', 'deepDiveTableLabel')
+								.attr('nowrap', 'nowrap')
+								.style('color', '#000000')
+								.text(data[data['headers'][j]][i]);
+			}
+		}
+	}
+}
+
 /* HEI listeners */
 function heiHandler_click() {
-	
+	var cardId = 'heiDrawdown';
+	var cardTitle = 'HEI';
 	if(!hei_i) {
-	
-		var cardId = 'heiDrawdown';
-		var cardTitle = 'HEI';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -202,6 +277,9 @@ function heiHandler_click() {
 		var lhs = dietCreateSide(cardBody, '100%', 'left');
 		var rhs = dietCreateSide(cardBody, '0%', 'right');
 		
+		/* Add LHS Table */
+		dietCreateTable(lhs, hei);		
+		 
 		/* Add RHS Plot */
 		dietCreatePlot(rhs, hei, '#'+cardId);
 		plotScatter(hei, '#'+cardId);
@@ -216,15 +294,17 @@ function heiHandler_click() {
 				showingSpider = false;
 			}
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		hei_i = !hei_i;
 	}
 }
 
 /* AHEI Listeners */
 function aheiHandler_click() {
+	var cardId = 'aheiDrawdown';
+	var cardTitle = 'AHEI';
 	if(!ahei_i) {
-	
-		var cardId = 'aheiDrawdown';
-		var cardTitle = 'AHEI';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -236,6 +316,9 @@ function aheiHandler_click() {
 		/* Add sides */
 		var lhs = dietCreateSide(cardBody, '100%', 'left');
 		var rhs = dietCreateSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		dietCreateTable(lhs, ahei);		
 		
 		/* Add RHS Plot */
 		dietCreatePlot(rhs, ahei, '#'+cardId);
@@ -251,14 +334,16 @@ function aheiHandler_click() {
 				showingSpider = false;
 			}
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		ahei_i = !ahei_i;
 	}
 }
 
 function dashHandler_click() {
+	var cardId = 'dashDrawdown';
+	var cardTitle = 'DASH';
 	if(!dash_i) {
-	
-		var cardId = 'dashDrawdown';
-		var cardTitle = 'DASH';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -270,6 +355,9 @@ function dashHandler_click() {
 		/* Add sides */
 		var lhs = dietCreateSide(cardBody, '100%', 'left');
 		var rhs = dietCreateSide(cardBody, '0%', 'right');
+		
+		/* Add LHS Table */
+		dietCreateTable(lhs, dash);	
 		
 		/* Add RHS Plot */
 		dietCreatePlot(rhs, dash, '#'+cardId);
@@ -285,14 +373,16 @@ function dashHandler_click() {
 				showingSpider = false;
 			}
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		dash_i = !dash_i;
 	}
 }
 
 function nutrisavingsHandler_click() {
+	var cardId = 'nutrisavingsDrawdown';
+	var cardTitle = 'NutriSavings';
 	if(!nutrisavings_i) {
-	
-		var cardId = 'nutrisavingsDrawdown';
-		var cardTitle = 'NutriSavings';
 		
 		/* Create the card */
 		cardBody = dietCreateCard(cardId);
@@ -305,6 +395,9 @@ function nutrisavingsHandler_click() {
 		var lhs = dietCreateSide(cardBody, '100%', 'left');
 		var rhs = dietCreateSide(cardBody, '0%', 'right');
 		
+		/* Add LHS Table */
+		dietCreateTable(lhs, nutrisavings);	
+		
 		/* Add RHS Plot */
 		dietCreatePlot(rhs, nutrisavings, '#'+cardId);
 		
@@ -313,6 +406,9 @@ function nutrisavingsHandler_click() {
 			document.getElementById(cardId).remove();
 			nutrisavings_i = !nutrisavings_i;
 		});
+	} else {
+		document.getElementById(cardId).remove();
+		nutrisavings_i = !nutrisavings_i;
 	}
 }
 
@@ -407,9 +503,67 @@ function populateDietaryData() {
 	nutrisavings['name'] = 'NutriSavings';
 	nutrisavings['color'] = "#DB2354";
 
+	/* Get table data */
+	hei_table = {}
+	hei_table['Value'] = hei['sum'];
+	hei_table['Ideal'] = Array(hei['sum'].length).fill(100);
+	hei_table['Date'] = genDateStr(hei['date']);
+	hei_table['Source'] = Array(hei['sum'].length).fill('Self-Reported');
+	hei_table['colors'] = createDietColors(hei_table['Value'], hei_table['Ideal']);
+	hei['tableData'] = hei_table;
+	hei['tableData']['headers'] = ['Value', 'Date', 'Source'];
+	
+	ahei_table = {}
+	ahei_table['Value'] = ahei['sum'];
+	ahei_table['Ideal'] = Array(ahei['sum'].length).fill(87.5);
+	ahei_table['Date'] = genDateStr(ahei['date']);
+	ahei_table['Source'] = Array(ahei['sum'].length).fill('Self-Reported');
+	ahei_table['colors'] = createDietColors(ahei_table['Value'], ahei_table['Ideal']);
+	ahei['tableData'] = ahei_table;
+	ahei['tableData']['headers'] = ['Value', 'Date', 'Source'];
+	
+	dash_table = {}
+	dash_table['Value'] = dash['sum'];
+	dash_table['Ideal'] = Array(dash['sum'].length).fill(9);
+	dash_table['Date'] = genDateStr(dash['date']);
+	dash_table['Source'] = Array(dash['sum'].length).fill('Self-Reported');
+	dash_table['colors'] = createDietColors(dash_table['Value'], dash_table['Ideal']);
+	dash['tableData'] = dash_table;
+	dash['tableData']['headers'] = ['Value', 'Date', 'Source'];
+	
+	nutrisavings_table = {}
+	nutrisavings_table['Value'] = nutrisavings['sum'];
+	nutrisavings_table['Ideal'] = Array(nutrisavings['sum'].length).fill(100);
+	nutrisavings_table['Date'] = genDateStr(nutrisavings['date']);
+	nutrisavings_table['Source'] = Array(nutrisavings['sum'].length).fill('Kroger');
+	nutrisavings_table['colors'] = createDietColors(nutrisavings_table['Value'], nutrisavings_table['Ideal']);
+	nutrisavings['tableData'] = nutrisavings_table;
+	nutrisavings['tableData']['headers'] = ['Value', 'Date', 'Source'];
+	
 	/* Plot Percentages */
 	//plotPercentages([hei,ahei,dash]);
 
+}
+
+function createDietColors(values, ideal) {
+	retColors = [];
+	for(i = 0; i < values.length; i++) {
+		if(values[i]/ideal[i] < 0.7) {
+			retColors.push('#C21807');
+		} else {
+			retColors.push('');
+		}
+	}
+	return retColors;
+}
+
+function genDateStr(dates) {
+	retDates = [];
+	for(i = 0; i < dates.length; i++) {
+		var tempDate = dates[i].toLocaleString();
+		retDates.push(tempDate.split(',')[0]);
+	}
+	return retDates;
 }
 
 function clearScatter(cardId) {
@@ -424,13 +578,13 @@ function plotScatter(scoreObj, cardId) {
 	// Put the data for this sore in an easy to use object
 	var plotVals = []
 	for(i = 0; i < scoreObj['date'].length; i++) {
-		plotVals.push([i, scoreObj['date'][i], scoreObj['percentage'][i], scoreObj]);
+		plotVals.push([i, scoreObj['date'][i], scoreObj['sum'][i], scoreObj]);
 	}
 
 	var tool_tip = d3.tip()
 	  .attr("class", "d3-tip")
-	  .offset([-400, -150])
-	  .html("<div id='tipDiv'></div>");
+	  .offset([-380, -250])
+	  .html("<div id='tipDiv' class='card'></div>");
 
 	var tool_tip_percent = d3.tip()
 	  .attr("class", "d3-tip")
@@ -457,7 +611,7 @@ function plotScatter(scoreObj, cardId) {
 	   })
 	   .attr("transform",
 				  "translate(" + margin.left + "," + margin.top + ")")
-	   .style("fill", scoreObj['color'])
+	   .style("fill", 'steelblue')
 	   .style("cursor", 'pointer')
 	   .on('click', function(d) {
 		if (!showingSpider) {
@@ -473,10 +627,12 @@ function plotScatter(scoreObj, cardId) {
 
 			createSpider(tipSVG, d[0], d[3]);
 			showingSpider = true;
+			monitorSpider = false;
 		}
 		else {
 			d3.select("#tipDiv").remove();
 			showingSpider = false;
+			monitorSpider = false;
 		}
 
 	    })
@@ -490,11 +646,28 @@ function plotScatter(scoreObj, cardId) {
 					.text(function() {
 						return (d[3]['sum'][i]/d[3]['ideal'][i] * 100).toFixed(2) + "%";  // Value of the text
 					});
+			svg.selectAll("circle").attr("r", 6);
 		})
 
 		.on('mouseout', function(d, i){
 			d3.select("#tipPercentDiv").remove();  // Remove text location
+			svg.selectAll("circle").attr("r", 3);
 		});
+
+	/* monitor for click when spider chart is shown */
+	d3.select("body").on("click",function(){
+		if (showingSpider && monitorSpider) {
+			//console.log("removing spider chart");
+			d3.select("#tipDiv").remove();
+			showingSpider = false;
+			monitoringSpider = false;
+		}
+		else if (showingSpider && !monitorSpider) {
+			//console.log("watching to remove spider chart");
+			monitorSpider = true;
+		}
+	});
+	//monitorSpider = true;
 	/*
 	var borderPath = svg.append("rect")
        			.attr("x", 0)
@@ -509,7 +682,7 @@ function plotScatter(scoreObj, cardId) {
 
 /* Create the spider chart on mouseover */
 function createSpider(toolTip, index, data) {
-	var w = 300,
+	var w = 480,
 		h = 250;
 
 	console.log(data);
@@ -683,15 +856,17 @@ function fillOutScores(actComponentScores, idealComponentScores, date, loc_mrpp,
 	var idealTotal = idealComponentScores.reduce(add, 0.0);
 	var propOfIdeal = actTotal/idealTotal;
 
-	$(loc_mrpp).text("Most Recent Purchase Period (" + date.toDateString() + ")");
-
 	/* We want to have a color scale for the %'s */
-	var color = d3.scale.linear().domain([0.30,0.70])
-								 .interpolate(d3.interpolateHcl)
-								 .range([d3.rgb("#C21807"), d3.rgb('#4CBB17')]);
+	var color = function(value) {
+					if(value < 0.70) {
+						return '#C21807';
+					} else {
+						return '';
+					}
+				}
 
 	var value_color = color(propOfIdeal);
-	$(loc_val).text(String("" + actTotal.toFixed(2) + "/" + idealTotal));
+	$(loc_val).text(String("" + actTotal.toFixed(1) + "/" + idealTotal.toFixed(1)));
 	d3.select(loc_val).style("color",value_color);
 	return value_color;
 }
@@ -817,240 +992,3 @@ function getNutriSavingsData_randomized() {
 	return retStruct;
 }
 
-function plotMap(address, queryType) {
- 
-
-  var map = null;
-  var gmarkers = [];
-  var destMarkers = [];
-  var service = null; 
-  var noAutoComplete = true;
-  var noQuery = true;
-  var initialService = null;
-  var geocoder = new google.maps.Geocoder();
-  var infowindow = new google.maps.InfoWindow({
-    size: new google.maps.Size(100, 30)
-  });
-  var startLoc = new google.maps.LatLng(40.7902778, -73.9597222); // Manhattan, NY
-  var circle = new google.maps.Circle({
-    center: startLoc,
-    radius: 5 * 1609.34, // 10 miles
-    strokeWeight: 2,
-    strokeColor: "black",
-    strokeOpacity: 0.9,
-    fillColor: "red",
-    fillOpacity: 0.15,
-    clickable: false,
-    map: map
-  });
- 
-  function callback(results, status) {
-    if (status == google.maps.places.PlacesServiceStatus.OK) {
-      var places = [];
-      for (var i = 0; i < gmarkers.length; i++) {
-        gmarkers[i].setMap(null);
-      }
-      gmarkers = [];
-
-      for (var i = 0; i < results.length; i++) {
-        var place = results[i];
-        places.push(place);
-        createMarker(results[i]);
-      }
-
-      var marker = new google.maps.Marker({
-          position: startLoc,
-          map: map,
-          
-        });
-
-      map.fitBounds(circle.getBounds());
-      google.maps.event.trigger(map, 'resize');
-      map.panTo(startLoc);
-      //map.setZoom(map.getZoom() + 1);
-      // if (markers.length == 1) map.setZoom(17);
-      var destArray = [];
-      destMarkers = [];
-
-      var minDist = Number.MAX_VALUE;
-
-      var htmlString = "Nearby " + queryType + " : " + "\n" ; 
-
-      for (var i = 0; i < gmarkers.length; i++) {
-        var currDist = google.maps.geometry.spherical.computeDistanceBetween(startLoc, gmarkers[i].getPosition());
-        if (currDist < 5 * 1609.34) { // 1609.34 meters/mile
-
-        	//htmlString = htmlString + "\n" + "\n" +results[i].name + "\n" + results[i].formatted_address +  "(" + Number(Math.round( currDist / 1609.34 +'e2')+'e-2') + " miles away)";
-
-			createTableRows(results[i].name, results[i].formatted_address.split(',')[0]);
-			
-          destArray.push(gmarkers[i].getPosition());
-          destMarkers.push(gmarkers[i]); 
-        }
-      }
-
-      $("#groceryInfo").text(htmlString);
-
-    }   
-  }
-
-  function initialize() {
-		
-    map = new google.maps.Map(document.getElementById('map'), {
-      center: new google.maps.LatLng(40.65, -73.95), // Brooklyn, NY
-      mapTypeId: google.maps.MapTypeId.ROADMAP,
-      streetViewControl: false
-    }); 
-    //circle.setMap(map);
-    service = new google.maps.places.PlacesService(map);
-    initialService = new google.maps.places.PlacesService(map);
-
-
-    geocoder.geocode({
-      'address': address
-    }, function(results, status) {
-      if (status == google.maps.GeocoderStatus.OK) {
-        startLoc = results[0].geometry.location;
-        circle.setCenter(startLoc);
-        var request = {
-          bounds: circle.getBounds(),
-          query: queryType
-        };
-        initialService.textSearch(request, callback);
-      } else {
-        alert("geocode failed:" + status); 
-      }
-    });
- 
-    var groceryCard = document.getElementById('GroceryCardMap');
-    var groceryCardDim = groceryCard.getBoundingClientRect();
-    var height = groceryCardDim.height*3.0;
-    var width = groceryCardDim.width*1.4;
-
-	var svg2 = d3.select("#mapChart")
-		.append("svg")
-		.attr("width", width)
-		.attr("height", height);
-
-	var svg3 = d3.select("#groceryInfo")
-		.append("svg")
-		.attr("width", 0.2*width)
-		.attr("height", 0.7*height);
-
-
-
-  }
-
- 
-  var mapDiv = document.getElementById('mapChart');
-
-  initialize();
-  //google.maps.event.addDomListener(window, 'load', initialize);
-
-  function createMarker(place) {
-    var placeLoc = place.geometry.location;
-    if (place.icon) {  
-      var image = {
-        url: place.icon,
-        // size:new google.maps.Size(71, 71),
-        // origin: new google.maps.Point(0, 0), 
-        // anchor:new google.maps.Point(35, 0),
-        scaledSize: new google.maps.Size(13, 13)
-      };
-    } else var image = null;
-
-    var marker = new google.maps.Marker({
-      map: map,
-      icon: image,
-      position: place.geometry.location
-    });
-    var request = {
-      reference: place.reference
-    };   
-
-    google.maps.event.addListener(marker, 'click', function() {
-      infowindow.marker = marker;
-      service.getDetails(request, function(place, status) { 
-        if (status == google.maps.places.PlacesServiceStatus.OK) {
-          var contentStr = '<h5>' + place.name + '</h5><p>' + place.formatted_address;
-          if (!!place.formatted_phone_number) contentStr += '<br>' + place.formatted_phone_number;
-          if (!!place.website) contentStr += '<br><a target="_blank" href="' + place.website + '">' + place.website + '</a>';
-          contentStr += '<br>' + place.types + '</p>';
-          infowindow.setContent(contentStr + '<input type="button" value="zoom in" onclick="map.setCenter(infowindow.marker.getPosition());map.setZoom(map.getZoom()+1);"/><input type="button" value="zoom out" onclick="map.fitBounds(circle.getBounds());"/>');
-          infowindow.open(map, marker);
-        } else { 
-          var contentStr = "<h5>No Result, status=" + status + "</h5>";
-          infowindow.setContent(contentStr);
-          infowindow.open(map, marker); 
-        }
-      }); 
-    
-    });     
-    
-    gmarkers.push(marker);
-  }       
- 
-}
-
-function plotMarkers() {
-
-	var option = this.options[this.selectedIndex].text;
-	plotMap(pat_addr, option);
-
-}
-
-/* Generic create table rows for Grocery */
-function createTableRows(businessName, streetAddr) {
-	var tableBody = document.getElementById("groceryTableData").getElementsByTagName('tbody')[0];
-	var newRow = tableBody.insertRow(tableBody.rows.length);
-	newRow.className = "groceryTableRow";
-	
-	/* Create space for star */
-	var starCell = newRow.insertCell(0);
-	var starDiv = document.createElement('div');
-	starDiv.setAttribute('style', 'height:20px;width:20px');
-	
-	/* Create empty star */
-	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	svg.setAttribute('width', '100%');
-	svg.setAttribute('height', '100%');
-	svg.setAttribute('viewBox', '0 0 100 100');
-	svg.setAttribute('preserveAspectRatio', 'none');
-	svg.setAttribute('style','background-color: none');
-	
-	starCell.appendChild(starDiv);
-	starDiv.appendChild(svg);
-	
-	var star = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-	star.setAttribute('points', '47.6190476190476,4.76190476190476 19.047619047619,94.2857142857143 90.4761904761905,37.1428571428571 4.76190476190476,37.1428571428571 76.1904761904762,94.2857142857143');
-	star.setAttribute('class', 'star');
-	
-	/* Set the id of the star to be address so we can reference it */
-	star.setAttribute('id', 'A' + streetAddr.split(' ').join('_'));
-	
-	svg.appendChild(star);
-	
-	/* Create space for data */
-	var newCell = newRow.insertCell(1);
-	var bName = document.createTextNode(businessName);
-	var nLine = document.createElement("br");
-	var sAddr = document.createTextNode(streetAddr);
-	newCell.appendChild(bName);
-	newCell.append(nLine);
-	newCell.appendChild(sAddr);
-	
-	var starRef = d3.select('#'+ 'A' + streetAddr.split(' ').join('_'));
-	starRef.on("click", 
-		function(){
-			if(parseFloat(d3.select(this).style('fill-opacity'))==0.3) {
-				d3.select(this).transition().duration(10)
-							   .style('fill', '#ffdd42')
-							   .style('fill-opacity', 1.0);			   
-			} else {
-				d3.select(this).transition().duration(10)
-							   .style('fill', '#C8C8C8')
-							   .style('fill-opacity', 0.3);
-			}
-		}
-	);
-}

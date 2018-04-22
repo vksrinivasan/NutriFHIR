@@ -402,7 +402,7 @@ function onReady(smart) {
 	}
      });
    });*/
-
+ 
   $.when(pt, obv, cond, meds).fail(onError);
   $.when(pt, obv, cond, meds).done(
     function(patient, obv, conditions, prescriptions) {
@@ -425,24 +425,40 @@ function onReady(smart) {
       );
 
       /* Get Patient Gender */
-      $("#gender_text").text(
-        titleCase(patient['gender'])
-      );
+	  var pGender = 'N/A';
+	  if(typeof patient['gender'] !== 'undefined') {
+		  pGender = patient['gender'];
+		  $("#gender_text").text(
+			titleCase(pGender)
+		  );
+	  } else {
+		  $("#gender_text").text(pGender);
+	  }
+
 
       /* Hispanic or Latino? */
 
-      $("#hisp_or_lat_text").text(patient['extension'][1]['extension'][1].valueString);
+      //$("#hisp_or_lat_text").text(patient['extension'][1]['extension'][1].valueString);
 
 
       /* Get Patient Marital Status */
-      $("#married_text").text(
-        titleCase(patient['maritalStatus'].text)
-      );
-
+	  var pMStatus = 'N/A';
+	  if(typeof patient['maritalStatus'] !== 'undefined') {
+		  pMStatus = patient['maritalStatus'];
+		  $("#married_text").text(
+			titleCase(pMStatus.text)
+		  );
+	  } else {
+		  $("#married_text").text(
+			pMStatus
+		  );
+	  }
+      
+    
 
       /* Get Patient Birth Date and Age*/
       var dob = new Date(patient['birthDate']);
-      var day = dob.getDate();
+      var day = dob.getDate(); 
       var monthIndex = dob.getMonth() + 1;
       var year = dob.getFullYear();
 
@@ -461,8 +477,10 @@ function onReady(smart) {
 
       var dobStr = monthIndex + "/" + day + '/' + year;
       //console.log(dobStr);
-
-      $("#dob_age_text").text(dobStr + " (" + age + "Y)");
+		
+	  $('#dob_text').text(dobStr);
+	  $('#age_text').text(age);
+      //$("#dob_age_text").text(dobStr + " (" + age + "Y)");
 
 
       /* Get Patient Address */
@@ -474,7 +492,7 @@ function onReady(smart) {
         (fullAddress)
       );
 
-      function normalize(phone) {
+/*       function normalize(phone) {
         //normalize string and remove all unnecessary characters
         phone = phone.replace(/[^\d]/g, "");
         //check if number length equals to 10
@@ -489,7 +507,7 @@ function onReady(smart) {
 
       $("#home_phone_text").text(
         (phoneNum)
-      );
+      ); */
 
       /* Print statuses for diabetes and hypertension */
       console.log("Diabetes: " + isDiabetic);
@@ -510,72 +528,125 @@ function onReady(smart) {
       /* Get Weight */
       var byCodes = smart.byCodes(obv, 'code');
       var weight = byCodes('3141-9');
-      $("#weight-text").text(getQuantityValueAndUnit(weight[0]));
-      colorField("#weight-text", weight[0]);
+	  var weightFinal = getQuantityValueAndUnit(weight[0]);
+	  if(weightFinal == '-') {
+			$("#weight-text").text('N/A');
+	  } else {
+		  $("#weight-text").text(weightFinal);
+	  }
+      
 
       /* Get Height */
       var height = byCodes('8302-2');
-      $("#height-text").text(getQuantityValueAndUnit(height[0]));
-	  colorField('#height-text', height[0]);
+	  var heightFinal = getQuantityValueAndUnit(height[0]);
+	  if(heightFinal == '-') {
+		  $("#height-text").text('N/A');
+	  } else {
+		  $("#height-text").text(heightFinal);
+	  }
+      
 
       /* Get BMI */
       var BMI = byCodes('39156-5');
-      $("#bmi-score").text(getQuantityValueAndUnit(BMI[0]));
-      colorField("#bmi-score", BMI[0]);
+	  var BMIFinal = getQuantityValueAndUnit(BMI[0]);
+	  if(BMIFinal == '-') {
+		  $("#bmi-score").text('N/A');
+	  } else {
+		  $("#bmi-score").text(BMIFinal);
+		  colorField("#bmi-score", BMI[0]);
+	  }
+      
 
       /*Get Cholesterol(moles/volume) in Serum*/
       var cholesterol = byCodes('14647-2')
 
       /*Get total HBA1C*/
       var hba1c = byCodes('4548-4')
-      $("#hba1c-score").text(getQuantityValueAndUnit(hba1c[0]));
-      colorField("#hba1c-score", hba1c[0]);
+	  var hba1cFinal = getQuantityValueAndUnit(hba1c[0]);
+	  if(hba1cFinal == '-') {
+		  $("#hba1c-score").text('N/A');
+	  } else {
+		  $("#hba1c-score").text(hba1cFinal);
+		  colorField("#hba1c-score", hba1c[0]);		  
+	  }
+
 
       /*Get total cholesterol*/
       var chol = byCodes('2093-3')
-      $("#chol").text(getQuantityValueAndUnit(chol[0]))
-      console.log(obv)
-      colorField("#chol", chol[0]);
-
+	  var cholFinal = getQuantityValueAndUnit(chol[0]);
+	  if(cholFinal == '-') {
+		  $("#chol").text('N/A');
+	  } else {
+		  $("#chol").text(cholFinal);
+		  colorField("#chol", chol[0]);
+	  }
+      
       /*Get HDL*/
       var hdl = byCodes('2085-9')
-      $("#hdl-score").text(getQuantityValueAndUnit(hdl[0]))
-      colorField("#hdl-score", hdl[0]);
+	  var hdlFinal = getQuantityValueAndUnit(hdl[0]);
+	  if(hdlFinal == '-') {
+		  $("#hdl-score").text('N/A');
+	  } else {
+		  $("#hdl-score").text(hdlFinal);
+		  colorField("#hdl-score", hdl[0]);		  
+	  }
 
-      /*Get HDL*/
-      var ldl = byCodes('13457-7')
-      $("#ldl-score").text(getQuantityValueAndUnit(ldl[0]))
-      colorField("#ldl-score", ldl[0]);
+      /*Get LDL*/
+      var ldl = byCodes('13457-7');
+	  var ldlFinal = getQuantityValueAndUnit(ldl[0]);
+	  if(ldlFinal != '-') {
+		  $("#ldl-score").text(ldlFinal);
+		  colorField("#ldl-score", ldl[0]);
+	  } else {
+		  $("#ldl-score").text('N/A');
+	  }
+      
 
       /*Get Glucose [Mass/volume] in serum or plasma*/
-      var gluc = byCodes('2345-7')
-      $("#gluc-score").text(getQuantityValueAndUnit(gluc[0]))
-      colorField("#gluc-score", gluc[0]);
+      var gluc = byCodes('2345-7');
+	  var glucFinal = getQuantityValueAndUnit(gluc[0]);
+	  if(glucFinal == '-') {
+		  $("#gluc-score").text('N/A');
+	  } else {
+		  $("#gluc-score").text(glucFinal);
+		  colorField("#gluc-score", gluc[0]);	  
+	  }
+
 
       /*Get Systolic Blood Pressure*/
-      var sbp = byCodes('8480-6')
-      $("#sbp-text").text(getQuantityValueAndUnit(sbp[0]))
-      colorField("#sbp-text", sbp[0]);
+      var sbp = byCodes('8480-6');
+	  var sbpFinal = getQuantityValueAndUnit(sbp[0]);
+	  if(sbpFinal == '-') {
+	     $("#sbp-text").text('N/A');
+	  } else {
+		 $("#sbp-text").text(sbpFinal);
+		 colorField("#sbp-text", sbp[0]);
+	  }
 
       /*Get Diastolic Blood Pressure*/
       var dbp = byCodes('8462-4')
-      $("#dbp-text").text(getQuantityValueAndUnit(dbp[0]))
-      colorField("#dbp-text", dbp[0]);
+	  var dbpFinal = getQuantityValueAndUnit(dbp[0]);
+	  if(dbpFinal == '-') {
+	      $("#dbp-text").text('N/A');
+	  } else {
+		  $("#dbp-text").text(dbpFinal);
+		  colorField("#dbp-text", dbp[0]);		  
+	  }
 
 	  var address = fullAddress;
       var queryType = "Groceries";
       pat_addr = fullAddress;
 
 	  /* Fill out all plot data global variables we will use */
-	  height_plot_data = populatePlotData(height);
-	  weight_plot_data = populatePlotData(weight);
-	  bmi_plot_data = populatePlotData(BMI);
-	  glucose_plot_data = populatePlotData(gluc);
-	  hba1c_plot_data = populatePlotData(hba1c);
-	  bp_plot_data = populatePlotData({});
-	  totChol_plot_data = populatePlotData(chol);
-	  hdl_plot_data = populatePlotData(hdl);
-	  ldl_plot_data = populatePlotData(ldl);
+	  height_plot_data = populatePlotData(height, false);
+	  weight_plot_data = populatePlotData(weight, false);
+	  bmi_plot_data = populatePlotData(BMI, true);
+	  glucose_plot_data = populatePlotData(gluc, true);
+	  hba1c_plot_data = populatePlotData(hba1c, true);
+	  bp_plot_data = populatePlotData({}, true);
+	  totChol_plot_data = populatePlotData(chol, true);
+	  hdl_plot_data = populatePlotData(hdl, true);
+	  ldl_plot_data = populatePlotData(ldl, true);
 
     }
   )
@@ -587,7 +658,7 @@ function onError() {
 }
 
 /* Helper function to populate the structs we need for the deepdive cards */
-function populatePlotData(data) {
+function populatePlotData(data, needColor) {
 	td = {Value: [], Date: [], Method: [], Location: [], headers: [], colors: []};
 	gd = {values: [], refHi: [], refLo: [], dates: [], units: []};
 
@@ -597,7 +668,13 @@ function populatePlotData(data) {
 		td['Value'].push(getQuantityValueAndUnit(data[i]));
 		var tDate = getDate(data[i]);
 		td['Date'].push(tDate.substring(0,10));
-		td['colors'].push(getColor(data[i])[1]);
+		
+		if(needColor) {
+			td['colors'].push(getColor(data[i])[1]);
+		}
+		else {
+			td['colors'].push('none');
+		}
 
 		// Use our encounter dictionary to find out where the encounter occured
 		var encounter_num = parseInt(data[i]['encounter']['reference'].replace('Encounter/', ''));
@@ -671,17 +748,17 @@ function getQuantityValueAndUnit(ob) {
   } else {
     return '-';
   }
-}
-
-/* Helper function to get value */
-function getValue(ob) {
+}  
+ 
+/* Helper function to get value */   
+function getValue(ob) { 
 	if(typeof ob != 'undefined' &&
 	   typeof ob.valueQuantity != 'undefined' &&
 	   typeof ob.valueQuantity.value != 'undefined') {
-		   return ob.valueQuantity.value;
-   } else {
-	   return undefined;
-   }
+		   return ob.valueQuantity.value;        
+   } else {  
+	   return undefined;  
+   }             
 }
 
 /* Helper function to get dates */
@@ -726,11 +803,11 @@ function getUnits(ob) {
 	   typeof ob.valueQuantity != 'undefined' &&
 	   typeof ob.valueQuantity.code != 'undefined') {
 		   return ob.valueQuantity.code;
-   } else {
+   } else { 
 	   return undefined;
    }
-}
-
+}   
+   
 function getColor(ob) {
   if (typeof ob != 'undefined' &&
       typeof ob.valueQuantity != 'undefined' &&
@@ -747,13 +824,13 @@ function getColor(ob) {
 			.range([d3.rgb('#4CBB17'), d3.rgb("#C21807")]);
 
 		if (ob.valueQuantity.value > ob['referenceRange'][0]['high']['value']) {
-		  var value_color = color(ob['referenceRange'][0]['high']['value']);
+		  var value_color = "#C21807";
 		}
 		else if (ob.valueQuantity.value < ob['referenceRange'][0]['low']['value']) {
-		  var value_color = color(ob['referenceRange'][0]['low']['value']);
+		  var value_color = "#C21807";
 		}
 		else {
-		  var value_color = color(ob.valueQuantity.value);
+		  var value_color = 'none';//color(ob.valueQuantity.value);
 		}
 		return [true, value_color];
   }
@@ -846,11 +923,11 @@ test= [
     data: [1,6, 3, 10, 5, 8, 3,2,12],
     pointPlacement: 'on'
 },
-{
+{ 
     name: 'Purchase period 3',
     data: [9,9, 8, 10, 6, 9, 7,8,7],
     pointPlacement: 'on'
-},
+},  
 {
     name: 'Reference',
     data: [10,10, 10, 10, 10, 10, 10,10,20],
