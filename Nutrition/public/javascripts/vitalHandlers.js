@@ -60,7 +60,9 @@ function createTitleBurger(cardBody, title) {
 /* Generic create card sides/divisions */
 function createSide(cardBody, perc, side) {
 	var side = cardBody.append('div')
-							.attr('style', 'float:' + side + '; width: ' + perc);
+			.attr('style', 'float:' + side + '; width: ' + perc)
+			.style("overflow", "auto")
+			.style("height", "75px"); //75px for 3 lines, can change to 100px for 4 lines
 	return side;
 }
 

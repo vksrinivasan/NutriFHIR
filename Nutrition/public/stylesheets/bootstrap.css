@@ -5997,8 +5997,8 @@ button.close {
   position: absolute;
   z-index: 1070;
   display: block;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 12px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
   font-style: normal;
   font-weight: normal;
   line-height: 1.42857143;
@@ -6016,6 +6016,10 @@ button.close {
   opacity: 0;
 
   line-break: auto;
+}
+
+.tooltip_title{
+  font-weight: bold;
 }
 .tooltip.in {
   filter: alpha(opacity=90);
@@ -6824,14 +6828,14 @@ button.close {
 }
 
 #map {
-   
+
     position :absolute;
     top:0;
     left:0;
     bottom:0;
     right:250px;
 	height: 300px;
-  
+
 }
 
 .card.GroceryContentsContainer {
@@ -6842,7 +6846,7 @@ button.close {
   position : absolute;
   top:0;
   right:0;
-  width: 250px;    
+  width: 250px;
   height: 300px;
   padding-left: 10px;
 }
