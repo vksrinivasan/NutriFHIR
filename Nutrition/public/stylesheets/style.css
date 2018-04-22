@@ -17,9 +17,9 @@
 
 .floating-box {
     display: inline-block;
-    width: 40%;
+    width: 49%;
     height: auto;
-    margin: 10px;
+    margin: 2px;
 }
 
 
@@ -60,7 +60,7 @@ h3 {
 }
 
 h4{
-  color: var(--grey-color);
+  color: #2196f3;
 }
 
 body {
@@ -318,6 +318,17 @@ body {
 footer{
   margin-top:20px;
 }
+
+/*custom tip*/
+.custom-tip{
+  color: #2196f3;
+}
+
+.myCustomClass{
+    border-color: rgb(0,190,0);
+    background-color: white;
+}
+
 
 .axis path,
 .axis line {

@@ -300,20 +300,46 @@ input.vis-configuration.vis-config-range:focus::-ms-fill-upper {
 
 div.vis-tooltip {
     position: absolute;
-    visibility: hidden;
+    visibility: none;
     padding: 5px;
+    padding-bottom: 5px;
     white-space: nowrap;
     font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    color: #000;
+    color: black;
     background-color: white;
     -moz-border-radius: 3px;
     -webkit-border-radius: 0px;
-    border-radius: 0px;
-    border: 2px solid #808074;
-    box-shadow: 5px 5px 10px rgba(0,0,0,.2);
+    border-radius: 1px;
+    border: 0.7px solid grey;
+    box-shadow: 3px 3px 3px rgba(0,0,0,.2);
     pointer-events: none;
     z-index: 5
+}
+
+/*tip title*/
+.tiptitle{
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 15px;
+  padding-bottom: 1px;
+  color: #2296f4;
+}
+
+/*tip-content*/
+.tipcontent{
+  padding-left: 10px;
+  padding-right: 5px;
+  color: black;
+  font-size: 14px;
+  padding-top: 15px;
+  padding-bottom: 4px;
+  display: inline;
+}
+
+.tooltip-header{
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+  color: #2296f4;
 }
 
 .vis-current-time {
