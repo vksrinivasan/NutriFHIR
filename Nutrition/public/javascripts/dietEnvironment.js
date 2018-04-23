@@ -842,6 +842,7 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
           var markerToRemove = rowMarkerMap[rowId]
           markerToRemove.setMap(null)
           row.parentNode.removeChild(row);
+          map.panTo(startLoc);
 
         }
 
