@@ -42,7 +42,7 @@ function onReady(smart) {
   var isDiabetic = 0;
   var hasHypertension = false;
 
-  var cond = smart.patient.api.search({type: 'Condition'});
+  //var cond = smart.patient.api.search({type: 'Condition'});
   //var meds = smart.patient.api.search({type: 'MedicationOrder'});
   //var allMeds = smart.patient.api.search({type: 'MedicationStatement'})
 
@@ -82,7 +82,8 @@ function onReady(smart) {
         item.type = 'point'
       }
 
-      if(statement.medicationCodeableConcept.coding){
+
+      if(statement.medicationCodeableConcept.coding !== undefined){
         item.content = statement.medicationCodeableConcept.coding[0].display
       }
       else{
@@ -369,19 +370,24 @@ function onReady(smart) {
 
 
   /* Go through encounters */
-  console.log('on encounters');
+  //console.log('on encounters');
   smart.patient.api.fetchAllWithReferences({type: "Encounter"}).then(function(results) {
     results.forEach(function(statement){
-      encounterId_Locations[statement.id] = statement['location'][0]['location']['display'];
+      if(statement['location'] == undefined) {
+        encounterId_Locations[statement.id] = 'N/A';  
+      } else { 
+        encounterId_Locations[statement.id] = statement['location'][0]['location']['display'];
+      }
     });
   });
 
-  console.log(encounterId_Locations);
+  //console.log(encounterId_Locations);
 
 
 
   /* Generate Problem List */
-  smart.patient.api.fetchAllWithReferences({type: 'Condition'}).then(function(results) {
+  /*
+   smart.patient.api.fetchAllWithReferences({type: 'Condition'}).then(function(results) {
    results.forEach(function(condition){
 	if (condition.code.text !== "Entered In Error" && condition.category.text == "Problem") {
           //$("#problems-list").append("<p>" + condition.code.text + "</p>");
@@ -392,6 +398,7 @@ function onReady(smart) {
 	}
      });
    });
+*/
 
   /* Generate Allergy List */
   /*
@@ -403,9 +410,9 @@ function onReady(smart) {
      });
    });*/
  
-  $.when(pt, obv, cond, meds).fail(onError);
-  $.when(pt, obv, cond, meds).done(
-    function(patient, obv, conditions, prescriptions) {
+  $.when(pt, obv, meds).fail(onError);
+  $.when(pt, obv, meds).done(
+    function(patient, obv, prescriptions) {
       console.log(patient);
       // console.log(obv);
       // console.log(conditions);
@@ -534,6 +541,7 @@ function onReady(smart) {
       /* Get Weight */
       var byCodes = smart.byCodes(obv, 'code');
       var weight = byCodes('3141-9');
+	  weight = sortObv(weight);
 	  var weightFinal = getQuantityValueAndUnit(weight[0]);
 	  if(weightFinal == '-') {
 			$("#weight-text").text('N/A');
@@ -544,6 +552,7 @@ function onReady(smart) {
 
       /* Get Height */
       var height = byCodes('8302-2');
+	  height = sortObv(height);
 	  var heightFinal = getQuantityValueAndUnit(height[0]);
 	  if(heightFinal == '-') {
 		  $("#height-text").text('N/A');
@@ -555,6 +564,7 @@ function onReady(smart) {
       /* Get BMI */
       var BMI = byCodes('39156-5');
 	//console.log(BMI);
+	  BMI = sortObv(BMI);
 	  var BMIFinal = getQuantityValueAndUnit(BMI[0]);
 	  if(BMIFinal == '-') {
 		  $("#bmi-score").text('N/A');
@@ -566,9 +576,11 @@ function onReady(smart) {
 
       /*Get Cholesterol(moles/volume) in Serum*/
       var cholesterol = byCodes('14647-2')
+      cholesterol = sortObv(cholesterol);
 
       /*Get total HBA1C*/
       var hba1c = byCodes('4548-4')
+      hba1c = sortObv(hba1c);
 	  var hba1cFinal = getQuantityValueAndUnit(hba1c[0]);
 	  if(hba1cFinal == '-') {
 		  $("#hba1c-score").text('N/A');
@@ -580,6 +592,7 @@ function onReady(smart) {
 
       /*Get total cholesterol*/
       var chol = byCodes('2093-3')
+      chol = sortObv(chol);
 	  var cholFinal = getQuantityValueAndUnit(chol[0]);
 	  if(cholFinal == '-') {
 		  $("#chol").text('N/A');
@@ -590,6 +603,7 @@ function onReady(smart) {
       
       /*Get HDL*/
       var hdl = byCodes('2085-9')
+      hdl = sortObv(hdl);
 	  var hdlFinal = getQuantityValueAndUnit(hdl[0]);
 	  if(hdlFinal == '-') {
 		  $("#hdl-score").text('N/A');
@@ -600,6 +614,7 @@ function onReady(smart) {
 
       /*Get LDL*/
       var ldl = byCodes('13457-7');
+      ldl = sortObv(ldl);
 	  var ldlFinal = getQuantityValueAndUnit(ldl[0]);
 	  if(ldlFinal != '-') {
 		  $("#ldl-score").text(ldlFinal);
@@ -611,6 +626,7 @@ function onReady(smart) {
 
       /*Get Glucose [Mass/volume] in serum or plasma*/
       var gluc = byCodes('2345-7');
+      gluc = sortObv(gluc);
 	  var glucFinal = getQuantityValueAndUnit(gluc[0]);
 	  if(glucFinal == '-') {
 		  $("#gluc-score").text('N/A');
@@ -622,6 +638,7 @@ function onReady(smart) {
 
       /*Get Systolic Blood Pressure*/
       var sbp = byCodes('8480-6');
+      sbp = sortObv(sbp);
 	  var sbpFinal = getQuantityValueAndUnit(sbp[0]);
 	  if(sbpFinal == '-') {
 	     $("#sbp-text").text('N/A');
@@ -632,6 +649,7 @@ function onReady(smart) {
 
       /*Get Diastolic Blood Pressure*/
       var dbp = byCodes('8462-4')
+      dbp = sortObv(dbp);
 	  var dbpFinal = getQuantityValueAndUnit(dbp[0]);
 	  if(dbpFinal == '-') {
 	      $("#dbp-text").text('N/A');
@@ -659,6 +677,19 @@ function onReady(smart) {
   )
 }
 
+/* Sort obv */
+function sortObv(obv) {
+      if(obv.length == 0) {
+            return obv;
+      } else {
+            obv.sort(function(a,b) {
+		return new Date(Date.parse(b.issued)) - new Date(Date.parse(a.issued));
+	    });
+	    return obv;
+      }
+      
+}
+
 /* Required On Error function */
 function onError() {
   console.log('Loading error', arguments);
@@ -669,11 +700,19 @@ function populatePlotData(data, needColor) {
 	td = {Value: [], Date: [], Method: [], Location: [], headers: [], colors: []};
 	gd = {values: [], refHi: [], refLo: [], dates: [], units: []};
 
+	var checkSeen = {};
+
 	for(i = 0; i < data.length; i++) {
+
+		tDate = getDate(data[i]);
+		if(tDate.substring(0,10) in checkSeen) {
+			continue;
+		}
+
+		checkSeen[tDate.substring(0,10)] = true;
 
 		/* Push Table Data */
 		td['Value'].push(getQuantityValueAndUnit(data[i]));
-		var tDate = getDate(data[i]);
 		td['Date'].push(tDate.substring(0,10));
 		
 		if(needColor) {
@@ -775,7 +814,7 @@ function getQuantityValueAndUnit(ob) {
 		console.log('> 300');
 		console.log(ob);
 	}
-        return ob.valueQuantity.value + ' ' + ob.valueQuantity.unit;
+        return parseFloat(ob.valueQuantity.value.toFixed(2)) + ' ' + ob.valueQuantity.unit;
   } else {
     return '-';
   }
@@ -876,9 +915,9 @@ function colorField(fieldID, ob) {
 	if(value_color[0]) {
 		d3.select(fieldID).style("color", value_color[1]);
 	} else {
-		console.log("not coloring " + fieldID);
+		//console.log("not coloring " + fieldID);
 		if (typeof ob != 'undefined') {
-		  console.log(typeof ob.referenceRange[0]['high']);
+		//console.log(typeof ob.referenceRange[0]['high']);
 		}
 	}
 }
