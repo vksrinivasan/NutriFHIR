@@ -59,11 +59,11 @@ function onReady(smart) {
      //console.log(statement)
      item = {}
 
-     try{
+     //try{
      item.id =  id
-     if(statement.effectivePeriod){
+     if(statement.effectivePeriod !== undefined){
      item.start =  new Date(statement.effectivePeriod.start)
-     if(statement.effectivePeriod.end){
+     if(statement.effectivePeriod.end !== undefined){
           item.end = new Date(statement.effectivePeriod.end)
           diff = Math.abs(item.start.getTime() - item.end.getTime()) / 3600000;
           if(diff > 48){
@@ -74,28 +74,46 @@ function onReady(smart) {
           }
         }
         }
-     else{
-      item.start = new Date(statement.effectiveDateTime).toLocaleDateString()
+     else if(statement.effectiveDateTime !== undefined){
+      item.start = new Date(statement.effectiveDateTime)
       }
 
+      if(item.start == 'Invalid Date'){
+        //console.log(statement.dateAsserted)
+        item.start = new Date(statement.dateAsserted)
+      }
+
+
+      //console.log(item.start)
       if(!item.type){
         item.type = 'point'
       }
 
+      if(statement.medicationCodeableConcept !== undefined){
 
       if(statement.medicationCodeableConcept.coding !== undefined){
         item.content = statement.medicationCodeableConcept.coding[0].display
       }
-      else{
+      else if(statement.medicationCodeableConcept.text !== undefined){
         item.content = statement.medicationCodeableConcept.text
       }
-
-     if(statement.dosage[0].route){
-     item.route = statement.dosage[0].route.text
+      else if(statement.medicationReference !== undefined){
+        item.content = statement.medicationReference.reference
       }
+    }
 
-    if(statement.dosage[0].quantityQuantity){
+     if(statement.dosage !== undefined){
+       if(statement.dosage[0].route !== undefined ){
+       if(statement.dosage[0].route.text !== undefined){
+         item.route = statement.dosage[0].route.text
+            }
+      }
+    }
+
+    if(statement.dosage !== undefined){
+        if(statement.dosage[0].quantityQuantity !== undefined){
      item.dosageQuantity = statement.dosage[0].quantityQuantity.value +" "+statement.dosage[0].quantityQuantity.unit
+   }
     }
 
     item.status = statement.status
@@ -107,16 +125,16 @@ function onReady(smart) {
       item.sflag = 'inactive'
       item.className = 'inactive pat'
     }
-    if(statement.informationSource){
+    if(statement.informationSource !== undefined){
       item.source = statement.informationSource.display
-      if(statement.informationSource.reference){
+      if(statement.informationSource.reference !== undefined){
         if(statement.informationSource.reference.split("/")[0] = "Practitioner")
         {
           item.reference = statement.informationSource.reference
           item.flag = 'prac'
         }
         else{
-          item.reference = statement.informationSource.reference
+          item.reference = 'Patient'
           item.flag ='pat'
         }
       }
@@ -134,16 +152,23 @@ function onReady(smart) {
                  '<b class = "tipcontent">Status : '+item.status+'</b><br>'+
                  '<b class = "tipcontent">Route : '+item.route+'</b><br>'+
                  '<b class = "tipcontent">Dose : '+item.dosageQuantity+'</b><br>'
-    }
+    //}
 
-
-    catch (e){
-      console.log(e)
-    }
+  //  catch (e){
+  //    console.log(e)
+  //  }
 
     //console.log(item)
-    //console.log(item)
-    meds.push(item)
+
+
+    if(item.status !== 'entered-in-error'){
+
+      if(item.content !== undefined){
+          meds.push(item)
+          //console.log(item.content)
+          }
+      }
+
     id =id +1;
 
      });
@@ -182,16 +207,16 @@ function onReady(smart) {
             items.forEach(function(each){
                   if(each.flag == 'pat'){
                     items.update({id : each.id, className : "hide"+" "+each.status})
-                    console.log('hide pat')
+                    //console.log('hide pat')
                     }
                   if(each.flag == 'prac' && each.sflag == "inactive") {
                     items.update({id : each.id, className : "hide"+" "+each.status})
-                    console.log('hide prac and inactive')
+                    //console.log('hide prac and inactive')
                   }
                   if(each.flag == 'prac' && each.sflag == "active"){
                     items.update({id : each.id, className : "visible"+" "+each.status})
-                    console.log(each)
-                    console.log('show prac and active')
+                    //console.log(each)
+                    //console.log('show prac and active')
                   }
                  })
 
@@ -201,16 +226,16 @@ function onReady(smart) {
             items.forEach(function(each){
                   if(each.flag == 'prac'){
                     items.update({id : each.id, className : "hide" +" "+ each.status})
-                    console.log('hide prac')
+                    //console.log('hide prac')
                     }
                   if(each.flag == 'pat' && each.sflag == "inactive") {
                     items.update({id : each.id, className : "hide"+" "+each.status})
-                    console.log('hide pat and inactive')
+                    //console.log('hide pat and inactive')
                   }
                   if(each.flag == 'pat' && each.sflag == "active"){
                     items.update({id : each.id, className : "visible"+" "+each.status})
-                    console.log(each)
-                    console.log('show pat and active')
+                    //console.log(each)
+                    //console.log('show pat and active')
                   }
                  })
           }
@@ -218,7 +243,7 @@ function onReady(smart) {
           if($(this).attr("id") == 'all'){
             items.forEach(function(each){
               if(each.sflag == "inactive"){
-              console.log("hide inactive "+each.status,each.flag)
+              //console.log("hide inactive "+each.status,each.flag)
               items.update({id : each.id, className : "hide" +" "+ each.status})
               }
               else{
@@ -232,15 +257,15 @@ function onReady(smart) {
           if(!$('#statusCheck').prop('checked')){
 
              if($(this).attr("id") == 'prac'){
-             console.log($('#statusCheck').prop('checked'))
+             //console.log($('#statusCheck').prop('checked'))
              items.forEach(function(each){
                    if(each.flag == 'pat'){
                      items.update({id : each.id, className : "hide"+" "+each.status})
-                     console.log('hide pat')
+                     //console.log('hide pat')
                      }
                    if(each.flag == 'prac') {
                      items.update({id : each.id, className : "visible"+" "+each.status})
-                     console.log('show')
+                     //console.log('show')
                    }
                   })
 
@@ -250,18 +275,18 @@ function onReady(smart) {
              items.forEach(function(each){
                    if(each.flag == 'prac'){
                      items.update({id : each.id, className : "hide" +" "+ each.status})
-                     console.log('hide prac')
+                     //console.log('hide prac')
                      }
                    if(each.flag == 'pat') {
                      items.update({id : each.id, className : "visible"+" "+each.status})
-                     console.log('show pat')
+                     //console.log('show pat')
                    }
                   })
                 }
 
            if($(this).attr("id") == 'all'){
              items.forEach(function(each){
-               console.log("hide inactive "+each.status,each.flag)
+               //console.log("hide inactive "+each.status,each.flag)
                items.update({id : each.id, className : "visible" +" "+ each.status})
              })
            }
@@ -334,13 +359,13 @@ function onReady(smart) {
           if(each.content == test){
           //console.log(each)
           $("#medTitle").text(each.content)
-          $("#source").text("Source : "+each.source)
+          $("#source").text("Source : "+each.reference)
           $("#dose").text("Dose : "+each.dosageQuantity)
           $("#status").text("Status : "+each.sflag)
         }
         })
         //console.log($(this).next('div').text())
-        console.log($('.custom-tip').children())
+        //console.log($('.custom-tip').children())
         var content = $('.custom-tip').children()[1].innerHTML+"<br>"+$('.custom-tip').children()[3].innerHTML
         +"<br>"+$('.custom-tip').children()[5].innerHTML
         var title = $('.custom-tip').children()[0].innerHTML
@@ -439,7 +464,7 @@ function onReady(smart) {
 			titleCase(pGender)
 		  );
 	  } else {
-		  $("#gender_text").text(pGender);
+		  $("#gender_text"  ).text(pGender);
 	  }
 
 
@@ -460,12 +485,12 @@ function onReady(smart) {
 			pMStatus
 		  );
 	  }
-      
-    
+
+
 
       /* Get Patient Birth Date and Age*/
       var dob = new Date(patient['birthDate']);
-      var day = dob.getDate(); 
+      var day = dob.getDate();
       var monthIndex = dob.getMonth() + 1;
       var year = dob.getFullYear();
 
@@ -484,7 +509,7 @@ function onReady(smart) {
 
       var dobStr = monthIndex + "/" + day + '/' + year;
       //console.log(dobStr);
-		
+
 	  $('#dob_text').text(dobStr);
 	  $('#age_text').text(age);
       //$("#dob_age_text").text(dobStr + " (" + age + "Y)");
@@ -548,7 +573,7 @@ function onReady(smart) {
 	  } else {
 		  $("#weight-text").text(weightFinal);
 	  }
-      
+
 
       /* Get Height */
       var height = byCodes('8302-2');
@@ -559,7 +584,7 @@ function onReady(smart) {
 	  } else {
 		  $("#height-text").text(heightFinal);
 	  }
-      
+
 
       /* Get BMI */
       var BMI = byCodes('39156-5');
@@ -572,7 +597,7 @@ function onReady(smart) {
 		  $("#bmi-score").text(BMIFinal);
 		  colorField("#bmi-score", BMI[0]);
 	  }
-      
+
 
       /*Get Cholesterol(moles/volume) in Serum*/
       var cholesterol = byCodes('14647-2')
@@ -586,7 +611,7 @@ function onReady(smart) {
 		  $("#hba1c-score").text('N/A');
 	  } else {
 		  $("#hba1c-score").text(hba1cFinal);
-		  colorField("#hba1c-score", hba1c[0]);		  
+		  colorField("#hba1c-score", hba1c[0]);
 	  }
 
 
@@ -600,7 +625,7 @@ function onReady(smart) {
 		  $("#chol").text(cholFinal);
 		  colorField("#chol", chol[0]);
 	  }
-      
+
       /*Get HDL*/
       var hdl = byCodes('2085-9')
       hdl = sortObv(hdl);
@@ -609,7 +634,7 @@ function onReady(smart) {
 		  $("#hdl-score").text('N/A');
 	  } else {
 		  $("#hdl-score").text(hdlFinal);
-		  colorField("#hdl-score", hdl[0]);		  
+		  colorField("#hdl-score", hdl[0]);
 	  }
 
       /*Get LDL*/
@@ -622,7 +647,7 @@ function onReady(smart) {
 	  } else {
 		  $("#ldl-score").text('N/A');
 	  }
-      
+
 
       /*Get Glucose [Mass/volume] in serum or plasma*/
       var gluc = byCodes('2345-7');
@@ -632,7 +657,7 @@ function onReady(smart) {
 		  $("#gluc-score").text('N/A');
 	  } else {
 		  $("#gluc-score").text(glucFinal);
-		  colorField("#gluc-score", gluc[0]);	  
+		  colorField("#gluc-score", gluc[0]);
 	  }
 
 
@@ -655,7 +680,7 @@ function onReady(smart) {
 	      $("#dbp-text").text('N/A');
 	  } else {
 		  $("#dbp-text").text(dbpFinal);
-		  colorField("#dbp-text", dbp[0]);		  
+		  colorField("#dbp-text", dbp[0]);
 	  }
 
 	  var address = fullAddress;
@@ -714,7 +739,7 @@ function populatePlotData(data, needColor) {
 		/* Push Table Data */
 		td['Value'].push(getQuantityValueAndUnit(data[i]));
 		td['Date'].push(tDate.substring(0,10));
-		
+
 		if(needColor) {
 			td['colors'].push(getColor(data[i])[1]);
 		}
@@ -736,7 +761,7 @@ function populatePlotData(data, needColor) {
 		gd['dates'].push(new Date(tDate));
 		gd['units'].push(getUnits(data[i]));
 	}
-	
+
 	gd['refHi'] = cleanReferenceLoHi(gd['refHi']);
 	gd['refLo'] = cleanReferenceLoHi(gd['refLo']);
 
@@ -748,14 +773,14 @@ function populatePlotData(data, needColor) {
 /* Helper function to clean reference hi/lo data */
 function cleanReferenceLoHi(data) {
 	var retArray = new Array(data.length);
-	
+
 	var avgVal = undefined;
 	for(i = 0; i < data.length; i++) {
 		if(data[i] != undefined) {
 			avgVal = data[i];
 		}
 	}
-	
+
 	for(i = 0; i < retArray.length; i++) {
 		retArray[i] = avgVal;
 	}
@@ -818,17 +843,17 @@ function getQuantityValueAndUnit(ob) {
   } else {
     return '-';
   }
-}  
- 
-/* Helper function to get value */   
-function getValue(ob) { 
+}
+
+/* Helper function to get value */
+function getValue(ob) {
 	if(typeof ob != 'undefined' &&
 	   typeof ob.valueQuantity != 'undefined' &&
 	   typeof ob.valueQuantity.value != 'undefined') {
-		   return ob.valueQuantity.value;        
-   } else {  
-	   return undefined;  
-   }             
+		   return ob.valueQuantity.value;
+   } else {
+	   return undefined;
+   }
 }
 
 /* Helper function to get dates */
@@ -873,11 +898,11 @@ function getUnits(ob) {
 	   typeof ob.valueQuantity != 'undefined' &&
 	   typeof ob.valueQuantity.code != 'undefined') {
 		   return ob.valueQuantity.code;
-   } else { 
+   } else {
 	   return undefined;
    }
-}   
-   
+}
+
 function getColor(ob) {
   if (typeof ob != 'undefined' &&
       typeof ob.valueQuantity != 'undefined' &&
@@ -993,11 +1018,11 @@ test= [
     data: [1,6, 3, 10, 5, 8, 3,2,12],
     pointPlacement: 'on'
 },
-{ 
+{
     name: 'Purchase period 3',
     data: [9,9, 8, 10, 6, 9, 7,8,7],
     pointPlacement: 'on'
-},  
+},
 {
     name: 'Reference',
     data: [10,10, 10, 10, 10, 10, 10,10,20],
