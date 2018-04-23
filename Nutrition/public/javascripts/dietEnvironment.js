@@ -773,7 +773,7 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
 
   var starId = 'B' + newString.split(' ').join('_')
   star.setAttribute('id', starId);
-  var starRef = d3.select('#'+ 'B' + streetAddr.split(' ').join('_'));
+  var starRef = d3.select('#'+ 'B' + newString.split(' ').join('_'));
   starRef.on("click", 
     function(){
       //console.log('hi');
