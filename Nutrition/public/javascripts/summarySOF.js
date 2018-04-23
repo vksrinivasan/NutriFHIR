@@ -56,7 +56,7 @@ function onReady(smart) {
 
    //Trying timeline concept
    results.forEach(function(statement){
-     console.log(statement)
+     //console.log(statement)
      item = {}
 
      try{
@@ -141,13 +141,13 @@ function onReady(smart) {
     }
 
     //console.log(item)
-    console.log(item)
+    //console.log(item)
     meds.push(item)
     id =id +1;
 
      });
 
-    console.log(meds)
+    //console.log(meds)
      //Build timeline
      var cap_options = {
          tooltip: {
@@ -177,7 +177,7 @@ function onReady(smart) {
          if($('#statusCheck').prop('checked')){
 
             if($(this).attr("id") == 'prac'){
-            console.log($('#statusCheck').prop('checked'))
+            //console.log($('#statusCheck').prop('checked'))
             items.forEach(function(each){
                   if(each.flag == 'pat'){
                     items.update({id : each.id, className : "hide"+" "+each.status})
@@ -331,7 +331,7 @@ function onReady(smart) {
         var test = $(this).text()
         items.forEach(function(each){
           if(each.content == test){
-          console.log(each)
+          //console.log(each)
           $("#medTitle").text(each.content)
           $("#source").text("Source : "+each.source)
           $("#dose").text("Dose : "+each.dosageQuantity)
@@ -484,13 +484,19 @@ function onReady(smart) {
 
 
       /* Get Patient Address */
-      var adr = patient['address'][0]['line'][0];
-      var city = patient['address'][0].city;
-      var state = patient['address'][0].state;
-      var fullAddress = adr + ", " + city + ", " + state;
-      $("#addr_text").text(
-        (fullAddress)
-      );
+      if (patient['address']) {
+	      var adr = patient['address'][0]['line'][0];
+	      var city = patient['address'][0].city;
+	      var state = patient['address'][0].state;
+	      var fullAddress = adr + ", " + city + ", " + state;
+	      $("#addr_text").text(
+		(fullAddress)
+	      );
+      }
+      else {
+	      /* no patient address - empty string */
+	      var fullAddress = "NA";
+      }
 
 /*       function normalize(phone) {
         //normalize string and remove all unnecessary characters
@@ -510,7 +516,7 @@ function onReady(smart) {
       ); */
 
       /* Print statuses for diabetes and hypertension */
-      console.log("Diabetes: " + isDiabetic);
+      /* console.log("Diabetes: " + isDiabetic);
       if (isDiabetic > 0) {
 	       $("#has-diabetes").text("Yes");
       }
@@ -523,7 +529,7 @@ function onReady(smart) {
       }
       else {
 	       $("#has-hypertension").text("No");
-      }
+      }*/
 
       /* Get Weight */
       var byCodes = smart.byCodes(obv, 'code');
@@ -548,6 +554,7 @@ function onReady(smart) {
 
       /* Get BMI */
       var BMI = byCodes('39156-5');
+	//console.log(BMI);
 	  var BMIFinal = getQuantityValueAndUnit(BMI[0]);
 	  if(BMIFinal == '-') {
 		  $("#bmi-score").text('N/A');
@@ -764,6 +771,10 @@ function getQuantityValueAndUnit(ob) {
       typeof ob.valueQuantity != 'undefined' &&
       typeof ob.valueQuantity.value != 'undefined' &&
       typeof ob.valueQuantity.unit != 'undefined') {
+	if (ob.valueQuantity.value > 300) {
+		console.log('> 300');
+		console.log(ob);
+	}
         return ob.valueQuantity.value + ' ' + ob.valueQuantity.unit;
   } else {
     return '-';
