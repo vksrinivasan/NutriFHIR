@@ -721,7 +721,8 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
   newRow.className = "groceryTableRow";
 
   // set row id
-  var rowId = 'A' + streetAddr.split(' ').join('_');
+  newString = streetAddr.replace(/[^a-zA-Z0-9]/g,'_');
+  var rowId = 'A' + newString.split(' ').join('_');
   newRow.setAttribute('id', rowId);
   
   /* Create space for star */
@@ -770,7 +771,7 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
   rowContentMap[rowId] = content;
   
 
-  var starId = 'B' + streetAddr.split(' ').join('_')
+  var starId = 'B' + newString.split(' ').join('_')
   star.setAttribute('id', starId);
   var starRef = d3.select('#'+ 'B' + streetAddr.split(' ').join('_'));
   starRef.on("click", 
@@ -823,18 +824,23 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
           currContent.Preferred = 0;
           rowContentMap[rowId] = currContent;
 
-          if(rowId == firstElementId)
-          {
-              var table = document.getElementById("groceryTableData");
-              for (var i = 1, row; row = table.rows[i]; i++) {
+          // traverse all the rows below the star row
+          baseRow = document.getElementById(rowId)
 
-                  if(rowContentMap[row.id].Preferred == 1) {
-                    firstElement.parentNode.insertBefore(row, firstElement);
-                    
+          var startSwitching = false;
+          var table = document.getElementById("groceryTableData");
+          for (var i = 1, row; row = table.rows[i]; i++) {
 
-                  }
+              if(startSwitching)
+              {
+                  if(rowContentMap[row.id].Preferred == 1) 
+                      baseRow.parentNode.insertBefore(row, baseRow);
               }
+
+              if(row.id == rowId)
+                startSwitching = true;
           }
+  
         }
         else
         {
