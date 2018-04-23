@@ -265,7 +265,10 @@
 
 
   function waitForElement(){
-    if(typeof pat_addr !== "undefined"){
+    if (pat_addr == 'NA') {
+	return;
+    }
+    else if(typeof pat_addr !== "undefined" && pat_addr !== 'NA'){
     	console.log("got it!");
     	console.log(pat_addr);
     	plotMap(pat_addr, "Groceries");
