@@ -536,12 +536,15 @@ autocomplete.addListener('place_changed', function() {
                 currMarker.setVisible(true);
 
               }
+              else 
+              {
 
-              var firstElement = document.getElementById("groceryTableData").rows[0];
-                  
-              firstElement.parentNode.insertBefore(currRow, firstElement);
+                  var firstElement = document.getElementById("groceryTableData").rows[0];
+                  firstElement.parentNode.insertBefore(currRow, firstElement);
+
+              }
+
               
-
 
               var currAddr = currContent.Address;
               d3.select('#'+ 'B' + currAddr.split(' ').join('_')).transition().duration(10)
@@ -554,6 +557,9 @@ autocomplete.addListener('place_changed', function() {
           }
           
           map.panTo(place.geometry.location);
+
+          searchBox = document.getElementById("searchInput");
+          searchBox.value = "";
           //map.setZoom(2);  // Why 17? Because it looks good.
         
           //p_marker.setPosition(place.geometry.location);
@@ -715,7 +721,8 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
   newRow.className = "groceryTableRow";
 
   // set row id
-  var rowId = 'A' + streetAddr.split(' ').join('_');
+  newString = streetAddr.replace(/[^a-zA-Z0-9]/g,'_');
+  var rowId = 'A' + newString.split(' ').join('_');
   newRow.setAttribute('id', rowId);
   
   /* Create space for star */
@@ -754,6 +761,8 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
   newCell.append(nLine);
   newCell.appendChild(sAddr);
 
+  newCell.setAttribute('class', 'rowText');
+
   // map update
   var content = {'Name' : businessName, 'Address' : streetAddr, 'Color' : colorType, 'Preferred' : preferredValue};
   if(rowId in rowContentMap)
@@ -762,9 +771,9 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
   rowContentMap[rowId] = content;
   
 
-  var starId = 'B' + streetAddr.split(' ').join('_')
+  var starId = 'B' + newString.split(' ').join('_')
   star.setAttribute('id', starId);
-  var starRef = d3.select('#'+ 'B' + streetAddr.split(' ').join('_'));
+  var starRef = d3.select('#'+ 'B' + newString.split(' ').join('_'));
   starRef.on("click", 
     function(){
       //console.log('hi');
@@ -815,17 +824,23 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
           currContent.Preferred = 0;
           rowContentMap[rowId] = currContent;
 
-          if(rowId == firstElementId)
-          {
-              var table = document.getElementById("groceryTableData");
-              for (var i = 1, row; row = table.rows[i]; i++) {
+          // traverse all the rows below the star row
+          baseRow = document.getElementById(rowId)
 
-                  if(rowContentMap[row.id].Preferred == 1) {
-                    firstElement.parentNode.insertBefore(row, firstElement);
+          var startSwitching = false;
+          var table = document.getElementById("groceryTableData");
+          for (var i = 1, row; row = table.rows[i]; i++) {
 
-                  }
+              if(startSwitching)
+              {
+                  if(rowContentMap[row.id].Preferred == 1) 
+                      baseRow.parentNode.insertBefore(row, baseRow);
               }
+
+              if(row.id == rowId)
+                startSwitching = true;
           }
+  
         }
         else
         {
@@ -833,6 +848,7 @@ function createTableRows(businessName, streetAddr, colorType, preferredValue = 0
           var markerToRemove = rowMarkerMap[rowId]
           markerToRemove.setMap(null)
           row.parentNode.removeChild(row);
+          map.panTo(startLoc);
 
         }
 
@@ -849,13 +865,29 @@ function onRowClick(tableId, callback) {
     var table = document.getElementById(tableId),
         rows = table.getElementsByTagName("tr"),
         i;
-    for (i = 0; i < rows.length; i++) {
+
+    for (var i = 0, row; row = table.rows[i]; i++) {
+   //iterate through rows
+   //rows would be accessed using the "row" variable assigned in the for loop
+      for (var j = 0, col; col = row.cells[j]; j++) {
+          //iterate through columns
+          //columns would be accessed using the "col" variable assigned in the for loop
+          if(j == 1) {
+            col.onclick  = function (row) {
+                            return function () {
+                            callback(row);
+                           };
+                        }(table.rows[i]);
+            }
+      }  
+    }
+    /*for (i = 0; i < rows.length; i++) {
         table.rows[i].onclick = function (row) {
             return function () {
                 callback(row);
             };
         }(table.rows[i]);
-    }
+    }*/
 };
  
 onRowClick("groceryTableData", function (row){
