@@ -1,0 +1,11 @@
+{
+"enabled": true,
+  "id": "http://localhost:6001/cds-services/nutrifhir",
+  "url": "http://localhost:6001/cds-services/nutrifhir",
+  "name": "NutriFHIR Summary",
+  "title": "NutriFHIR Summary",
+  "hook": "patient-view",
+  "prefetch": {
+    "patient": "Patient/{{Patient.id}}"
+  }
+}
