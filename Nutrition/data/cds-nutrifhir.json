@@ -1,29 +1,21 @@
 {
-"summary": "NutriFHIR Summary",
-"indicator": "warning",
-"detail": "*NutriSavings:* 64 *HEI:* 90",
-"source": [
-{
-"label": "NutriSavings",
-"url": "nutrisavings.com",
-"icon": "http://127.0.0.1:5000/img"
-},
-{
-"label": "Healthy Eating Index",
-"url": "hei.com",
-"icon": "http://127.0.0.1:5000/img"
-}
-],
-"links": [
+   "cards": [
     {
-    "label": "NutriFHIR",
-    "url": "https://NutriFHIR.com",
-    "type": "absolute"
+        "summary": "NutriFHIR Summary",
+        "indicator": "info",
+        "detail": "<style type='text/css'>z{color:#384e74;margin:0} y{color:#E5980B;margin:0} r{color:#B90907;margin:0} g{color:#14A10A;margin:0}</style> <z><h6>Last updated: <z> <g>April 14, 2018</g></h6> <z><h6>NutriSavings Score: </z><y>64</y></h6> <z><h6>HEI: </z><r>41</r></h6> <z><h6> AHEI: </z><r>53</r></h6> <z><h6> DASH: </z><y>66</y></h6>",
+        "source": {
+            "label": "NutriFHIR",
+            "url": "https://NutriFHIR.com",
+            "type": "smart",
+            "appContext": "module-123",
+            "icon": "http://localhost:6001/img/apple"
+        },
+        "suggestions": [
+            {
+            "label": "Suggest to provide dietary counseling"
+            }
+        ]
     }
-],
-"suggestions": [
-    {
-    "label": "Consider dietary scrutiny and modification"
-    }
-]
+    ]
 }
