@@ -1,0 +1,9 @@
+{
+    "hook": "patient-view",
+    "title": "Diet Indicator Summary Tool",
+    "description": "A CDSHooks services for NutriFHIR which provides summary findings of the patient's personal and environmental dietary indicators.",
+    "id": "nutrifhir-summary",
+    "prefetch": {
+        "patient": "Patient/{{Patient.id}}"
+    }
+}

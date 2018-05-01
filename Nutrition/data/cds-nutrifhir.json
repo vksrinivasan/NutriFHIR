@@ -1,0 +1,29 @@
+{
+"summary": "NutriFHIR Summary",
+"indicator": "warning",
+"detail": "*NutriSavings:* 64 *HEI:* 90",
+"source": [
+{
+"label": "NutriSavings",
+"url": "nutrisavings.com",
+"icon": "http://127.0.0.1:5000/img"
+},
+{
+"label": "Healthy Eating Index",
+"url": "hei.com",
+"icon": "http://127.0.0.1:5000/img"
+}
+],
+"links": [
+    {
+    "label": "NutriFHIR",
+    "url": "https://NutriFHIR.com",
+    "type": "absolute"
+    }
+],
+"suggestions": [
+    {
+    "label": "Consider dietary scrutiny and modification"
+    }
+]
+}
