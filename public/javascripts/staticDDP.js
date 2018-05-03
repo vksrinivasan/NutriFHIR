@@ -995,10 +995,11 @@ function getNutriSavingsData_randomized() {
 		function (obj) { 
 			return obj.activityID === "NS012"; 
 		}
-	).activityValue);
+	).activityDate);
 	
 	
-	var dates = [new Date(2018,0,1), new Date(2018,1,1),new Date(2018,2,1),nutriSavingsScoreDate];
+	//var dates = [new Date(2018,0,1), new Date(2018,1,1),new Date(2018,2,1),nutriSavingsScoreDate];
+	var dates = [new Date(2018,0,1), new Date(2018,1,1),new Date(2018,2,1),new Date(2018,3,1)];
 	var scores = [[], [], [], []];
 
 	for(i = 0; i < dates.length; i++) {
